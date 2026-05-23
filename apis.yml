@@ -1,0 +1,148 @@
+aid: airslate
+url: https://raw.githubusercontent.com/api-evangelist/airslate/refs/heads/main/apis.yml
+name: airSlate
+kind: company
+description: >-
+  airSlate is a document workflow automation holding company whose product
+  family covers no-code workflow automation (altaFlow, formerly airSlate
+  WorkFlow), electronic signature (signNow), PDF editing and form filling
+  (pdfFiller and DocHub), legal forms (US Legal Forms), landing pages
+  (Instapage), and an AI-powered marketing intelligence platform. Developer
+  APIs are exposed primarily through the signNow and pdfFiller product lines;
+  WorkFlow / altaFlow surfaces automation bots and integrations rather than a
+  broad public REST API.
+image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+tags:
+  - Document Automation
+  - eSignature
+  - Workflow
+  - PDF
+  - No-Code
+  - AI
+created: '2026-05-23'
+modified: '2026-05-23'
+specificationVersion: '0.19'
+apis:
+  - aid: airslate:workflow
+    name: airSlate WorkFlow (altaFlow)
+    description: >-
+      No-code document workflow automation platform (recently rebranded as
+      altaFlow). Supports building workflows that combine forms, contracts,
+      bots, and integrations across CRM and ERP systems. Developer access is
+      primarily via prebuilt bots and integration connectors.
+    humanURL: https://www.airslate.com/workflow
+    baseURL: https://www.airslate.com/workflow
+    tags:
+      - Workflow Automation
+      - No-Code
+      - Bots
+    properties:
+      - type: Website
+        url: https://www.airslate.com/workflow
+  - aid: airslate:signnow
+    name: signNow API
+    description: >-
+      REST API for signNow, airSlate's electronic signature product. Covers
+      documents, signatures, templates, users, groups, fields, and webhooks.
+      Supports OAuth 2.0 with production base api.signnow.com and evaluation
+      base api-eval.signnow.com.
+    humanURL: https://docs.signnow.com/
+    baseURL: https://api.signnow.com
+    tags:
+      - eSignature
+      - REST
+      - OAuth2
+    properties:
+      - type: Documentation
+        url: https://docs.signnow.com/
+  - aid: airslate:pdffiller
+    name: pdfFiller API
+    description: >-
+      REST API for pdfFiller, covering document upload and conversion, form
+      filling, templates, and e-signature flows. Used to embed PDF editing
+      and form workflows into third-party applications.
+    humanURL: https://www.pdffiller.com/en/api
+    baseURL: https://api.pdffiller.com/v2
+    tags:
+      - PDF
+      - Forms
+      - Document Editing
+    properties:
+      - type: Documentation
+        url: https://www.pdffiller.com/en/api
+  - aid: airslate:dochub
+    name: DocHub
+    description: >-
+      Cloud PDF editor that integrates with Google Workspace. Provides editing,
+      signing, and sharing of PDFs from inside Google apps. Programmatic
+      access is primarily via Google Workspace integration surfaces.
+    humanURL: https://dochub.com/
+    baseURL: https://dochub.com/
+    tags:
+      - PDF
+      - Google Workspace
+    properties:
+      - type: Website
+        url: https://dochub.com/
+  - aid: airslate:us-legal-forms
+    name: US Legal Forms
+    description: >-
+      Online catalog of 85,000+ state-specific legal forms. Consumer and SMB
+      product; no public developer API.
+    humanURL: https://www.uslegalforms.com/
+    baseURL: https://www.uslegalforms.com/
+    tags:
+      - Legal Forms
+    properties:
+      - type: Website
+        url: https://www.uslegalforms.com/
+  - aid: airslate:instapage
+    name: Instapage
+    description: >-
+      Landing page builder and personalization platform. Offers REST endpoints
+      for account integration via the Instapage developer surface.
+    humanURL: https://instapage.com/
+    baseURL: https://instapage.com/
+    tags:
+      - Landing Pages
+      - Marketing
+    properties:
+      - type: Website
+        url: https://instapage.com/
+  - aid: airslate:marketing-intelligence
+    name: airSlate Marketing Intelligence Platform
+    description: >-
+      AI-powered automation platform for end-to-end marketing operations.
+      Positioned as a vertical AI product rather than a developer API.
+    humanURL: https://www.airslate.com/
+    baseURL: https://www.airslate.com/
+    tags:
+      - AI
+      - Marketing
+    properties:
+      - type: Website
+        url: https://www.airslate.com/
+common:
+  - type: Website
+    url: https://www.airslate.com/
+  - type: Documentation
+    url: https://docs.signnow.com/
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/airslate
+  - type: GitHub
+    url: https://github.com/signnow
+  - type: Twitter
+    url: https://twitter.com/airSlate_
+integrations:
+  - name: Salesforce
+  - name: Microsoft Dynamics 365
+  - name: NetSuite
+  - name: HubSpot
+  - name: Google Workspace
+  - name: Microsoft 365
+  - name: Dropbox
+  - name: Box
+  - name: Slack
+maintainers:
+  - FN: Kin Lane
+    email: kin@apievangelist.com
