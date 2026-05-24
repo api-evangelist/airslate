@@ -1,0 +1,424 @@
+openapi: 3.1.0
+info:
+  title: airSlate signNow REST API
+  version: "v2"
+  description: |
+    Best-effort OpenAPI 3.1 representation of the airSlate signNow REST API.
+    airSlate exposes its developer API primarily through the signNow product
+    family. Endpoint paths and request shapes are derived from the official
+    signNow Python SDK (github.com/signnow/SNPythonSDK) and public docs at
+    https://docs.signnow.com/. Authentication uses OAuth 2.0 with a Basic
+    token for the application credential and resource-owner password or
+    client credentials grant for the access token.
+  contact:
+    name: airSlate signNow
+    url: https://docs.signnow.com/
+servers:
+  - url: https://api.signnow.com
+    description: signNow production API
+  - url: https://api-eval.signnow.com
+    description: signNow evaluation/sandbox API
+tags:
+  - name: OAuth
+  - name: Users
+  - name: Documents
+  - name: Document Fields
+  - name: Document Groups
+  - name: Folders
+  - name: Templates
+  - name: Invites
+  - name: Embedded
+  - name: Smart Fields
+  - name: Webhooks
+paths:
+  /oauth2/token:
+    post:
+      tags: [OAuth]
+      summary: Obtain OAuth2 access token
+      operationId: createToken
+      responses:
+        '200': { description: Token issued }
+    get:
+      tags: [OAuth]
+      summary: Verify OAuth2 access token
+      operationId: verifyToken
+      responses:
+        '200': { description: OK }
+  /user:
+    get:
+      tags: [Users]
+      summary: Get current user
+      operationId: getUser
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [Users]
+      summary: Create user
+      operationId: createUser
+      responses:
+        '201': { description: Created }
+    put:
+      tags: [Users]
+      summary: Update user
+      operationId: updateUser
+      responses:
+        '200': { description: OK }
+  /user/email/verify:
+    put:
+      tags: [Users]
+      summary: Verify user email
+      operationId: verifyUserEmail
+      responses:
+        '200': { description: OK }
+  /user/forgotpassword:
+    post:
+      tags: [Users]
+      summary: Request password reset
+      operationId: resetPassword
+      responses:
+        '200': { description: OK }
+  /document:
+    post:
+      tags: [Documents]
+      summary: Upload a document
+      operationId: createDocument
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201': { description: Created }
+  /document/{document_id}:
+    get:
+      tags: [Documents]
+      summary: Retrieve a document
+      operationId: getDocument
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+    put:
+      tags: [Documents]
+      summary: Update document fields/metadata
+      operationId: updateDocument
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+    delete:
+      tags: [Documents]
+      summary: Delete document
+      operationId: deleteDocument
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '204': { description: Deleted }
+  /document/{document_id}/download:
+    get:
+      tags: [Documents]
+      summary: Download document
+      operationId: downloadDocument
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /document/{document_id}/download/link:
+    post:
+      tags: [Documents]
+      summary: Generate a one-time download link
+      operationId: createDownloadLink
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /document/{document_id}/historyfull:
+    get:
+      tags: [Documents]
+      summary: Get full document history
+      operationId: getDocumentHistory
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /document/merge:
+    post:
+      tags: [Documents]
+      summary: Merge documents into one
+      operationId: mergeDocuments
+      responses:
+        '200': { description: OK }
+  /document/{document_id}/move:
+    post:
+      tags: [Documents]
+      summary: Move document to a folder
+      operationId: moveDocument
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /document/{document_id}/fields:
+    get:
+      tags: [Document Fields]
+      summary: List fields on a document
+      operationId: getDocumentFields
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /document/{document_id}/fieldextract:
+    post:
+      tags: [Document Fields]
+      summary: Extract fields from a document
+      operationId: extractDocumentFields
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /v2/documents/{document_id}/prefill-texts:
+    put:
+      tags: [Document Fields]
+      summary: Prefill text fields on a document
+      operationId: prefillDocumentFields
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /document/{document_id}/integration/object/smartfields:
+    post:
+      tags: [Smart Fields]
+      summary: Prefill smart fields on a document
+      operationId: prefillSmartFields
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /folder:
+    get:
+      tags: [Folders]
+      summary: List folders
+      operationId: listFolders
+      responses:
+        '200': { description: OK }
+  /folder/{folder_id}:
+    get:
+      tags: [Folders]
+      summary: List documents in folder
+      operationId: getFolderDocuments
+      parameters:
+        - { name: folder_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /documentgroup:
+    post:
+      tags: [Document Groups]
+      summary: Create a document group
+      operationId: createDocumentGroup
+      responses:
+        '201': { description: Created }
+  /documentgroup/{document_group_id}:
+    get:
+      tags: [Document Groups]
+      summary: Retrieve a document group
+      operationId: getDocumentGroup
+      parameters:
+        - { name: document_group_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+    delete:
+      tags: [Document Groups]
+      summary: Delete a document group
+      operationId: deleteDocumentGroup
+      parameters:
+        - { name: document_group_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '204': { description: Deleted }
+  /documentgroup/{document_group_id}/downloadall:
+    post:
+      tags: [Document Groups]
+      summary: Download all documents in a group
+      operationId: downloadDocumentGroup
+      parameters:
+        - { name: document_group_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /v2/document-groups/{document_group_id}/recipients:
+    get:
+      tags: [Document Groups]
+      summary: List document group recipients
+      operationId: getDocumentGroupRecipients
+      parameters:
+        - { name: document_group_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+    put:
+      tags: [Document Groups]
+      summary: Update document group recipients
+      operationId: updateDocumentGroupRecipients
+      parameters:
+        - { name: document_group_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /template:
+    post:
+      tags: [Templates]
+      summary: Create a template
+      operationId: createTemplate
+      responses:
+        '201': { description: Created }
+  /template/{template_id}/copy:
+    post:
+      tags: [Templates]
+      summary: Clone a template
+      operationId: cloneTemplate
+      parameters:
+        - { name: template_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '201': { description: Cloned }
+  /template/{document_id}/bulkinvite:
+    post:
+      tags: [Templates]
+      summary: Bulk invite signers using a template
+      operationId: bulkInvite
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /documentgroup/template/{template_id}:
+    get:
+      tags: [Templates]
+      summary: Get a document group template
+      operationId: getGroupTemplate
+      parameters:
+        - { name: template_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+    put:
+      tags: [Templates]
+      summary: Update a document group template
+      operationId: updateGroupTemplate
+      parameters:
+        - { name: template_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /document/{document_id}/invite:
+    post:
+      tags: [Invites]
+      summary: Send field or free-form invite
+      operationId: sendInvite
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Sent }
+  /document/{document_id}/fieldinvitecancel:
+    put:
+      tags: [Invites]
+      summary: Cancel a field invite
+      operationId: cancelFieldInvite
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /invite/{invite_id}/cancel:
+    put:
+      tags: [Invites]
+      summary: Cancel a free-form invite
+      operationId: cancelFreeFormInvite
+      parameters:
+        - { name: invite_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /v2/documents/{document_id}/free-form-invites:
+    get:
+      tags: [Invites]
+      summary: List free-form invites on a document
+      operationId: listFreeFormInvites
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /link:
+    post:
+      tags: [Invites]
+      summary: Create a signing link
+      operationId: createSigningLink
+      responses:
+        '200': { description: OK }
+  /v2/documents/{document_id}/embedded-invites:
+    post:
+      tags: [Embedded]
+      summary: Create embedded invite
+      operationId: createEmbeddedInvite
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /v2/documents/{document_id}/embedded-sending:
+    post:
+      tags: [Embedded]
+      summary: Create embedded sending link
+      operationId: createEmbeddedSending
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /v2/documents/{document_id}/embedded-editor:
+    post:
+      tags: [Embedded]
+      summary: Create embedded editor link
+      operationId: createEmbeddedEditor
+      parameters:
+        - { name: document_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /api/v2/events:
+    get:
+      tags: [Webhooks]
+      summary: List webhook event subscriptions
+      operationId: listWebhooks
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [Webhooks]
+      summary: Create webhook event subscription
+      operationId: createWebhook
+      responses:
+        '201': { description: Created }
+  /api/v2/events/{event_subscription_id}:
+    put:
+      tags: [Webhooks]
+      summary: Update webhook event subscription
+      operationId: updateWebhook
+      parameters:
+        - { name: event_subscription_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+    delete:
+      tags: [Webhooks]
+      summary: Delete webhook event subscription
+      operationId: deleteWebhook
+      parameters:
+        - { name: event_subscription_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '204': { description: Deleted }
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: |
+        HTTP Basic auth carrying the application Basic Token (base64 of
+        client_id:client_secret) used against POST /oauth2/token.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        OAuth 2.0 bearer access token issued by /oauth2/token. Required on
+        all resource endpoints.
+security:
+  - BearerAuth: []
