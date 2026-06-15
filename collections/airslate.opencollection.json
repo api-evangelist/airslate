@@ -1,0 +1,819 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "airSlate signNow REST API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "OAuth",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Verify OAuth2 access token",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/oauth2/token"
+          },
+          "docs": "Verify OAuth2 access token"
+        },
+        {
+          "info": {
+            "name": "Obtain OAuth2 access token",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/oauth2/token"
+          },
+          "docs": "Obtain OAuth2 access token"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Users",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get current user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/user"
+          },
+          "docs": "Get current user"
+        },
+        {
+          "info": {
+            "name": "Create user",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/user"
+          },
+          "docs": "Create user"
+        },
+        {
+          "info": {
+            "name": "Update user",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/user"
+          },
+          "docs": "Update user"
+        },
+        {
+          "info": {
+            "name": "Verify user email",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/user/email/verify"
+          },
+          "docs": "Verify user email"
+        },
+        {
+          "info": {
+            "name": "Request password reset",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/user/forgotpassword"
+          },
+          "docs": "Request password reset"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Documents",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Upload a document",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/document",
+            "body": {
+              "type": "multipart-form",
+              "data": [
+                {
+                  "name": "file",
+                  "type": "text",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "docs": "Upload a document"
+        },
+        {
+          "info": {
+            "name": "Retrieve a document",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/document/:document_id",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Retrieve a document"
+        },
+        {
+          "info": {
+            "name": "Update document fields/metadata",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/document/:document_id",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Update document fields/metadata"
+        },
+        {
+          "info": {
+            "name": "Delete document",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.signnow.com/document/:document_id",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete document"
+        },
+        {
+          "info": {
+            "name": "Download document",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/document/:document_id/download",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Download document"
+        },
+        {
+          "info": {
+            "name": "Generate a one-time download link",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/document/:document_id/download/link",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Generate a one-time download link"
+        },
+        {
+          "info": {
+            "name": "Get full document history",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/document/:document_id/historyfull",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get full document history"
+        },
+        {
+          "info": {
+            "name": "Merge documents into one",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/document/merge"
+          },
+          "docs": "Merge documents into one"
+        },
+        {
+          "info": {
+            "name": "Move document to a folder",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/document/:document_id/move",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Move document to a folder"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Document Fields",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List fields on a document",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/document/:document_id/fields",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "List fields on a document"
+        },
+        {
+          "info": {
+            "name": "Extract fields from a document",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/document/:document_id/fieldextract",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Extract fields from a document"
+        },
+        {
+          "info": {
+            "name": "Prefill text fields on a document",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/v2/documents/:document_id/prefill-texts",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Prefill text fields on a document"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Smart Fields",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Prefill smart fields on a document",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/document/:document_id/integration/object/smartfields",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Prefill smart fields on a document"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Folders",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List folders",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/folder"
+          },
+          "docs": "List folders"
+        },
+        {
+          "info": {
+            "name": "List documents in folder",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/folder/:folder_id",
+            "params": [
+              {
+                "name": "folder_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "List documents in folder"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Document Groups",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a document group",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/documentgroup"
+          },
+          "docs": "Create a document group"
+        },
+        {
+          "info": {
+            "name": "Retrieve a document group",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/documentgroup/:document_group_id",
+            "params": [
+              {
+                "name": "document_group_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Retrieve a document group"
+        },
+        {
+          "info": {
+            "name": "Delete a document group",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.signnow.com/documentgroup/:document_group_id",
+            "params": [
+              {
+                "name": "document_group_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete a document group"
+        },
+        {
+          "info": {
+            "name": "Download all documents in a group",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/documentgroup/:document_group_id/downloadall",
+            "params": [
+              {
+                "name": "document_group_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Download all documents in a group"
+        },
+        {
+          "info": {
+            "name": "List document group recipients",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/v2/document-groups/:document_group_id/recipients",
+            "params": [
+              {
+                "name": "document_group_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "List document group recipients"
+        },
+        {
+          "info": {
+            "name": "Update document group recipients",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/v2/document-groups/:document_group_id/recipients",
+            "params": [
+              {
+                "name": "document_group_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Update document group recipients"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Templates",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a template",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/template"
+          },
+          "docs": "Create a template"
+        },
+        {
+          "info": {
+            "name": "Clone a template",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/template/:template_id/copy",
+            "params": [
+              {
+                "name": "template_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Clone a template"
+        },
+        {
+          "info": {
+            "name": "Bulk invite signers using a template",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/template/:document_id/bulkinvite",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Bulk invite signers using a template"
+        },
+        {
+          "info": {
+            "name": "Get a document group template",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/documentgroup/template/:template_id",
+            "params": [
+              {
+                "name": "template_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get a document group template"
+        },
+        {
+          "info": {
+            "name": "Update a document group template",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/documentgroup/template/:template_id",
+            "params": [
+              {
+                "name": "template_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Update a document group template"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Invites",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Send field or free-form invite",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/document/:document_id/invite",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Send field or free-form invite"
+        },
+        {
+          "info": {
+            "name": "Cancel a field invite",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/document/:document_id/fieldinvitecancel",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Cancel a field invite"
+        },
+        {
+          "info": {
+            "name": "Cancel a free-form invite",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/invite/:invite_id/cancel",
+            "params": [
+              {
+                "name": "invite_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Cancel a free-form invite"
+        },
+        {
+          "info": {
+            "name": "List free-form invites on a document",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/v2/documents/:document_id/free-form-invites",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "List free-form invites on a document"
+        },
+        {
+          "info": {
+            "name": "Create a signing link",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/link"
+          },
+          "docs": "Create a signing link"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Embedded",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create embedded invite",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/v2/documents/:document_id/embedded-invites",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Create embedded invite"
+        },
+        {
+          "info": {
+            "name": "Create embedded sending link",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/v2/documents/:document_id/embedded-sending",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Create embedded sending link"
+        },
+        {
+          "info": {
+            "name": "Create embedded editor link",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/v2/documents/:document_id/embedded-editor",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Create embedded editor link"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Webhooks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List webhook event subscriptions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/api/v2/events"
+          },
+          "docs": "List webhook event subscriptions"
+        },
+        {
+          "info": {
+            "name": "Create webhook event subscription",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/api/v2/events"
+          },
+          "docs": "Create webhook event subscription"
+        },
+        {
+          "info": {
+            "name": "Update webhook event subscription",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/api/v2/events/:event_subscription_id",
+            "params": [
+              {
+                "name": "event_subscription_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Update webhook event subscription"
+        },
+        {
+          "info": {
+            "name": "Delete webhook event subscription",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.signnow.com/api/v2/events/:event_subscription_id",
+            "params": [
+              {
+                "name": "event_subscription_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete webhook event subscription"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
