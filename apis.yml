@@ -123,6 +123,12 @@ apis:
       - type: Website
         url: https://www.airslate.com/
 common:
+  - type: DomainSecurity
+    url: security/airslate-domain-security.yml
+  - type: Authentication
+    url: authentication/airslate-authentication.yml
+  - url: https://blog.airslate.com/feed/
+    type: Blog
   - type: Website
     url: https://www.airslate.com/
   - type: Documentation

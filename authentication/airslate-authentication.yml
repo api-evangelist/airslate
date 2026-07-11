@@ -1,0 +1,23 @@
+generated: '2026-07-11'
+method: derived
+source: openapi/airslate-openapi.yml
+summary:
+  types:
+  - http
+schemes:
+- name: BasicAuth
+  type: http
+  scheme: basic
+  description: |-
+    HTTP Basic auth carrying the application Basic Token (base64 of
+    client_id:client_secret) used against POST /oauth2/token.
+  sources:
+  - openapi/airslate-openapi.yml
+- name: BearerAuth
+  type: http
+  scheme: bearer
+  description: |-
+    OAuth 2.0 bearer access token issued by /oauth2/token. Required on
+    all resource endpoints.
+  sources:
+  - openapi/airslate-openapi.yml
