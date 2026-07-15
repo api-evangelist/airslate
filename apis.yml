@@ -123,6 +123,8 @@ apis:
       - type: Website
         url: https://www.airslate.com/
 common:
+  - type: AgenticAccess
+    url: agentic-access/airslate-agentic-access.yml
   - type: DomainSecurity
     url: security/airslate-domain-security.yml
   - type: Authentication
