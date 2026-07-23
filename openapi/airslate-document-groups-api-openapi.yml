@@ -1,0 +1,132 @@
+openapi: 3.1.0
+info:
+  title: airSlate signNow REST Document Fields Document Groups API
+  version: v2
+  description: 'Best-effort OpenAPI 3.1 representation of the airSlate signNow REST API.
+
+    airSlate exposes its developer API primarily through the signNow product
+
+    family. Endpoint paths and request shapes are derived from the official
+
+    signNow Python SDK (github.com/signnow/SNPythonSDK) and public docs at
+
+    https://docs.signnow.com/. Authentication uses OAuth 2.0 with a Basic
+
+    token for the application credential and resource-owner password or
+
+    client credentials grant for the access token.
+
+    '
+  contact:
+    name: airSlate signNow
+    url: https://docs.signnow.com/
+servers:
+- url: https://api.signnow.com
+  description: signNow production API
+- url: https://api-eval.signnow.com
+  description: signNow evaluation/sandbox API
+security:
+- BearerAuth: []
+tags:
+- name: Document Groups
+paths:
+  /documentgroup:
+    post:
+      tags:
+      - Document Groups
+      summary: Create a document group
+      operationId: createDocumentGroup
+      responses:
+        '201':
+          description: Created
+  /documentgroup/{document_group_id}:
+    get:
+      tags:
+      - Document Groups
+      summary: Retrieve a document group
+      operationId: getDocumentGroup
+      parameters:
+      - name: document_group_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+      - Document Groups
+      summary: Delete a document group
+      operationId: deleteDocumentGroup
+      parameters:
+      - name: document_group_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Deleted
+  /documentgroup/{document_group_id}/downloadall:
+    post:
+      tags:
+      - Document Groups
+      summary: Download all documents in a group
+      operationId: downloadDocumentGroup
+      parameters:
+      - name: document_group_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /v2/document-groups/{document_group_id}/recipients:
+    get:
+      tags:
+      - Document Groups
+      summary: List document group recipients
+      operationId: getDocumentGroupRecipients
+      parameters:
+      - name: document_group_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+    put:
+      tags:
+      - Document Groups
+      summary: Update document group recipients
+      operationId: updateDocumentGroupRecipients
+      parameters:
+      - name: document_group_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: 'HTTP Basic auth carrying the application Basic Token (base64 of
+
+        client_id:client_secret) used against POST /oauth2/token.
+
+        '
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: 'OAuth 2.0 bearer access token issued by /oauth2/token. Required on
+
+        all resource endpoints.
+
+        '

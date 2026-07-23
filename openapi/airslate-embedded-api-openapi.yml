@@ -1,0 +1,95 @@
+openapi: 3.1.0
+info:
+  title: airSlate signNow REST Document Fields Embedded API
+  version: v2
+  description: 'Best-effort OpenAPI 3.1 representation of the airSlate signNow REST API.
+
+    airSlate exposes its developer API primarily through the signNow product
+
+    family. Endpoint paths and request shapes are derived from the official
+
+    signNow Python SDK (github.com/signnow/SNPythonSDK) and public docs at
+
+    https://docs.signnow.com/. Authentication uses OAuth 2.0 with a Basic
+
+    token for the application credential and resource-owner password or
+
+    client credentials grant for the access token.
+
+    '
+  contact:
+    name: airSlate signNow
+    url: https://docs.signnow.com/
+servers:
+- url: https://api.signnow.com
+  description: signNow production API
+- url: https://api-eval.signnow.com
+  description: signNow evaluation/sandbox API
+security:
+- BearerAuth: []
+tags:
+- name: Embedded
+paths:
+  /v2/documents/{document_id}/embedded-invites:
+    post:
+      tags:
+      - Embedded
+      summary: Create embedded invite
+      operationId: createEmbeddedInvite
+      parameters:
+      - name: document_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /v2/documents/{document_id}/embedded-sending:
+    post:
+      tags:
+      - Embedded
+      summary: Create embedded sending link
+      operationId: createEmbeddedSending
+      parameters:
+      - name: document_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /v2/documents/{document_id}/embedded-editor:
+    post:
+      tags:
+      - Embedded
+      summary: Create embedded editor link
+      operationId: createEmbeddedEditor
+      parameters:
+      - name: document_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: 'HTTP Basic auth carrying the application Basic Token (base64 of
+
+        client_id:client_secret) used against POST /oauth2/token.
+
+        '
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: 'OAuth 2.0 bearer access token issued by /oauth2/token. Required on
+
+        all resource endpoints.
+
+        '
