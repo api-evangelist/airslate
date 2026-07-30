@@ -11,7 +11,20 @@ description: >-
   APIs are exposed primarily through the signNow and pdfFiller product lines;
   WorkFlow / altaFlow surfaces automation bots and integrations rather than a
   broad public REST API.
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+accessModel:
+  pricing: free
+  onboarding: self-serve
+  trial: false
+  try_now: true
+  public: false
+  label: Free · Self-serve signup
+  confidence: high
+  source:
+  - plans
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/airslate.png
 tags:
   - Document Automation
   - eSignature
@@ -23,105 +36,211 @@ created: '2026-05-23'
 modified: '2026-05-23'
 specificationVersion: '0.19'
 apis:
-  - aid: airslate:workflow
-    name: airSlate WorkFlow (altaFlow)
-    description: >-
-      No-code document workflow automation platform (recently rebranded as
-      altaFlow). Supports building workflows that combine forms, contracts,
-      bots, and integrations across CRM and ERP systems. Developer access is
-      primarily via prebuilt bots and integration connectors.
-    humanURL: https://www.airslate.com/workflow
-    baseURL: https://www.airslate.com/workflow
-    tags:
-      - Workflow Automation
-      - No-Code
-      - Bots
-    properties:
-      - type: Website
-        url: https://www.airslate.com/workflow
-  - aid: airslate:signnow
-    name: signNow API
-    description: >-
-      REST API for signNow, airSlate's electronic signature product. Covers
-      documents, signatures, templates, users, groups, fields, and webhooks.
-      Supports OAuth 2.0 with production base api.signnow.com and evaluation
-      base api-eval.signnow.com.
-    humanURL: https://docs.signnow.com/
-    baseURL: https://api.signnow.com
-    tags:
-      - eSignature
-      - REST
-      - OAuth2
-    properties:
-      - type: Documentation
-        url: https://docs.signnow.com/
-  - aid: airslate:pdffiller
-    name: pdfFiller API
-    description: >-
-      REST API for pdfFiller, covering document upload and conversion, form
-      filling, templates, and e-signature flows. Used to embed PDF editing
-      and form workflows into third-party applications.
-    humanURL: https://www.pdffiller.com/en/api
-    baseURL: https://api.pdffiller.com/v2
-    tags:
-      - PDF
-      - Forms
-      - Document Editing
-    properties:
-      - type: Documentation
-        url: https://www.pdffiller.com/en/api
-  - aid: airslate:dochub
-    name: DocHub
-    description: >-
-      Cloud PDF editor that integrates with Google Workspace. Provides editing,
-      signing, and sharing of PDFs from inside Google apps. Programmatic
-      access is primarily via Google Workspace integration surfaces.
-    humanURL: https://dochub.com/
-    baseURL: https://dochub.com/
-    tags:
-      - PDF
-      - Google Workspace
-    properties:
-      - type: Website
-        url: https://dochub.com/
-  - aid: airslate:us-legal-forms
-    name: US Legal Forms
-    description: >-
-      Online catalog of 85,000+ state-specific legal forms. Consumer and SMB
-      product; no public developer API.
-    humanURL: https://www.uslegalforms.com/
-    baseURL: https://www.uslegalforms.com/
-    tags:
-      - Legal Forms
-    properties:
-      - type: Website
-        url: https://www.uslegalforms.com/
-  - aid: airslate:instapage
-    name: Instapage
-    description: >-
-      Landing page builder and personalization platform. Offers REST endpoints
-      for account integration via the Instapage developer surface.
-    humanURL: https://instapage.com/
-    baseURL: https://instapage.com/
-    tags:
-      - Landing Pages
-      - Marketing
-    properties:
-      - type: Website
-        url: https://instapage.com/
-  - aid: airslate:marketing-intelligence
-    name: airSlate Marketing Intelligence Platform
-    description: >-
-      AI-powered automation platform for end-to-end marketing operations.
-      Positioned as a vertical AI product rather than a developer API.
-    humanURL: https://www.airslate.com/
-    baseURL: https://www.airslate.com/
-    tags:
-      - AI
-      - Marketing
-    properties:
-      - type: Website
-        url: https://www.airslate.com/
+- aid: airslate:workflow
+  name: airSlate WorkFlow (altaFlow)
+  description: >-
+    No-code document workflow automation platform (recently rebranded as altaFlow). Supports building
+    workflows that combine forms, contracts, bots, and integrations across CRM and ERP systems. Developer
+    access is primarily via prebuilt bots and integration connectors.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Workflow Automation
+  - No-Code
+  - Bots
+  properties:
+  - type: Website
+    url: https://www.airslate.com/workflow
+- aid: airslate:signnow
+  name: signNow API
+  description: >-
+    REST API for signNow, airSlate's electronic signature product. Covers documents, signatures, templates,
+    users, groups, fields, and webhooks. Supports OAuth 2.0 with production base api.signnow.com and evaluation
+    base api-eval.signnow.com.
+  humanURL: https://docs.signnow.com/
+  baseURL: https://api.signnow.com
+  tags:
+  - eSignature
+  - REST
+  - OAuth2
+  properties:
+  - type: Documentation
+    url: https://docs.signnow.com/
+- aid: airslate:pdffiller
+  name: pdfFiller API
+  description: >-
+    REST API for pdfFiller, covering document upload and conversion, form filling, templates, and e-signature
+    flows. Used to embed PDF editing and form workflows into third-party applications.
+  humanURL: https://www.pdffiller.com/en/api
+  baseURL: https://api.pdffiller.com/v2
+  tags:
+  - PDF
+  - Forms
+  - Document Editing
+  properties:
+  - type: Documentation
+    url: https://www.pdffiller.com/en/api
+- aid: airslate:dochub
+  name: DocHub
+  description: >-
+    Cloud PDF editor that integrates with Google Workspace. Provides editing, signing, and sharing of
+    PDFs from inside Google apps. Programmatic access is primarily via Google Workspace integration surfaces.
+  humanURL: https://dochub.com/
+  baseURL: https://dochub.com/
+  tags:
+  - PDF
+  - Google Workspace
+  properties:
+  - type: Website
+    url: https://dochub.com/
+- aid: airslate:us-legal-forms
+  name: US Legal Forms
+  description: >-
+    Online catalog of 85,000+ state-specific legal forms. Consumer and SMB product; no public developer
+    API.
+  humanURL: https://www.uslegalforms.com/
+  baseURL: https://www.uslegalforms.com/
+  tags:
+  - Legal Forms
+  properties:
+  - type: Website
+    url: https://www.uslegalforms.com/
+- aid: airslate:instapage
+  name: Instapage
+  description: >-
+    Landing page builder and personalization platform. Offers REST endpoints for account integration via
+    the Instapage developer surface.
+  humanURL: https://instapage.com/
+  baseURL: https://instapage.com/
+  tags:
+  - Landing Pages
+  - Marketing
+  properties:
+  - type: Website
+    url: https://instapage.com/
+- aid: airslate:marketing-intelligence
+  name: airSlate Marketing Intelligence Platform
+  description: >-
+    AI-powered automation platform for end-to-end marketing operations. Positioned as a vertical AI product
+    rather than a developer API.
+  humanURL: https://www.airslate.com/
+  baseURL: https://www.airslate.com/
+  tags:
+  - AI
+  - Marketing
+  properties:
+  - type: Website
+    url: https://www.airslate.com/
+- aid: airslate:airslate-document-fields-api
+  name: airSlate Document Fields API
+  description: The Document Fields API from airSlate — 3 operation(s) for document fields.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Document Fields
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-document-fields-api-openapi.yml
+- aid: airslate:airslate-document-groups-api
+  name: airSlate Document Groups API
+  description: The Document Groups API from airSlate — 4 operation(s) for document groups.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Document Groups
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-document-groups-api-openapi.yml
+- aid: airslate:airslate-documents-api
+  name: airSlate Documents API
+  description: The Documents API from airSlate — 7 operation(s) for documents.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Documents
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-documents-api-openapi.yml
+- aid: airslate:airslate-embedded-api
+  name: airSlate Embedded API
+  description: The Embedded API from airSlate — 3 operation(s) for embedded.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Embedded
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-embedded-api-openapi.yml
+- aid: airslate:airslate-folders-api
+  name: airSlate Folders API
+  description: The Folders API from airSlate — 2 operation(s) for folders.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Folders
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-folders-api-openapi.yml
+- aid: airslate:airslate-invites-api
+  name: airSlate Invites API
+  description: The Invites API from airSlate — 5 operation(s) for invites.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Invites
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-invites-api-openapi.yml
+- aid: airslate:airslate-oauth-api
+  name: airSlate OAuth API
+  description: The OAuth API from airSlate — 1 operation(s) for oauth.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - OAuth
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-oauth-api-openapi.yml
+- aid: airslate:airslate-smart-fields-api
+  name: airSlate Smart Fields API
+  description: The Smart Fields API from airSlate — 1 operation(s) for smart fields.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Smart Fields
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-smart-fields-api-openapi.yml
+- aid: airslate:airslate-templates-api
+  name: airSlate Templates API
+  description: The Templates API from airSlate — 4 operation(s) for templates.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Templates
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-templates-api-openapi.yml
+- aid: airslate:airslate-users-api
+  name: airSlate Users API
+  description: The Users API from airSlate — 3 operation(s) for users.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Users
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-users-api-openapi.yml
+- aid: airslate:airslate-webhooks-api
+  name: airSlate Webhooks API
+  description: The Webhooks API from airSlate — 2 operation(s) for webhooks.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-webhooks-api-openapi.yml
 common:
   - type: AgenticAccess
     url: agentic-access/airslate-agentic-access.yml
