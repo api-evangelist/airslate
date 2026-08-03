@@ -1,0 +1,34 @@
+{
+  "provider": "airslate",
+  "sources": [
+    "airslate-document-fields-api-openapi.yml",
+    "airslate-document-groups-api-openapi.yml",
+    "airslate-documents-api-openapi.yml",
+    "airslate-embedded-api-openapi.yml",
+    "airslate-folders-api-openapi.yml",
+    "airslate-invites-api-openapi.yml",
+    "airslate-oauth-api-openapi.yml",
+    "airslate-smart-fields-api-openapi.yml",
+    "airslate-templates-api-openapi.yml",
+    "airslate-users-api-openapi.yml",
+    "airslate-webhooks-api-openapi.yml"
+  ],
+  "outputs": [
+    "airslate-document-fields-api-openapi.yml",
+    "airslate-document-groups-api-openapi.yml",
+    "airslate-documents-api-openapi.yml",
+    "airslate-embedded-api-openapi.yml",
+    "airslate-folders-api-openapi.yml",
+    "airslate-invites-api-openapi.yml",
+    "airslate-oauth-api-openapi.yml",
+    "airslate-smart-fields-api-openapi.yml",
+    "airslate-templates-api-openapi.yml",
+    "airslate-users-api-openapi.yml",
+    "airslate-webhooks-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}
