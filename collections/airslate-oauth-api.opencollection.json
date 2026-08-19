@@ -1,0 +1,46 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "airSlate signNow REST Document Fields OAuth API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "OAuth",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Verify OAuth2 access token",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/oauth2/token"
+          },
+          "docs": "Verify OAuth2 access token"
+        },
+        {
+          "info": {
+            "name": "Obtain OAuth2 access token",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/oauth2/token"
+          },
+          "docs": "Obtain OAuth2 access token"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

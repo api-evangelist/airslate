@@ -1,0 +1,82 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "airSlate signNow REST Document Fields Webhooks API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Webhooks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List webhook event subscriptions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/api/v2/events"
+          },
+          "docs": "List webhook event subscriptions"
+        },
+        {
+          "info": {
+            "name": "Create webhook event subscription",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/api/v2/events"
+          },
+          "docs": "Create webhook event subscription"
+        },
+        {
+          "info": {
+            "name": "Update webhook event subscription",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/api/v2/events/:event_subscription_id",
+            "params": [
+              {
+                "name": "event_subscription_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Update webhook event subscription"
+        },
+        {
+          "info": {
+            "name": "Delete webhook event subscription",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.signnow.com/api/v2/events/:event_subscription_id",
+            "params": [
+              {
+                "name": "event_subscription_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete webhook event subscription"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

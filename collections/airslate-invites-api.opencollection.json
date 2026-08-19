@@ -1,0 +1,107 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "airSlate signNow REST Document Fields Invites API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Invites",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Send field or free-form invite",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/document/:document_id/invite",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Send field or free-form invite"
+        },
+        {
+          "info": {
+            "name": "Cancel a field invite",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/document/:document_id/fieldinvitecancel",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Cancel a field invite"
+        },
+        {
+          "info": {
+            "name": "Cancel a free-form invite",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/invite/:invite_id/cancel",
+            "params": [
+              {
+                "name": "invite_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Cancel a free-form invite"
+        },
+        {
+          "info": {
+            "name": "List free-form invites on a document",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/v2/documents/:document_id/free-form-invites",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "List free-form invites on a document"
+        },
+        {
+          "info": {
+            "name": "Create a signing link",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/link"
+          },
+          "docs": "Create a signing link"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,78 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "airSlate signNow REST Document Fields Embedded API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Embedded",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create embedded invite",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/v2/documents/:document_id/embedded-invites",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Create embedded invite"
+        },
+        {
+          "info": {
+            "name": "Create embedded sending link",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/v2/documents/:document_id/embedded-sending",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Create embedded sending link"
+        },
+        {
+          "info": {
+            "name": "Create embedded editor link",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/v2/documents/:document_id/embedded-editor",
+            "params": [
+              {
+                "name": "document_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Create embedded editor link"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

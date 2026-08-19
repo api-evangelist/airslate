@@ -1,0 +1,79 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "airSlate signNow REST Document Fields Users API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Users",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get current user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/user"
+          },
+          "docs": "Get current user"
+        },
+        {
+          "info": {
+            "name": "Create user",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/user"
+          },
+          "docs": "Create user"
+        },
+        {
+          "info": {
+            "name": "Update user",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/user"
+          },
+          "docs": "Update user"
+        },
+        {
+          "info": {
+            "name": "Verify user email",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/user/email/verify"
+          },
+          "docs": "Verify user email"
+        },
+        {
+          "info": {
+            "name": "Request password reset",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/user/forgotpassword"
+          },
+          "docs": "Request password reset"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

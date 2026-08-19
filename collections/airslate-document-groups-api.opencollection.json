@@ -1,0 +1,125 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "airSlate signNow REST Document Fields Document Groups API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Document Groups",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a document group",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/documentgroup"
+          },
+          "docs": "Create a document group"
+        },
+        {
+          "info": {
+            "name": "Retrieve a document group",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/documentgroup/:document_group_id",
+            "params": [
+              {
+                "name": "document_group_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Retrieve a document group"
+        },
+        {
+          "info": {
+            "name": "Delete a document group",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.signnow.com/documentgroup/:document_group_id",
+            "params": [
+              {
+                "name": "document_group_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete a document group"
+        },
+        {
+          "info": {
+            "name": "Download all documents in a group",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.signnow.com/documentgroup/:document_group_id/downloadall",
+            "params": [
+              {
+                "name": "document_group_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Download all documents in a group"
+        },
+        {
+          "info": {
+            "name": "List document group recipients",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.signnow.com/v2/document-groups/:document_group_id/recipients",
+            "params": [
+              {
+                "name": "document_group_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "List document group recipients"
+        },
+        {
+          "info": {
+            "name": "Update document group recipients",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.signnow.com/v2/document-groups/:document_group_id/recipients",
+            "params": [
+              {
+                "name": "document_group_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Update document group recipients"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
