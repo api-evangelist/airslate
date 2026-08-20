@@ -27,6 +27,13 @@ accessModel:
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/airslate.png
 tags:
   - Document Automation
+  - E-Signature
+  - Workflows
+  - PDF
+  - No-Code
+  - Artificial Intelligence
+tags_raw:
+  - Document Automation
   - eSignature
   - Workflow
   - PDF
@@ -45,6 +52,10 @@ apis:
   humanURL: https://www.airslate.com/workflow
   baseURL: https://www.airslate.com/workflow
   tags:
+  - Workflow-Automation
+  - No-Code
+  - Bots
+  tags_raw:
   - Workflow Automation
   - No-Code
   - Bots
@@ -60,6 +71,10 @@ apis:
   humanURL: https://docs.signnow.com/
   baseURL: https://api.signnow.com
   tags:
+  - E-Signature
+  - REST
+  - Authentication
+  tags_raw:
   - eSignature
   - REST
   - OAuth2
@@ -126,6 +141,9 @@ apis:
   humanURL: https://www.airslate.com/
   baseURL: https://www.airslate.com/
   tags:
+  - Artificial Intelligence
+  - Marketing
+  tags_raw:
   - AI
   - Marketing
   properties:
@@ -197,6 +215,8 @@ apis:
   humanURL: https://www.airslate.com/workflow
   baseURL: https://www.airslate.com/workflow
   tags:
+  - Authentication
+  tags_raw:
   - OAuth
   properties:
   - type: OpenAPI
@@ -227,6 +247,8 @@ apis:
   humanURL: https://www.airslate.com/workflow
   baseURL: https://www.airslate.com/workflow
   tags:
+  - User
+  tags_raw:
   - Users
   properties:
   - type: OpenAPI
@@ -237,6 +259,8 @@ apis:
   humanURL: https://www.airslate.com/workflow
   baseURL: https://www.airslate.com/workflow
   tags:
+  - Webhook
+  tags_raw:
   - Webhooks
   properties:
   - type: OpenAPI
