@@ -11,6 +11,17 @@ description: >-
   APIs are exposed primarily through the signNow and pdfFiller product lines;
   WorkFlow / altaFlow surfaces automation bots and integrations rather than a
   broad public REST API.
+deliveryModel:
+  model: unknown
+  open_source: false
+  commercial: false
+  callable_host: true
+  label: Delivery model not determined — needs a product licence on record
+  confidence: low
+  source:
+  - openapi
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: free
   onboarding: self-serve
