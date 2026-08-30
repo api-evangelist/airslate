@@ -38,7 +38,7 @@ accessModel:
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/airslate.png
 tags:
   - Document Automation
-  - E-Signature
+  - eSignature
   - Workflows
   - PDF
   - No-Code
@@ -82,7 +82,7 @@ apis:
   humanURL: https://docs.signnow.com/
   baseURL: https://api.signnow.com
   tags:
-  - E-Signature
+  - eSignature
   - REST
   - Authentication
   tags_raw:
