@@ -221,18 +221,6 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/airslate-invites-api-openapi.yml
-- aid: airslate:airslate-oauth-api
-  name: airSlate OAuth API
-  description: The OAuth API from airSlate — 1 operation(s) for oauth.
-  humanURL: https://www.airslate.com/workflow
-  baseURL: https://www.airslate.com/workflow
-  tags:
-  - Authentication
-  tags_raw:
-  - OAuth
-  properties:
-  - type: OpenAPI
-    url: openapi/airslate-oauth-api-openapi.yml
 - aid: airslate:airslate-smart-fields-api
   name: airSlate Smart Fields API
   description: The Smart Fields API from airSlate — 1 operation(s) for smart fields.
@@ -277,6 +265,16 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/airslate-webhooks-api-openapi.yml
+- aid: airslate:airslate-oauth-api
+  name: airSlate O Auth API
+  description: The OAuth API from airSlate — 1 operation(s) for oauth.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - OAuth
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-oauth-api-openapi.yml
 common:
   - type: AgenticAccess
     url: agentic-access/airslate-agentic-access.yml
