@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: airSlate signNow REST Document Fields Documents API
+  title: airSlate signNow REST Documents API
   version: v2
   description: 'Best-effort OpenAPI 3.1 representation of the airSlate signNow REST API.
 
@@ -14,9 +14,7 @@ info:
 
     token for the application credential and resource-owner password or
 
-    client credentials grant for the access token.
-
-    '
+    client credentials grant for the access token.'
   contact:
     name: airSlate signNow
     url: https://docs.signnow.com/

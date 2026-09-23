@@ -1,17 +1,7 @@
 {
   "provider": "airslate",
   "sources": [
-    "airslate-document-fields-api-openapi.yml",
-    "airslate-document-groups-api-openapi.yml",
-    "airslate-documents-api-openapi.yml",
-    "airslate-embedded-api-openapi.yml",
-    "airslate-folders-api-openapi.yml",
-    "airslate-invites-api-openapi.yml",
-    "airslate-oauth-api-openapi.yml",
-    "airslate-smart-fields-api-openapi.yml",
-    "airslate-templates-api-openapi.yml",
-    "airslate-users-api-openapi.yml",
-    "airslate-webhooks-api-openapi.yml"
+    "_original/airslate-openapi.yml"
   ],
   "outputs": [
     "airslate-document-fields-api-openapi.yml",
@@ -26,9 +16,28 @@
     "airslate-users-api-openapi.yml",
     "airslate-webhooks-api-openapi.yml"
   ],
-  "archived": [],
+  "archived": [
+    "deleted 1 superseded output(s) from the previous generation"
+  ],
   "errors": [],
   "warnings": [],
-  "notes": [],
-  "skipped": []
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "airslate-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "superseded outputs removed: airslate-o-auth-api-openapi.yml",
+    "apis.yml register: written (+1 apis, 18 total)"
+  ],
+  "skipped": [
+    "airslate-document-fields-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "airslate-document-groups-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "airslate-documents-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "airslate-embedded-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "airslate-folders-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "airslate-invites-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "airslate-o-auth-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "airslate-smart-fields-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "airslate-templates-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "airslate-users-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "airslate-webhooks-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }
