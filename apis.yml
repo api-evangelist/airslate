@@ -64,13 +64,14 @@ apis:
   humanURL: https://www.airslate.com/workflow
   baseURL: https://www.airslate.com/workflow
   tags:
-  - Workflow-Automation
+  - Workflow Automation
   - No-Code
   - Bots
   tags_raw:
   - Workflow Automation
   - No-Code
   - Bots
+  - Workflow-Automation
   properties:
   - type: Website
     url: https://www.airslate.com/workflow
@@ -151,7 +152,6 @@ apis:
     AI-powered automation platform for end-to-end marketing operations. Positioned as a vertical AI product
     rather than a developer API.
   humanURL: https://www.airslate.com/
-  baseURL: https://www.airslate.com/
   tags:
   - Artificial Intelligence
   - Marketing
