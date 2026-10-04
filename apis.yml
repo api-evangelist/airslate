@@ -278,6 +278,9 @@ apis:
   - type: OpenAPI
     url: openapi/airslate-oauth-api-openapi.yml
 common:
+  - type: CapabilityMap
+    url: capabilities/airslate-capability-edges.yml
+    name: airSlate Business Capability Map
   - type: AgenticAccess
     url: agentic-access/airslate-agentic-access.yml
   - type: DomainSecurity
