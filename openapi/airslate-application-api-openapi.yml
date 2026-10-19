@@ -1,0 +1,234 @@
+openapi: 3.2.0
+info:
+  title: SignNow Application API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Application
+paths:
+  /v2/application/signing-links:
+    get:
+      operationId: get-v2-application-signing-links
+      summary: Get signing links
+      description: Retrieve the list of user's signing links.
+      parameters:
+      - in: query
+        name: per_page
+        required: false
+        description: 'How many links to show per page in response. Default value: 15'
+        schema:
+          type: string
+      - in: query
+        name: page
+        required: false
+        description: 'In how many pages to display the response. Default value: 1'
+        schema:
+          type: string
+      - in: query
+        name: count
+        required: false
+        description: 'Possible values: array with 2 items. Item type is null or integer. Format: `?filters=[{"count":{"type":"between","value":[2,5]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: active
+        required: false
+        description: 'Filter only active or inactive links. Possible values: true/false. Format: `?filters=[{"active":{"type":"=","value":false}}]`'
+        schema:
+          type: string
+      - in: query
+        name: created
+        required: false
+        description: 'Filter by the date of creation. Possible values: desc (descending order)/asc (ascending order). Example: `?sort[created]=desc`'
+        schema:
+          type: string
+      - in: query
+        name: count
+        required: false
+        description: 'Filter by count. Possible values: desc (descending order)/asc (ascending order). Example: `?sort[count]=desc`'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Returns data about links. Returns an error when:
+
+
+            * Invalid authorization, "code": 1537. Message: "invalid_token"'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      required:
+                      - id
+                      - active
+                      - created
+                      - count
+                      - hash
+                      properties:
+                        id:
+                          type: string
+                          minLength: 1
+                        hash:
+                          type: string
+                          minLength: 1
+                        count:
+                          type: number
+                        active:
+                          type: boolean
+                        created:
+                          type: number
+                    minItems: 1
+                    uniqueItems: true
+                  meta:
+                    type: object
+                    required:
+                    - pagination
+                    properties:
+                      pagination:
+                        type: object
+                        required:
+                        - total
+                        - count
+                        - per_page
+                        - current_page
+                        - total_pages
+                        - links
+                        properties:
+                          count:
+                            type: number
+                          links:
+                            type: object
+                            required:
+                            - previous
+                            - next
+                            properties:
+                              next:
+                                type: string
+                                minLength: 1
+                              previous:
+                                type: string
+                                minLength: 1
+                          total:
+                            type: number
+                          per_page:
+                            type: number
+                          total_pages:
+                            type: number
+                          current_page:
+                            type: number
+                x-examples:
+                  example-1:
+                    data:
+                    - id: 247a8c718b48958df42e0556e205453bf5151f5a
+                      hash: HaSh
+                      count: 7
+                      active: true
+                      created: 1554801793
+                    meta:
+                      pagination:
+                        count: 1
+                        links:
+                          next: http://127.0.0.1:84/v2/signing-links?per_page=1&page=3
+                          previous: http://127.0.0.1:84/v2/signing-links?per_page=1&page=1
+                        total: 3
+                        per_page: 1
+                        total_pages: 3
+                        current_page: 2
+                description: ''
+              example:
+                example-1:
+                  data:
+                  - id: 24XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    hash: HaSh
+                    count: 7
+                    active: true
+                    created: 1554801793
+                  meta:
+                    pagination:
+                      count: 1
+                      links:
+                        next: http://example.com/v2/signing-links?per_page=1&page=3
+                        previous: http://example.com/v2/signing-links?per_page=1&page=1
+                      total: 3
+                      per_page: 1
+                      total_pages: 3
+                      current_page: 2
+      security:
+      - Basic: []
+      tags:
+      - Application
+  /v2/application/signing-links/{signing_link_short_url_id}:
+    put:
+      operationId: put-v2-application-signing-links-signing-link-short-url-id
+      summary: Activate/deactivate signing link
+      description: 'Allows API users to activate or deactivate the existing signing links.
+
+
+        For more information, check out our video tutorial.
+
+
+        **Video tutorial**
+
+
+        Note: The design shown in the video is outdated, but the flow is still accurate. You can go ahead and follow the steps as demonstrated.
+
+
+        Video tutorial'
+      parameters:
+      - in: path
+        name: signing_link_short_url_id
+        required: true
+        description: ID of a Signing Link that should be activated/deactivated
+        schema:
+          type: string
+      responses:
+        '204':
+          description: 'Returns empty 204 successul request. Returns an error when:
+
+
+            * Empty "active" parameter, "code": 0. Message: "Field `active` must be not null"
+
+            * Incorrect value of "active" parameter, "code": 0. Message: "Field `active` must be a boolean"
+
+            * API user is not the owner of the signing link, "code": 0. Message: "Access for the resource `signingLinkId` is forbidden"
+
+            * Invalid "from" email, "code": 65582. Message: "Document not found"
+
+            * Invalid authorization, "code": 1537. Message: "invalid_token"'
+      security:
+      - Basic: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - active
+              properties:
+                active:
+                  type: boolean
+                  description: 'Boolean. Determines if the link must be active. Possible values: `true` - yes, the link must be active, `false` - deactivate the link.'
+              x-examples:
+                example-1:
+                  active: true
+              description: ''
+        required: true
+      tags:
+      - Application
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

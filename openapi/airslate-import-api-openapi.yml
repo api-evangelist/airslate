@@ -1,0 +1,136 @@
+openapi: 3.2.0
+info:
+  title: SignNow Import API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Import
+paths:
+  /import/document-templates:
+    post:
+      operationId: post-import-document-templates
+      summary: Import template from DocuSign
+      description: 'Upload a zip file containing JSON from DocuSign as a template to the user’s account and receive a unique template ID.
+
+
+        **How to download a template from DocuSign as a zip file**
+
+
+        1. Log in to your DocuSign account and go to the **Templates** tab.
+
+        2. Select the template you’d like to download and click **Use** > **Download** next to it.
+
+        3. The template will be downloaded to your device in ZIP format.
+
+
+        *Note*: To download multiple DocuSign templates at once, select all the templates you need and click **More** > **Download** in the action panel above your templates.'
+      parameters:
+      - in: header
+        name: Content-type
+        required: false
+        description: multipart/form-data
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of created document templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    file_size:
+                      type:
+                      - integer
+                      - 'null'
+                    document_id:
+                      type:
+                      - 'null'
+                      - string
+                    document_name:
+                      type: string
+                    processing_error:
+                      type: string
+                x-examples:
+                  example-1:
+                  - file_size: 12345
+                    document_id: f38b14c3da4aad10beee7fd76074ab7f08c57759
+                    document_name: document name 1
+                  - file_size: 12345
+                    document_id: 45b21ec8a9e7c18fba33cd4cbba72c9c3925ff62
+                    document_name: document name 2
+                  - file_size: null
+                    document_id: null
+                    document_name: document name 3
+                    processing_error: Data does not contain valid json'
+              example:
+                example-1:
+                - file_size: 12345
+                  document_id: f38b14c3da4aad10beee7fd76074ab7f08c57759
+                  document_name: document name 1
+                - file_size: 12345
+                  document_id: 45b21ec8a9e7c18fba33cd4cbba72c9c3925ff62
+                  document_name: document name 2
+                - file_size: null
+                  document_id: null
+                  document_name: document name 3
+                  processing_error: Data does not contain valid json'
+                Created document templates:
+                - file_size: 12345
+                  document_id: f3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  document_name: document name 1
+                - file_size: 12345
+                  document_id: 45XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  document_name: document name 2
+                - file_size: null
+                  document_id: null
+                  document_name: document name 3
+                  processing_error: Data does not contain valid json'
+        '400':
+          description: "* No file in the request: 65536\n  Message: \"Must upload one file\"\n* File size more than 50 MB: 65580\n  Message: \"File is too big.\"\n* Using the file with incorrect file type (must be application/json in a zip file): 65578\n  Message: \"Invalid file type.\"  \n* Request with any of these cases: \n  - invalid token of user\n  - expired token of user\n  - empty header\n  - authorization = null  \n  Message: 1537, \"invalid_token\"  \n* Something wrong with generating document dimensions: 21001101\n  Message: \"PdfProcessor. Couldn't get dimensions\"  \n"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Authorization:
+                  code: 1537
+                  message: invalid_token
+                No file in the request:
+                  code: 65536
+                  message: Must upload one file
+                File size more than 50 MB:
+                  code: 65580
+                  message: File is too big.
+                Using the file with incorrect file type:
+                  code: 65578
+                  message: Invalid file type.
+                Something wrong with generating document dimensions:
+                  code: 21001101
+                  message: PdfProcessor. Couldn't get dimensions
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  description: '@your-file.zip'
+      tags:
+      - Import
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

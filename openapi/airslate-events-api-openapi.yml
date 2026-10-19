@@ -1,0 +1,548 @@
+openapi: 3.2.0
+info:
+  title: SignNow Events API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Events
+paths:
+  /api/v2/events:
+    post:
+      operationId: post-api-v2-events
+      summary: Create event subscription
+      description: 'Allows to subscribe an external service(callback_url) to a specific event of user or document
+
+
+        > [!NOTE]
+
+        > For the payload your service receives for each event, see the response examples in Get callback info by ID.'
+      responses:
+        '204':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: '* "attributes must not be empty" - "attributes" array is missing or empty
+
+            * "''callback'' is missing." -  required parameter "callback" is missing
+
+            * "Action must be equal ''callback''" - required parameter "action" is missing OR value of "action" parameter differs from ''callback''
+
+            * "event must not be empty" - required parameter "event" is missing or has an empty value
+
+            * "event must be string" - value of the "event" parameter is not a string
+
+            * "callback must be string" - value of the "callback" parameter is not a string
+
+            * "callback must be url" - value of "callback" parameter is not an URL
+
+            * "Invalid integration id - {integration_id}" - value of "integration_id" parameter doesn''t exist in database'
+          content:
+            application/json:
+              example:
+                event:
+                  code: 65582
+                  message: event must be string
+                action:
+                  message: Action must be equal 'callback'
+                callback:
+                  code: 400
+                  message: attributes must not be empty
+                attributes:
+                  code: 400
+                  message: attributes must not be empty
+                empty event:
+                  code: 65582
+                  message: event must not be empty
+                integration:
+                  message: Invalid integration id - {integration_id}
+                callback is not an url:
+                  code: 400
+                  message: callback must be url
+                callback is not a string:
+                  code: 65582
+                  message: callback must be string
+        '403':
+          description: '**Authorization =  bearer**
+
+
+            Request is sent with bearer token which doesn''t belong user who is added to "entity_id" parameter
+
+
+            OR
+
+
+            Request is sent with bearer of user who is not an owner of document, added to "entity_id" parameter
+
+
+
+            **Authorization =  basic**
+
+
+            Correct request which is sent by application which is not in scope of allowed ones'
+          content:
+            application/json:
+              example:
+                application/json:
+                  message: Subscription to event is not allowed
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - event
+              - entity_id
+              properties:
+                event:
+                  type: string
+                action:
+                  type: string
+                entity_id:
+                  type: string
+                attributes:
+                  type: object
+                  required:
+                  - callback
+                  properties:
+                    headers:
+                      type: object
+                      properties:
+                        int_head:
+                          type: integer
+                        bool_head:
+                          type: boolean
+                        float_head:
+                          type: number
+                        string_head:
+                          type: string
+                    callback:
+                      type: string
+                    use_tls_12:
+                      type: boolean
+                    integration_id:
+                      type: string
+                    docid_queryparam:
+                      type: boolean
+        required: true
+      tags:
+      - Events
+    get:
+      operationId: get-api-v2-events
+      summary: Get event suscriptions
+      description: Gets information about all subscriptions to events made with a specific application
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        event:
+                          type: string
+                        action:
+                          type: string
+                        created:
+                          type: integer
+                        entity_id:
+                          type: integer
+                        json_attributes:
+                          type: object
+                          properties:
+                            headers:
+                              type: object
+                              properties:
+                                int_head:
+                                  type: integer
+                                bool_head:
+                                  type: boolean
+                                float_head:
+                                  type: number
+                                string_head:
+                                  type: string
+                            use_tls_12:
+                              type: boolean
+                            callback_url:
+                              type: string
+                            integration_id:
+                              type: string
+                            docid_queryparam:
+                              type: boolean
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                          links:
+                            type: array
+                            items:
+                              type: object
+                          total:
+                            type: integer
+                          per_page:
+                            type: integer
+                          total_pages:
+                            type: integer
+                          current_page:
+                            type: integer
+              example:
+                application/json:
+                  data:
+                  - id: 391a4c4a267b48c2a8e90ff802d4ae40fa051af6
+                    event: user.document.create
+                    action: callback
+                    created: 1575381580
+                    entity_id: 18972165
+                    json_attributes:
+                      headers:
+                        int_head: 12
+                        bool_head: false
+                        float_head: 12.24
+                        string_head: test
+                      use_tls_12: true
+                      callback_url: http://callback-url.com
+                      integration_id: b98fc00add6b43a606bc527c81eee741bf16a7d8
+                      docid_queryparam: true
+                  meta:
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+      security:
+      - Basic: []
+      tags:
+      - Events
+  /v2/events/{event_subscription_id}:
+    delete:
+      operationId: delete-event-subscription
+      summary: Delete event subscription (basic auth)
+      description: This endpoint allows API users to unsubscribe an external service (callback_url) from specific events of a user or document. This request uses Basic authorization. For the request with Bearer authorization, see Delete event subscription (bearer auth).
+      parameters:
+      - in: path
+        name: event_subscription_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: '**For basic auth:**
+
+
+            Application id which is used for request differs from application id created given event subscription.
+
+
+            **For bearer auth:**
+
+
+            The event subscription was created by another user'
+          content:
+            application/json:
+              example:
+                application/json:
+                  message: Unsubscription from event is not allowed
+        '404':
+          description: Value of "uniqueEventId" doesn't exist in database
+          content:
+            application/json:
+              example:
+                application/json:
+                  message: UserEventSubscription `uniqueEventId` not found
+      security:
+      - Basic: []
+      tags:
+      - Events
+    put:
+      operationId: update-event-subscription
+      summary: Edit event subscription (basic auth)
+      description: This endpoint allows API users to change an existing event subscription. This request uses Basic authorization. For the request with Bearer authorization, see Update event subscription (bearer auth).
+      parameters:
+      - in: path
+        name: event_subscription_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                x-examples:
+                  Example 1:
+                    id: 5eXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+              example:
+                Example 1:
+                  id: 5eXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        '400':
+          description: '* "attributes must not be empty" - "attributes" array is missing or empty
+
+            * "''callback'' is missing." -  required parameter "callback" is missing
+
+            * "Action must be equal ''callback''" - required parameter "action" is missing OR value of "action" parameter differs from ''callback''
+
+            * "event must not be empty" - required parameter "event" is missing or has an empty value
+
+            * "event must be string" - value of the "event" parameter is not a string
+
+            * "callback must be string" - value of the "callback" parameter is not a string
+
+            * "callback must be url" - value of "callback" parameter is not an URL
+
+            * "Invalid integration id - {integration_id}" - value of "integration_id" parameter doesn''t exist in database'
+          content:
+            application/json:
+              example:
+                event: "{\n  \"code\": 65582,\n  \"message\": \"event must be string\"\n}"
+                action:
+                  message: Action must be equal 'callback'
+                callback:
+                  code: 400
+                  message: attributes must not be empty
+                attributes:
+                  code: 400
+                  message: attributes must not be empty
+                empty event:
+                  code: 65582
+                  message: event must not be empty
+                integration:
+                  message: Invalid integration id - {integration_id}
+                callback is not an url:
+                  code: 400
+                  message: callback must be url
+                callback is not a string:
+                  code: 65582
+                  message: callback must be string
+      security:
+      - Basic: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  type: string
+                action:
+                  type: string
+                entity_id:
+                  type: string
+                attributes:
+                  type: object
+                  properties:
+                    headers:
+                      type: object
+                      properties:
+                        int_head:
+                          type: integer
+                        bool_head:
+                          type: boolean
+                        float_head:
+                          type: number
+                        string_head:
+                          type: string
+                    callback:
+                      type: string
+                    use_tls_12:
+                      type: boolean
+                    integration_id:
+                      type: string
+                    docid_queryparam:
+                      type: boolean
+        required: true
+      tags:
+      - Events
+  /api/v2/events/{event_subscription_id}:
+    delete:
+      operationId: delete-api-v2-events-event-subscription-id
+      summary: Delete event subscription
+      description: Unsubscribes an external service (callback_url) from specific events of user or document
+      parameters:
+      - in: path
+        name: event_subscription_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '403':
+          description: '**For basic auth:**
+
+
+            Application id which is used for request differs from application id created given event subscription.
+
+
+            **For bearer auth:**
+
+
+            The event subscription was created by another user'
+          content:
+            application/json:
+              example:
+                application/json:
+                  message: Unsubscription from event is not allowed
+        '404':
+          description: Value of "uniqueEventId" doesn't exist in database
+          content:
+            application/json:
+              example:
+                application/json:
+                  message: UserEventSubscription `uniqueEventId` not found
+      security:
+      - Basic: []
+      tags:
+      - Events
+    put:
+      operationId: put-api-v2-events-event-subscription-id
+      summary: Update event subscription
+      description: Allows changing an existing event subscription
+      parameters:
+      - in: path
+        name: event_subscription_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+              example:
+                application/json: '{
+
+
+                  "id": "" //event subscription unique ID
+
+
+                  }'
+        '400':
+          description: '* "attributes must not be empty" - "attributes" array is missing or empty
+
+            * "''callback'' is missing." -  required parameter "callback" is missing
+
+            * "Action must be equal ''callback''" - required parameter "action" is missing OR value of "action" parameter differs from ''callback''
+
+            * "event must not be empty" - required parameter "event" is missing or has an empty value
+
+            * "event must be string" - value of the "event" parameter is not a string
+
+            * "callback must be string" - value of the "callback" parameter is not a string
+
+            * "callback must be url" - value of "callback" parameter is not an URL
+
+            * "Invalid integration id - {integration_id}" - value of "integration_id" parameter doesn''t exist in database'
+          content:
+            application/json:
+              example:
+                event: "{\n  \"code\": 65582,\n  \"message\": \"event must be string\"\n}"
+                action:
+                  message: Action must be equal 'callback'
+                callback:
+                  code: 400
+                  message: attributes must not be empty
+                attributes:
+                  code: 400
+                  message: attributes must not be empty
+                empty event:
+                  code: 65582
+                  message: event must not be empty
+                integration:
+                  message: Invalid integration id - {integration_id}
+                callback is not an url:
+                  code: 400
+                  message: callback must be url
+                callback is not a string:
+                  code: 65582
+                  message: callback must be string
+      security:
+      - Basic: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  type: string
+                action:
+                  type: string
+                entity_id:
+                  type: string
+                attributes:
+                  type: object
+                  properties:
+                    headers:
+                      type: object
+                      properties:
+                        int_head:
+                          type: integer
+                        bool_head:
+                          type: boolean
+                        float_head:
+                          type: number
+                        string_head:
+                          type: string
+                    callback:
+                      type: string
+                    use_tls_12:
+                      type: boolean
+                    integration_id:
+                      type: string
+                    docid_queryparam:
+                      type: boolean
+        required: true
+      tags:
+      - Events
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

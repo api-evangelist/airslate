@@ -1,0 +1,522 @@
+openapi: 3.2.0
+info:
+  title: SignNow Teams API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Teams
+paths:
+  /v2/teams/{team_id}/admins:
+    get:
+      operationId: get-team-admins
+      summary: Get team admins
+      description: This endpoint returns the list of team admins and primary admin
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                new: {}
+                application/json:
+                  data:
+                  - type: 1
+                    email: admin@signnow.com
+                    created: 1573645637
+                    primary: true
+                    updated: 1573645752
+                    user_id: e13b50f63fd5492499b0ed346a3a3db6d045ca37
+        '403':
+          description: User is not a member of the team
+          content:
+            application/json:
+              example:
+                application/json:
+                  errors:
+                  - code: 0
+                    message: Access denied.
+        '404':
+          description: Team is inactive
+          content:
+            application/json:
+              example:
+                application/json:
+                  errors:
+                  - message: Team `f89ace7e23c6422091d4ed88447ee3d3842d757b` is not found.
+      security:
+      - Bearer: []
+      tags:
+      - Teams
+  /v2/teams:
+    get:
+      operationId: get-user-teams
+      summary: Get user's teams
+      description: This endpoint returns list of user teams
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        role:
+                          type: string
+                        type:
+                          type: string
+                        active:
+                          type: integer
+                        created:
+                          type: integer
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                          links:
+                            type: object
+                            properties:
+                              next:
+                                type: string
+                          total:
+                            type: integer
+                          per_page:
+                            type: integer
+                          total_pages:
+                            type: integer
+                          current_page:
+                            type: integer
+                x-examples:
+                  example-1:
+                    data:
+                    - id: e87f5fcf97e74e81a97738b2bf25195fa90d1e6d
+                      name: Handcrafted Metal Cheese
+                      role: admin
+                      type: VIEWABLE
+                      active: 1
+                      created: 1573658889
+                    meta:
+                      pagination:
+                        count: 1
+                        links:
+                          next: https://api.signnow.com/v2/teams?page=2
+                        total: 1
+                        per_page: 15
+                        total_pages: 1
+                        current_page: 1
+              example:
+                application/json:
+                  data:
+                  - id: e8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: Team 1
+                    role: admin
+                    type: VIEWABLE
+                    active: 1
+                    created: 1573658889
+                  meta:
+                    pagination:
+                      count: 1
+                      links:
+                        next: https://example.com/v2/teams?page=2
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+      security:
+      - Bearer: []
+      tags:
+      - Teams
+  /v2/teams/{request_id}/request:
+    patch:
+      operationId: patch-v2-teams-request-id-request
+      summary: Update team invite status
+      description: Allows API users to update the status of invite to join the team. Works only for the invite requests with the `waiting` status.
+      parameters:
+      - in: header
+        name: Content-type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      - in: path
+        name: request_id
+        required: true
+        description: ID of the invite to join the team.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Success:
+                  result: success
+        '400':
+          description: '* User declines the invite which is not in the `waiting` status
+
+            * User accepts/denies invite which isn''t addressed to them
+
+            * Request ID doesn''t exist
+
+            * User who updates the invite is a member of the Organization with specific parameters'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Request ID doesn't exist:
+                  errors:
+                  - code: 66392
+                    message: Team request not found
+                'Accepts/denies somebody''s invite ':
+                  errors:
+                  - code: 12023003
+                    message: You cannot access somebody else's team request
+                'Declines the not `waiting` invite ':
+                  errors:
+                  - code: 12023004
+                    message: This request is not pending
+                Organization with specific parameters:
+                  errors:
+                  - code: 65615
+                    message: Your Organization restricts you from joining this team
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - request_status
+              properties:
+                request_status:
+                  type: string
+                  description: 'The updated status of the invite request. Possible values:  `denied`, `declined`, `approved`.'
+        required: true
+      tags:
+      - Teams
+  /v2/teams/{team_id}/members:
+    get:
+      operationId: get-api-v2-teams-team-id-users
+      summary: Get team members
+      description: 'This endpoint allows users to get a list of members of a team, including admins.
+
+
+        Only team members can use the endpoint.'
+      parameters:
+      - in: query
+        name: with_declined_requests
+        required: false
+        description: Include users that declined an invitation to join the team.
+        schema:
+          type: boolean
+          default: false
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: '* Success
+
+            * Success with `with_declined_requests=true`'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: User ID
+                        role:
+                          type: string
+                          description: User's role (member or admin)
+                          x-stoplight:
+                            id: g3rco1yahqf07
+                        emails:
+                          type: array
+                          items:
+                            type: string
+                            x-stoplight:
+                              id: 3i5bp7j0keikq
+                          description: User's email addresses
+                          x-stoplight:
+                            id: yfogwsrq31v6e
+                        status:
+                          type: string
+                          description: User's status (accepted, declined, or pending)
+                          x-stoplight:
+                            id: wv8nu69pf3tm9
+                        billing:
+                          type: integer
+                          description: Is true if member is an admin
+                          x-stoplight:
+                            id: z6a8kr0wicegg
+                        primary:
+                          type: boolean
+                          description: Whether the user is a primary admin
+                          x-stoplight:
+                            id: xptvn3zt0l5ls
+                        full_name:
+                          type: string
+                          description: User's full name
+                          x-stoplight:
+                            id: ei7bxp9sextx4
+                        avatar_url:
+                          type: string
+                          description: URL of the avatar image
+                          x-stoplight:
+                            id: aqi1amqay9fpo
+                        invited_by:
+                          type: string
+                          description: Email address of the user who invited the member. Appears for pending members.
+                          x-stoplight:
+                            id: xmxwn6h75eiia
+                        request_uid:
+                          type: string
+                          description: ID of this member's invitation request. Appears for pending members.
+                          x-stoplight:
+                            id: olrwzuzfrqmvr
+                        request_role:
+                          type: string
+                          description: Is equal to `member` if a user is not an admin
+                          x-stoplight:
+                            id: 8ta5t7hxc61kk
+                        can_admin_view:
+                          type: boolean
+                          description: Whether a user is a secondary admin (not a team owner) and is not a user sending the request
+                          x-stoplight:
+                            id: etasi3kuiriys
+                        document_access:
+                          type: integer
+                          description: Is true if member is an admin
+                          x-stoplight:
+                            id: od1az748tj3e9
+                        request_updated:
+                          type: number
+                          description: Timestamp of when the invitation to join the team was sent to this user. Appears for pending members.
+                          x-stoplight:
+                            id: ddp8uej3mu8cf
+                    description: Array of members
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                            description: Number of users on the current page
+                          links:
+                            type: array
+                            items:
+                              type: object
+                            description: Links to the previous and next pages if they exist
+                          total:
+                            type: integer
+                            description: Number of users found
+                          per_page:
+                            type: integer
+                            description: Number of users to be displayed on a page
+                          total_pages:
+                            type: integer
+                            description: 'Total number of pages '
+                          current_page:
+                            type: integer
+                            description: Current page number
+                x-examples:
+                  Example 1:
+                    data:
+                    - id: '1234567890123456789012345678901234567890'
+                      pro: 0
+                      type: 1
+                      email: j.doe@email.com
+                      active: 1
+                      created: 1714404437
+                      updated: 1714404437
+                      is_admin: 1
+                      last_name: Doe
+                      first_name: Jane
+                    meta:
+                      pagination:
+                        count: 1
+                        links: []
+                        total: 1
+                        per_page: 15
+                        total_pages: 1
+                        current_page: 1
+              example:
+                Success:
+                  data:
+                  - id: 21436a9a91c744239f02318d4090d3c188f4f378
+                    role: admin
+                    emails:
+                    - member@mail.com
+                    status: accepted
+                    billing: 1
+                    primary: true
+                    full_name: Jane Doe
+                    avatar_url: https://example.com/avatars/user12345.png
+                    can_admin_view: false
+                    document_access: 1
+                  meta:
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                Example 1:
+                  data:
+                  - id: '1234567890123456789012345678901234567890'
+                    pro: 0
+                    type: 1
+                    email: j.doe@email.com
+                    active: 1
+                    created: 1714404437
+                    updated: 1714404437
+                    is_admin: 1
+                    last_name: Doe
+                    first_name: Jane
+                  meta:
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                With declined requests:
+                  data:
+                  - id: 23278db3aa1e40069462f00b2074673a682731a6
+                    role: member
+                    emails:
+                    - member1@mail.com
+                    status: pending
+                    full_name: Jane Doe
+                    avatar_url: https://cdn.example.com/users/avatars/56789.jpg
+                    invited_by: admin@mail.com
+                    request_uid: 983d5d4fca18841e78be8061622beeaed6a9da2cd
+                    request_role: member
+                    request_updated: 1719840457
+                  - id: b215d678cb01420c850c354859e0b6d8b4425b89
+                    role: admin
+                    emails:
+                    - admin@mail.com
+                    status: accepted
+                    billing: 1
+                    primary: false
+                    full_name: Jane Doe
+                    avatar_url: https://app.signnow.com/api/v2/avatars/66de0c3d72a24682848dc5d87f4007c1f2de22b7/download
+                    document_access: 1
+                  - id: 399b9178e4244152878e85333a360a95608a2723
+                    role: member
+                    emails:
+                    - member2@mail.com
+                    status: accepted
+                    full_name: Anna Green
+                    avatar_url: https://app.signnow.com/api/v2/avatars/66de0c3d72a24682848dc5d87f4007c1f2de22a8/download
+                    request_role: member
+                  - id: 21436a9a91c744239f02318d4090d3c188f4f378
+                    role: member
+                    emails:
+                    - member3@mail.com
+                    status: accepted
+                    full_name: Jeremy Black
+                    avatar_url: https://app.signnow.com/api/v2/avatars/99de0c3d72a24682848dc5d87f4007c1f2de22b7/download
+                    request_role: member
+                  - id: 8bb5e7e301e4468fb54fcf1c0f4892d8aebca3f3
+                    role: admin
+                    emails:
+                    - admin2@mail.com
+                    status: accepted
+                    billing: 1
+                    primary: true
+                    full_name: Elaine Hicks
+                    avatar_url: https://app.signnow.com/api/v2/avatars/55de0c3d72a24682848dc5d87f4007c1f2de22b7/download
+                    document_access: 1
+                  - id: 0bc4a5b4f22548ec89344e9a5ecd94c6ba5baefd
+                    role: member
+                    emails:
+                    - member4@mail.com
+                    status: declined
+                    full_name: Kate Brown
+                    avatar_url: https://app.signnow.com/api/v2/avatars/33de0c3d72a24682848dc5d87f4007c1f2de22b7/download
+                    request_role: member
+                  meta:
+                    pagination:
+                      count: 6
+                      links: []
+                      total: 6
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+        '400':
+          description: '* User is not team member
+
+            * Team not found
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Team not found:
+                  errors:
+                  - code: 66391
+                    message: Team not found
+                User not team member:
+                  errors:
+                  - code: 65582
+                    message: User is not part of this team
+      security:
+      - Bearer: []
+      tags:
+      - Teams
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

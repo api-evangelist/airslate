@@ -1,116 +1,2665 @@
 openapi: 3.2.0
 info:
-  title: airSlate signNow REST Templates API
-  version: v2
-  description: 'Best-effort OpenAPI 3.1 representation of the airSlate signNow REST API.
-
-    airSlate exposes its developer API primarily through the signNow product
-
-    family. Endpoint paths and request shapes are derived from the official
-
-    signNow Python SDK (github.com/signnow/SNPythonSDK) and public docs at
-
-    https://docs.signnow.com/. Authentication uses OAuth 2.0 with a Basic
-
-    token for the application credential and resource-owner password or
-
-    client credentials grant for the access token.'
-  contact:
-    name: airSlate signNow
-    url: https://docs.signnow.com/
+  title: SignNow Templates API
+  version: 1.0.0
 servers:
-- url: https://api.signnow.com
-  description: signNow production API
-- url: https://api-eval.signnow.com
-  description: signNow evaluation/sandbox API
-security:
-- BearerAuth: []
+- url: https://api.signnow.com/
 tags:
 - name: Templates
 paths:
-  /template:
-    post:
-      tags:
-      - Templates
-      summary: Create a template
-      operationId: createTemplate
-      responses:
-        '201':
-          description: Created
-  /template/{template_id}/copy:
-    post:
-      tags:
-      - Templates
-      summary: Clone a template
-      operationId: cloneTemplate
-      parameters:
-      - name: template_id
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        '201':
-          description: Cloned
-  /template/{document_id}/bulkinvite:
-    post:
-      tags:
-      - Templates
-      summary: Bulk invite signers using a template
-      operationId: bulkInvite
-      parameters:
-      - name: document_id
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          description: OK
-  /documentgroup/template/{template_id}:
+  /v2/templates/{template_id}/copies:
     get:
-      tags:
-      - Templates
-      summary: Get a document group template
-      operationId: getGroupTemplate
+      operationId: get-v2-templates-template-id-copies
+      summary: Get list of documents from template
+      description: 'The endpoint allows users to retrieve a list of all the documents created from a template.
+
+
+        **Example of a request with query parameters**
+
+
+        ```json
+
+
+        /v2/templates/{template_id}/copies?sort_by=created&sort_order=desc&per_page=20&filters[signing_status]=pending`
+
+
+        ```'
       parameters:
-      - name: template_id
-        in: path
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      - in: query
+        name: sort_by
+        required: false
+        description: 'Field to sort documents by. Possible values: `updated`, `created`, `document_name`.'
+        schema:
+          type: string
+          default: updated
+      - in: query
+        name: sort_order
+        required: false
+        description: 'Sort the list in ascending or descending order. Possible values: `asc`, `desc`.'
+        schema:
+          type: string
+          default: desc
+      - in: query
+        name: page
+        required: false
+        description: Page number to view.
+        schema:
+          type: integer
+          default: 1
+      - in: query
+        name: per_page
+        required: false
+        description: Number of documents per page.
+        schema:
+          type: integer
+          default: 15
+      - in: query
+        name: filters[signing_status]
+        required: false
+        description: 'Signing status to filter documents by. Possible values: `waiting-for-me`, `waiting-for-others`, `signed`, `pending`, `has-invites`, `expired`.'
+        schema:
+          type: string
+      - in: query
+        name: filters[entity_labels]
+        required: false
+        description: 'Label to filter documents by. Possible values: `declined` (the invite was declined), `undelivered` (the invite email wasn''t delivered). You can use both values together.'
+        schema:
+          type: string
+      - in: query
+        name: search_key
+        required: false
+        description: Search by a key word, part of word, or phrase.
+        schema:
+          type: string
+      - in: query
+        name: search_by
+        required: false
+        description: 'Field to search by. Possible values: `document-name`, `signer-email`, `inviter-email`, `document-text`, `document-id`.'
+        schema:
+          type: string
+      - in: query
+        name: exclude
+        required: false
+        description: 'Entities to exclude from the response. Possible value: `doc-from-dg` (documents that are in document groups).'
+        schema:
+          type: string
+      - in: path
+        name: template_id
         required: true
+        description: The ID of the template.
         schema:
           type: string
       responses:
         '200':
-          description: OK
+          description: '* Valid field invite. Without query parameters.
+
+            * Valid request. With specified sort and ordering.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: The ID of the document in the Document table
+                        owner:
+                          type: string
+                        roles:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              unique_id:
+                                type: string
+                              signing_order:
+                                type: integer
+                        fields:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              role:
+                                type: string
+                              type:
+                                type: string
+                              role_id:
+                                type: string
+                              field_id:
+                                type: string
+                              fulfiller:
+                                type: string
+                              element_id:
+                                type:
+                                - string
+                                - 'null'
+                              originator:
+                                type: string
+                              json_attributes:
+                                type: object
+                                properties:
+                                  x:
+                                    type: integer
+                                  y:
+                                    type: integer
+                                  name:
+                                    type: string
+                                  width:
+                                    type: integer
+                                  height:
+                                    type: integer
+                                  required:
+                                    type: boolean
+                                  page_number:
+                                    type: integer
+                                  allowed_types:
+                                    type: array
+                                    items:
+                                      type: string
+                              field_request_id:
+                                type: string
+                              template_field_id:
+                                type: string
+                              field_request_canceled:
+                                type:
+                                - boolean
+                                - 'null'
+                        created:
+                          type: integer
+                        updated:
+                          type: integer
+                        user_id:
+                          type: string
+                          description: The ID of the user
+                        requests:
+                          type: array
+                          items:
+                            type: object
+                        settings:
+                          type: object
+                          properties:
+                            ololo:
+                              type: boolean
+                            mytext:
+                              type: boolean
+                            mytext1:
+                              type: boolean
+                            enable_mfa:
+                              type: boolean
+                            enable_pki:
+                              type: boolean
+                            copy_export:
+                              type: boolean
+                            date_format:
+                              type: boolean
+                            enable_qwer:
+                              type: boolean
+                            upload_limit:
+                              type: boolean
+                            document_guide:
+                              type: boolean
+                            sso-only-login:
+                              type: boolean
+                            mobileweb_option:
+                              type: boolean
+                            cloud_auto_export:
+                              type: boolean
+                            logout_on_signing:
+                              type: boolean
+                            restrict_download:
+                              type: boolean
+                            common_experiments:
+                              type: boolean
+                            enable_experiments:
+                              type: boolean
+                            add_signature_stamp:
+                              type: boolean
+                            email_logo_position:
+                              type: boolean
+                            cfr_title_21_part_11:
+                              type: boolean
+                            email_btn_bkgd_color:
+                              type: boolean
+                            email_btn_text_color:
+                              type: boolean
+                            email_custom_message:
+                              type: boolean
+                            email_custom_subject:
+                              type: boolean
+                            email_footer_enabled:
+                              type: boolean
+                            enable_eu_date_format:
+                              type: boolean
+                            require_email_subject:
+                              type: boolean
+                            enable_hyperlink_field:
+                              type: boolean
+                            invite_expiration_days:
+                              type: boolean
+                            no_document_attachment:
+                              type: boolean
+                            agree_to_be_beta_tester:
+                              type: boolean
+                            electronic_consent_text:
+                              type: boolean
+                            flatten_document_fields:
+                              type: boolean
+                            org_allowed_team_admins:
+                              type: boolean
+                            document_schema_extended:
+                              type: boolean
+                            enable_document_comments:
+                              type: boolean
+                            front_end_session_length:
+                              type: boolean
+                            no_user_signature_return:
+                              type: boolean
+                            require_drawn_signatures:
+                              type: boolean
+                            signature_stamp_position:
+                              type: boolean
+                            allow_big_attachment_file:
+                              type: boolean
+                            cloud_export_with_history:
+                              type: boolean
+                            enable_full_story_tracker:
+                              type: boolean
+                            require_login_for_signing:
+                              type: boolean
+                            allow_download_certificate:
+                              type: boolean
+                            do_no_consent_redirect_url:
+                              type: boolean
+                            disable_email_notifications:
+                              type: boolean
+                            electronic_consent_required:
+                              type: boolean
+                            email_admin_on_banned_login:
+                              type: boolean
+                            enable_hyperlink_protection:
+                              type: boolean
+                            enable_team_admin_move_docs:
+                              type: boolean
+                            invite_decline_redirect_url:
+                              type: boolean
+                            allow_team_admin_rename_docs:
+                              type: boolean
+                            emailed_docs_include_history:
+                              type: boolean
+                            lock_signing_date_by_default:
+                              type: boolean
+                            no_document_file_attachments:
+                              type: boolean
+                            add_signature_stamp_with_name:
+                              type: boolean
+                            digitally_sign_dowloaded_docs:
+                              type: boolean
+                            watermark_downloaded_document:
+                              type: boolean
+                            invite_completion_redirect_url:
+                              type: boolean
+                            required_preset_signature_name:
+                              type: boolean
+                            signing_link_document_download:
+                              type: boolean
+                            block_login_via_social_networks:
+                              type: boolean
+                            hide_upgrade_subscription_button:
+                              type: boolean
+                            allow_edit_document_after_signing:
+                              type: boolean
+                            default_field_invite_remind_after:
+                              type: boolean
+                            disable_download_action_in_editor:
+                              type: boolean
+                            enable_advanced_threat_protection:
+                              type: boolean
+                            have_merged_document_group_option:
+                              type: boolean
+                            auto_deletion_documents_from_trash:
+                              type: boolean
+                            default_field_invite_remind_before:
+                              type: boolean
+                            default_field_invite_remind_repeat:
+                              type: boolean
+                            document_completion_retention_days:
+                              type: boolean
+                            require_authentication_for_invites:
+                              type: boolean
+                            save_signer_signature_and_initials:
+                              type: boolean
+                            signing_link_document_name_formula:
+                              type: boolean
+                            disable_recipients_list_from_editor:
+                              type: boolean
+                            document_attachment_only_for_signer:
+                              type: boolean
+                            default_field_invite_expiration_time:
+                              type: boolean
+                            unsuccessful_logout_attempts_allowed:
+                              type: boolean
+                            audit_trail_completion_retention_days:
+                              type: boolean
+                            block_organization_selfleave_by_member:
+                              type: boolean
+                            enable_render_pages_in_editor_as_images:
+                              type: boolean
+                            allow_document_copying_to_other_accounts:
+                              type: boolean
+                            allow_embedded_extended_token_expiration:
+                              type: boolean
+                            pending_invite_document_view_notification:
+                              type: boolean
+                            guide_signers_only_through_required_fields:
+                              type: boolean
+                            redirect_to_registration_when_fields_saved:
+                              type: boolean
+                            hide_decline_to_sign_option_in_signing_session:
+                              type: boolean
+                            max_attachments_for_signnow_fields_per_document:
+                              type: boolean
+                            only_administrator_is_able_to_invite_to_the_team:
+                              type: boolean
+                            allow_big_count_of_attachment_fields_per_document:
+                              type: boolean
+                            agreement_to_test_new_functionality_in_organization:
+                              type: boolean
+                            auto_apply_signatures_and_initials_to_document_fields:
+                              type: boolean
+                            block_export_options_when_credit_card_validation_is_used:
+                              type: boolean
+                            receive_signer_email_after_sent_field_invite_to_yourself:
+                              type: boolean
+                            enable_document_download_link_for_invite_completion_mails:
+                              type: boolean
+                            cc_completion_email_contain_only_downloading_document_link:
+                              type: boolean
+                            invite_update_notifications_for_all_invites_at_invite_create:
+                              type: boolean
+                            every_signature_and_initials_field_requires_user_authentication:
+                              type: boolean
+                        parent_id:
+                          type: string
+                        thumbnail:
+                          type: object
+                          properties:
+                            large:
+                              type: string
+                            small:
+                              type: string
+                            medium:
+                              type: string
+                        page_count:
+                          type: integer
+                        signatures:
+                          type: array
+                          items:
+                            type: object
+                        attachments:
+                          type: array
+                          items:
+                            type: object
+                        viewer_roles:
+                          type: array
+                          items:
+                            type: object
+                        document_name:
+                          type: string
+                          description: The name of the document
+                        field_invites:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              role:
+                                type: string
+                              email:
+                                type: string
+                              status:
+                                type: string
+                              created:
+                                type: integer
+                              role_id:
+                                type: string
+                              updated:
+                                type: integer
+                              declined:
+                                type: array
+                                items:
+                                  type: object
+                              reassign:
+                                type: boolean
+                              reminder:
+                                type: boolean
+                              id_verified:
+                                type: string
+                              is_embedded:
+                                type: boolean
+                              delivery_type:
+                                type: string
+                              password_type:
+                                type: string
+                              signer_user_id:
+                                type: string
+                              expiration_time:
+                                type: integer
+                              is_draft_exists:
+                                type: boolean
+                              password_method:
+                                type: string
+                              payment_request:
+                                type:
+                                - object
+                                - 'null'
+                              is_full_declined:
+                                type: boolean
+                              is_document_locked:
+                                type: boolean
+                              password_protected:
+                                type: boolean
+                              email_sent_statuses:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    status:
+                                      type: string
+                                    created_at:
+                                      type: integer
+                                    last_reaction_at:
+                                      type: integer
+                              force_new_signature:
+                                type:
+                                - boolean
+                                - 'null'
+                              signer_phone_invite:
+                                type:
+                                - string
+                                - 'null'
+                              decline_by_signature:
+                                type: string
+                              signing_instructions:
+                                type:
+                                - boolean
+                                - 'null'
+                              electronic_consent_id:
+                                type:
+                                - string
+                                - 'null'
+                              prefill_signature_name:
+                                type:
+                                - boolean
+                                - 'null'
+                              id_verification_required:
+                                type: string
+                              electronic_consent_required:
+                                type: integer
+                              required_preset_signature_name:
+                                type:
+                                - boolean
+                                - 'null'
+                        origin_user_id:
+                          type: string
+                        routing_details:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              cc:
+                                type: array
+                                items:
+                                  type: object
+                              id:
+                                type: string
+                              data:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    role_id:
+                                      type: string
+                                    reassign:
+                                      type: boolean
+                                    reminder:
+                                      type: object
+                                      properties:
+                                        remind_after:
+                                          type: integer
+                                        remind_before:
+                                          type: integer
+                                        remind_repeat:
+                                          type: integer
+                                    inviter_role:
+                                      type: boolean
+                                    default_email:
+                                      type: string
+                                    delivery_type:
+                                      type: string
+                                    signing_order:
+                                      type: integer
+                                    expiration_days:
+                                      type: integer
+                                    decline_by_signature:
+                                      type: boolean
+                              cc_step:
+                                type: array
+                                items:
+                                  type: object
+                              created:
+                                type: integer
+                              updated:
+                                type: integer
+                              viewers:
+                                type: array
+                                items:
+                                  type: object
+                              invite_link_instructions:
+                                type: string
+                        original_filename:
+                          type: string
+                        origin_document_id:
+                          type: string
+                        document_group_info:
+                          type:
+                          - object
+                          - 'null'
+                        enumeration_options:
+                          type: array
+                          items:
+                            type: object
+                        viewer_field_invites:
+                          type: array
+                          items:
+                            type: object
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                          links:
+                            type: array
+                            items:
+                              type: object
+                          total:
+                            type: integer
+                          per_page:
+                            type: integer
+                          total_pages:
+                            type: integer
+                          current_page:
+                            type: integer
+                x-examples:
+                  Example 1:
+                    data:
+                    - id: 5b99617cacb54336a81a112b37aa97715997d6dd
+                      owner: skochok.denys+5@airslate.com
+                      roles:
+                      - name: Recipient 1
+                        unique_id: d8f95fea6ac54de7a723bc2c87c2f5a783b1d955
+                        signing_order: 1
+                      fields:
+                      - id: 13b217bda6b44ee1a76189a93bab55a688546703
+                        role: Recipient 1
+                        type: signature
+                        role_id: d8f95fea6ac54de7a723bc2c87c2f5a783b1d955
+                        field_id: 6738efc957b54a898c4a63157db829b288b6c6ad
+                        fulfiller: skochok.denys+7@airslate.com
+                        element_id: null
+                        originator: skochok.denys+5@airslate.com
+                        json_attributes:
+                          x: 131
+                          y: 119
+                          name: Signature_1
+                          width: 80
+                          height: 20
+                          required: true
+                          page_number: 0
+                          allowed_types:
+                          - type
+                          - draw
+                          - upload
+                        field_request_id: 6738efc957b54a898c4a63157db829b288b6c6ad
+                        template_field_id: bec6a2bc1df34c8eaf8dad14fa91219efcde812f
+                        field_request_canceled: null
+                      created: 1651820262
+                      updated: 1651820264
+                      user_id: fc1ca0e9b4964754be3c0c25b45b4891f06d6914
+                      requests: []
+                      settings:
+                        ololo: false
+                        mytext: false
+                        mytext1: false
+                        enable_mfa: false
+                        enable_pki: false
+                        copy_export: false
+                        date_format: false
+                        enable_qwer: false
+                        upload_limit: false
+                        document_guide: false
+                        sso-only-login: false
+                        mobileweb_option: false
+                        cloud_auto_export: false
+                        logout_on_signing: false
+                        restrict_download: false
+                        common_experiments: false
+                        enable_experiments: false
+                        add_signature_stamp: false
+                        email_logo_position: false
+                        cfr_title_21_part_11: false
+                        email_btn_bkgd_color: false
+                        email_btn_text_color: false
+                        email_custom_message: false
+                        email_custom_subject: false
+                        email_footer_enabled: false
+                        enable_eu_date_format: false
+                        require_email_subject: false
+                        enable_hyperlink_field: false
+                        invite_expiration_days: false
+                        no_document_attachment: false
+                        agree_to_be_beta_tester: false
+                        electronic_consent_text: false
+                        flatten_document_fields: false
+                        org_allowed_team_admins: false
+                        document_schema_extended: false
+                        enable_document_comments: false
+                        front_end_session_length: false
+                        no_user_signature_return: false
+                        require_drawn_signatures: false
+                        signature_stamp_position: false
+                        allow_big_attachment_file: false
+                        cloud_export_with_history: false
+                        enable_full_story_tracker: false
+                        require_login_for_signing: false
+                        allow_download_certificate: false
+                        do_no_consent_redirect_url: false
+                        disable_email_notifications: false
+                        electronic_consent_required: false
+                        email_admin_on_banned_login: false
+                        enable_hyperlink_protection: false
+                        enable_team_admin_move_docs: false
+                        invite_decline_redirect_url: false
+                        allow_team_admin_rename_docs: false
+                        emailed_docs_include_history: false
+                        lock_signing_date_by_default: false
+                        no_document_file_attachments: false
+                        add_signature_stamp_with_name: false
+                        digitally_sign_dowloaded_docs: false
+                        watermark_downloaded_document: false
+                        invite_completion_redirect_url: false
+                        required_preset_signature_name: false
+                        signing_link_document_download: false
+                        block_login_via_social_networks: false
+                        hide_upgrade_subscription_button: false
+                        allow_edit_document_after_signing: false
+                        default_field_invite_remind_after: false
+                        disable_download_action_in_editor: false
+                        enable_advanced_threat_protection: false
+                        have_merged_document_group_option: false
+                        auto_deletion_documents_from_trash: false
+                        default_field_invite_remind_before: false
+                        default_field_invite_remind_repeat: false
+                        document_completion_retention_days: false
+                        require_authentication_for_invites: false
+                        save_signer_signature_and_initials: false
+                        signing_link_document_name_formula: false
+                        disable_recipients_list_from_editor: false
+                        document_attachment_only_for_signer: false
+                        default_field_invite_expiration_time: false
+                        unsuccessful_logout_attempts_allowed: false
+                        audit_trail_completion_retention_days: false
+                        block_organization_selfleave_by_member: false
+                        enable_render_pages_in_editor_as_images: false
+                        allow_document_copying_to_other_accounts: false
+                        allow_embedded_extended_token_expiration: false
+                        pending_invite_document_view_notification: false
+                        guide_signers_only_through_required_fields: false
+                        redirect_to_registration_when_fields_saved: false
+                        hide_decline_to_sign_option_in_signing_session: false
+                        max_attachments_for_signnow_fields_per_document: false
+                        only_administrator_is_able_to_invite_to_the_team: false
+                        allow_big_count_of_attachment_fields_per_document: false
+                        agreement_to_test_new_functionality_in_organization: false
+                        auto_apply_signatures_and_initials_to_document_fields: false
+                        block_export_options_when_credit_card_validation_is_used: false
+                        receive_signer_email_after_sent_field_invite_to_yourself: false
+                        enable_document_download_link_for_invite_completion_mails: false
+                        cc_completion_email_contain_only_downloading_document_link: false
+                        invite_update_notifications_for_all_invites_at_invite_create: false
+                        every_signature_and_initials_field_requires_user_authentication: false
+                      parent_id: eb6bf72b6fb24ebdadb09dd3186880bd69f89a58
+                      thumbnail:
+                        large: https://api.signnow-dev.xyz//document/5b99617cacb54336a81a112b37aa97715997d6dd/thumbnail?size=large
+                        small: https://api.signnow-dev.xyz//document/5b99617cacb54336a81a112b37aa97715997d6dd/thumbnail?size=small
+                        medium: https://api.signnow-dev.xyz//document/5b99617cacb54336a81a112b37aa97715997d6dd/thumbnail?size=medium
+                      page_count: 1
+                      signatures: []
+                      attachments: []
+                      viewer_roles: []
+                      document_name: test copy 11
+                      field_invites:
+                      - id: d57289ea57854323b1090f283fc475334a5fc065
+                        role: Recipient 1
+                        email: skochok.denys+7@airslate.com
+                        status: pending
+                        created: 1651820263
+                        role_id: d8f95fea6ac54de7a723bc2c87c2f5a783b1d955
+                        updated: 1651820264
+                        declined: []
+                        reassign: false
+                        reminder: true
+                        id_verified: UNVERIFIED
+                        is_embedded: false
+                        delivery_type: email
+                        password_type: ''
+                        signer_user_id: 509c873b2d8e4f278e7ae0db652a49288fd67cbc
+                        expiration_time: 1654412264
+                        is_draft_exists: false
+                        password_method: ''
+                        payment_request: null
+                        is_full_declined: false
+                        is_document_locked: false
+                        password_protected: false
+                        email_sent_statuses:
+                        - status: sent
+                          created_at: 1651820264
+                          last_reaction_at: 1651820264
+                        force_new_signature: null
+                        signer_phone_invite: null
+                        decline_by_signature: '0'
+                        signing_instructions: null
+                        electronic_consent_id: null
+                        prefill_signature_name: null
+                        id_verification_required: 'NO'
+                        electronic_consent_required: 0
+                        required_preset_signature_name: null
+                      origin_user_id: fc1ca0e9b4964754be3c0c25b45b4891f06d6914
+                      routing_details:
+                      - cc: []
+                        id: e2f2ee66c80844afb8d28978deaa90ce23a33984
+                        data:
+                        - name: Recipient 1
+                          role_id: d8f95fea6ac54de7a723bc2c87c2f5a783b1d955
+                          reassign: false
+                          reminder:
+                            remind_after: 10
+                            remind_before: 11
+                            remind_repeat: 7
+                          inviter_role: false
+                          default_email: ''
+                          delivery_type: email
+                          signing_order: 1
+                          expiration_days: 30
+                          decline_by_signature: false
+                        cc_step: []
+                        created: 1651820263
+                        updated: 1651820263
+                        viewers: []
+                        invite_link_instructions: ''
+                      original_filename: test copy 11.pdf
+                      origin_document_id: 3e04d53cb02f4dc68482d8fe441b6c54bcc15301
+                      document_group_info: null
+                      enumeration_options: []
+                      viewer_field_invites: []
+                    meta:
+                      pagination:
+                        count: 1
+                        links: []
+                        total: 1
+                        per_page: 15
+                        total_pages: 1
+                        current_page: 1
+              example:
+                Example 1:
+                  data:
+                  - id: 5b99617cacb54336a81a112b37aa97715997d6dd
+                    owner: skochok.denys+5@airslate.com
+                    roles:
+                    - name: Recipient 1
+                      unique_id: d8f95fea6ac54de7a723bc2c87c2f5a783b1d955
+                      signing_order: 1
+                    fields:
+                    - id: 13b217bda6b44ee1a76189a93bab55a688546703
+                      role: Recipient 1
+                      type: signature
+                      role_id: d8f95fea6ac54de7a723bc2c87c2f5a783b1d955
+                      field_id: 6738efc957b54a898c4a63157db829b288b6c6ad
+                      fulfiller: skochok.denys+7@airslate.com
+                      element_id: null
+                      originator: skochok.denys+5@airslate.com
+                      json_attributes:
+                        x: 131
+                        y: 119
+                        name: Signature_1
+                        width: 80
+                        height: 20
+                        required: true
+                        page_number: 0
+                        allowed_types:
+                        - type
+                        - draw
+                        - upload
+                      field_request_id: 6738efc957b54a898c4a63157db829b288b6c6ad
+                      template_field_id: bec6a2bc1df34c8eaf8dad14fa91219efcde812f
+                      field_request_canceled: null
+                    created: 1651820262
+                    updated: 1651820264
+                    user_id: fc1ca0e9b4964754be3c0c25b45b4891f06d6914
+                    requests: []
+                    settings:
+                      ololo: false
+                      mytext: false
+                      mytext1: false
+                      enable_mfa: false
+                      enable_pki: false
+                      copy_export: false
+                      date_format: false
+                      enable_qwer: false
+                      upload_limit: false
+                      document_guide: false
+                      sso-only-login: false
+                      mobileweb_option: false
+                      cloud_auto_export: false
+                      logout_on_signing: false
+                      restrict_download: false
+                      common_experiments: false
+                      enable_experiments: false
+                      add_signature_stamp: false
+                      email_logo_position: false
+                      cfr_title_21_part_11: false
+                      email_btn_bkgd_color: false
+                      email_btn_text_color: false
+                      email_custom_message: false
+                      email_custom_subject: false
+                      email_footer_enabled: false
+                      enable_eu_date_format: false
+                      require_email_subject: false
+                      enable_hyperlink_field: false
+                      invite_expiration_days: false
+                      no_document_attachment: false
+                      agree_to_be_beta_tester: false
+                      electronic_consent_text: false
+                      flatten_document_fields: false
+                      org_allowed_team_admins: false
+                      document_schema_extended: false
+                      enable_document_comments: false
+                      front_end_session_length: false
+                      no_user_signature_return: false
+                      require_drawn_signatures: false
+                      signature_stamp_position: false
+                      allow_big_attachment_file: false
+                      cloud_export_with_history: false
+                      enable_full_story_tracker: false
+                      require_login_for_signing: false
+                      allow_download_certificate: false
+                      do_no_consent_redirect_url: false
+                      disable_email_notifications: false
+                      electronic_consent_required: false
+                      email_admin_on_banned_login: false
+                      enable_hyperlink_protection: false
+                      enable_team_admin_move_docs: false
+                      invite_decline_redirect_url: false
+                      allow_team_admin_rename_docs: false
+                      emailed_docs_include_history: false
+                      lock_signing_date_by_default: false
+                      no_document_file_attachments: false
+                      add_signature_stamp_with_name: false
+                      digitally_sign_dowloaded_docs: false
+                      watermark_downloaded_document: false
+                      invite_completion_redirect_url: false
+                      required_preset_signature_name: false
+                      signing_link_document_download: false
+                      block_login_via_social_networks: false
+                      hide_upgrade_subscription_button: false
+                      allow_edit_document_after_signing: false
+                      default_field_invite_remind_after: false
+                      disable_download_action_in_editor: false
+                      enable_advanced_threat_protection: false
+                      have_merged_document_group_option: false
+                      auto_deletion_documents_from_trash: false
+                      default_field_invite_remind_before: false
+                      default_field_invite_remind_repeat: false
+                      document_completion_retention_days: false
+                      require_authentication_for_invites: false
+                      save_signer_signature_and_initials: false
+                      signing_link_document_name_formula: false
+                      disable_recipients_list_from_editor: false
+                      document_attachment_only_for_signer: false
+                      default_field_invite_expiration_time: false
+                      unsuccessful_logout_attempts_allowed: false
+                      audit_trail_completion_retention_days: false
+                      block_organization_selfleave_by_member: false
+                      enable_render_pages_in_editor_as_images: false
+                      allow_document_copying_to_other_accounts: false
+                      allow_embedded_extended_token_expiration: false
+                      pending_invite_document_view_notification: false
+                      guide_signers_only_through_required_fields: false
+                      redirect_to_registration_when_fields_saved: false
+                      hide_decline_to_sign_option_in_signing_session: false
+                      max_attachments_for_signnow_fields_per_document: false
+                      only_administrator_is_able_to_invite_to_the_team: false
+                      allow_big_count_of_attachment_fields_per_document: false
+                      agreement_to_test_new_functionality_in_organization: false
+                      auto_apply_signatures_and_initials_to_document_fields: false
+                      block_export_options_when_credit_card_validation_is_used: false
+                      receive_signer_email_after_sent_field_invite_to_yourself: false
+                      enable_document_download_link_for_invite_completion_mails: false
+                      cc_completion_email_contain_only_downloading_document_link: false
+                      invite_update_notifications_for_all_invites_at_invite_create: false
+                      every_signature_and_initials_field_requires_user_authentication: false
+                    parent_id: eb6bf72b6fb24ebdadb09dd3186880bd69f89a58
+                    thumbnail:
+                      large: https://api.signnow-dev.xyz//document/5b99617cacb54336a81a112b37aa97715997d6dd/thumbnail?size=large
+                      small: https://api.signnow-dev.xyz//document/5b99617cacb54336a81a112b37aa97715997d6dd/thumbnail?size=small
+                      medium: https://api.signnow-dev.xyz//document/5b99617cacb54336a81a112b37aa97715997d6dd/thumbnail?size=medium
+                    page_count: 1
+                    signatures: []
+                    attachments: []
+                    viewer_roles: []
+                    document_name: test copy 11
+                    field_invites:
+                    - id: d57289ea57854323b1090f283fc475334a5fc065
+                      role: Recipient 1
+                      email: skochok.denys+7@airslate.com
+                      status: pending
+                      created: 1651820263
+                      role_id: d8f95fea6ac54de7a723bc2c87c2f5a783b1d955
+                      updated: 1651820264
+                      declined: []
+                      reassign: false
+                      reminder: true
+                      id_verified: UNVERIFIED
+                      is_embedded: false
+                      delivery_type: email
+                      password_type: ''
+                      signer_user_id: 509c873b2d8e4f278e7ae0db652a49288fd67cbc
+                      expiration_time: 1654412264
+                      is_draft_exists: false
+                      password_method: ''
+                      payment_request: null
+                      is_full_declined: false
+                      is_document_locked: false
+                      password_protected: false
+                      email_sent_statuses:
+                      - status: sent
+                        created_at: 1651820264
+                        last_reaction_at: 1651820264
+                      force_new_signature: null
+                      signer_phone_invite: null
+                      decline_by_signature: '0'
+                      signing_instructions: null
+                      electronic_consent_id: null
+                      prefill_signature_name: null
+                      id_verification_required: 'NO'
+                      electronic_consent_required: 0
+                      required_preset_signature_name: null
+                    origin_user_id: fc1ca0e9b4964754be3c0c25b45b4891f06d6914
+                    routing_details:
+                    - cc: []
+                      id: e2f2ee66c80844afb8d28978deaa90ce23a33984
+                      data:
+                      - name: Recipient 1
+                        role_id: d8f95fea6ac54de7a723bc2c87c2f5a783b1d955
+                        reassign: false
+                        reminder:
+                          remind_after: 10
+                          remind_before: 11
+                          remind_repeat: 7
+                        inviter_role: false
+                        default_email: ''
+                        delivery_type: email
+                        signing_order: 1
+                        expiration_days: 30
+                        decline_by_signature: false
+                      cc_step: []
+                      created: 1651820263
+                      updated: 1651820263
+                      viewers: []
+                      invite_link_instructions: ''
+                    original_filename: test copy 11.pdf
+                    origin_document_id: 3e04d53cb02f4dc68482d8fe441b6c54bcc15301
+                    document_group_info: null
+                    enumeration_options: []
+                    viewer_field_invites: []
+                  meta:
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                Request with declined invite:
+                  data:
+                  - id: 5bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    owner: sender@email.com
+                    roles:
+                    - name: Recipient 1
+                      unique_id: d8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      signing_order: 1
+                    seals: []
+                    texts: []
+                    checks: []
+                    fields:
+                    - id: 13XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      role: Recipient 1
+                      type: signature
+                      role_id: d8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_id: 8bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      fulfiller: signer@email.com
+                      element_id: null
+                      originator: owner@email.com
+                      json_attributes:
+                        x: 68
+                        y: 664
+                        name: Signature 1
+                        width: 83
+                        height: 21
+                        required: true
+                        page_number: 0
+                        allowed_types:
+                        - type
+                        - draw
+                        - upload
+                      field_request_id: 8bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      template_field_id: beXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_request_canceled: null
+                    created: 1716320167
+                    inserts: []
+                    updated: 1716320169
+                    user_id: fcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    requests: []
+                    settings:
+                      allow_qes: false
+                      enable_mfa: false
+                      enable_pki: false
+                      enable_qes: false
+                      copy_export: false
+                      date_format: false
+                      upload_limit: false
+                      document_guide: false
+                      signing_reason: false
+                      sso-only-login: false
+                      run_experiments: false
+                      mobileweb_option: false
+                      cloud_auto_export: false
+                      default_workspace: false
+                      logout_on_signing: false
+                      restrict_download: false
+                      common_experiments: false
+                      add_signature_stamp: false
+                      disable_form_search: false
+                      email_logo_position: false
+                      cfr_title_21_part_11: false
+                      email_btn_bkgd_color: false
+                      email_btn_text_color: false
+                      email_custom_message: false
+                      email_custom_subject: false
+                      email_footer_enabled: false
+                      advanced_signing_flow: false
+                      enable_eu_date_format: false
+                      flatten_before_aspose: false
+                      require_email_subject: false
+                      use_team_generic_data: false
+                      enable_hyperlink_field: false
+                      invite_expiration_days: false
+                      no_document_attachment: false
+                      workspace_organization: false
+                      agree_to_be_beta_tester: false
+                      electronic_consent_text: false
+                      org_allowed_team_admins: false
+                      disable_email_recipients: false
+                      document_schema_extended: false
+                      enable_document_comments: false
+                      front_end_session_length: false
+                      no_user_signature_return: false
+                      require_drawn_signatures: false
+                      signature_stamp_position: false
+                      allow_big_attachment_file: false
+                      cloud_export_with_history: false
+                      enable_full_story_tracker: false
+                      enable_team_generic_email: false
+                      require_login_for_signing: false
+                      allow_download_certificate: false
+                      default_workspace_assigned: false
+                      do_no_consent_redirect_url: false
+                      disable_email_notifications: false
+                      electronic_consent_required: false
+                      email_admin_on_banned_login: false
+                      enable_hyperlink_protection: false
+                      enable_team_admin_move_docs: false
+                      invite_decline_redirect_url: false
+                      parse_only_signature_fields: false
+                      allow_team_admin_rename_docs: false
+                      emailed_docs_include_history: false
+                      lock_signing_date_by_default: false
+                      no_document_file_attachments: false
+                      add_signature_stamp_with_name: false
+                      attach_doc_on_all_cc_messages: false
+                      digitally_sign_dowloaded_docs: false
+                      watermark_downloaded_document: false
+                      invite_completion_redirect_url: false
+                      required_preset_signature_name: false
+                      signing_link_document_download: false
+                      block_login_via_social_networks: false
+                      completed_document_name_formula: false
+                      hide_upgrade_subscription_button: false
+                      allow_edit_document_after_signing: false
+                      default_field_invite_remind_after: false
+                      disable_download_action_in_editor: false
+                      enable_advanced_threat_protection: false
+                      have_merged_document_group_option: false
+                      default_field_invite_remind_before: false
+                      default_field_invite_remind_repeat: false
+                      document_completion_retention_days: false
+                      require_authentication_for_invites: false
+                      save_signer_signature_and_initials: false
+                      document_attachment_only_for_signer: false
+                      default_field_invite_expiration_time: false
+                      unsuccessful_logout_attempts_allowed: false
+                      audit_trail_completion_retention_days: false
+                      block_organization_selfleave_by_member: false
+                      enable_render_pages_in_editor_as_images: false
+                      allow_document_copying_to_other_accounts: false
+                      allow_embedded_extended_token_expiration: false
+                      pending_invite_document_view_notification: false
+                      disable_problem_invite_email_notifications: false
+                      guide_signers_only_through_required_fields: false
+                      redirect_to_registration_when_fields_saved: false
+                      hide_decline_to_sign_option_in_signing_session: false
+                      only_administrator_is_able_to_invite_to_the_team: false
+                      allow_big_count_of_attachment_fields_per_document: false
+                      agreement_to_test_new_functionality_in_organization: false
+                      document_prefill_disable_fields_existing_validation: false
+                      auto_apply_signatures_and_initials_to_document_fields: false
+                      allow_team_admin_create_csv_report_for_shared_template: false
+                      block_export_options_when_credit_card_validation_is_used: false
+                      receive_signer_email_after_sent_field_invite_to_yourself: false
+                      enable_document_download_link_for_invite_completion_mails: false
+                      cc_completion_email_contain_only_downloading_document_link: false
+                      invite_update_notifications_for_all_invites_at_invite_create: false
+                      every_signature_and_initials_field_requires_user_authentication: false
+                    parent_id: 67XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    thumbnail:
+                      large: https://api-eval.signnow.com/document/5bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                      small: https://api-eval.signnow.com/document/5bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                      medium: https://api-eval.signnow.com/document/5bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                    page_count: 1
+                    signatures: []
+                    attachments: []
+                    radiobuttons: []
+                    viewer_roles: []
+                    document_name: Request two signatures
+                    entity_labels:
+                    - updated: 1716320189
+                      is_system: true
+                      label_name: declined
+                    field_invites:
+                    - id: d5XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      role: Recipient 1
+                      email: signer@email.com
+                      status: pending
+                      created: 1716320169
+                      role_id: d8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      updated: 1716320169
+                      declined:
+                      - declined_text: The document contains incorrect data
+                      reassign: false
+                      reminder: false
+                      id_verified: UNVERIFIED
+                      is_embedded: false
+                      delivery_type: email
+                      password_type: ''
+                      signer_user_id: 50XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      expiration_time: 1718912169
+                      is_draft_exists: false
+                      password_method: ''
+                      payment_request: null
+                      is_full_declined: false
+                      is_document_locked: false
+                      password_protected: false
+                      email_sent_statuses:
+                      - status: sent
+                        created_at: 1716320171
+                        last_reaction_at: 1716320171
+                      - status: mail_open
+                        created_at: 1716320176
+                        last_reaction_at: 1716320175
+                      - status: mail_click
+                        created_at: 1716320177
+                        last_reaction_at: 1716320175
+                      force_new_signature: null
+                      signer_phone_invite: null
+                      decline_by_signature: '0'
+                      signing_instructions: null
+                      electronic_consent_id: 2aXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      prefill_signature_name: null
+                      id_verification_required: 'NO'
+                      electronic_consent_required: 1
+                      required_preset_signature_name: null
+                    recently_used: 1716320189
+                    notary_invites: []
+                    origin_user_id: fcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    routing_details:
+                    - cc: []
+                      id: e2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      data:
+                      - name: Recipient 1
+                        role_id: d8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        reassign: false
+                        reminder:
+                          remind_after: 0
+                          remind_before: 0
+                          remind_repeat: 0
+                        inviter_role: false
+                        default_email: signer@email.com
+                        delivery_type: email
+                        signing_order: 1
+                        expiration_days: 30
+                        decline_by_signature: false
+                      cc_step: []
+                      created: 1716320168
+                      updated: 1716320168
+                      viewers: []
+                      invite_link_instructions: ''
+                    field_validators: []
+                    original_filename: Request two signatures.pdf
+                    origin_document_id: 3eXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    document_group_info: null
+                    enumeration_options: []
+                    viewer_field_invites: []
+                  meta:
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                Request with sort and ordering:
+                  data:
+                  - id: 77XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    owner: owner@email.com
+                    roles:
+                    - name: Recipient 1
+                      unique_id: 9bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      signing_order: 1
+                    fields:
+                    - id: 51XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      role: Recipient 1
+                      type: signature
+                      role_id: 9bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_id: f1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      fulfiller: signer@email.com
+                      element_id: null
+                      originator: sender@email.com
+                      json_attributes:
+                        x: 114
+                        y: 122
+                        name: Signature_1
+                        width: 80
+                        height: 20
+                        required: true
+                        page_number: 0
+                        allowed_types:
+                        - type
+                        - draw
+                        - upload
+                      field_request_id: f1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      template_field_id: 42XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_request_canceled: null
+                    created: 1652070929
+                    updated: 1652070931
+                    user_id: fcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    requests: []
+                    settings:
+                      ololo: false
+                      mytext: false
+                      mytext1: false
+                      enable_mfa: false
+                      enable_pki: false
+                      copy_export: false
+                      date_format: false
+                      enable_qwer: false
+                      upload_limit: false
+                      document_guide: false
+                      sso-only-login: false
+                      mobileweb_option: false
+                      cloud_auto_export: false
+                      logout_on_signing: false
+                      restrict_download: false
+                      common_experiments: false
+                      enable_experiments: false
+                      add_signature_stamp: false
+                      email_logo_position: false
+                      cfr_title_21_part_11: false
+                      email_btn_bkgd_color: false
+                      email_btn_text_color: false
+                      email_custom_message: false
+                      email_custom_subject: false
+                      email_footer_enabled: false
+                      enable_eu_date_format: false
+                      require_email_subject: false
+                      enable_hyperlink_field: false
+                      invite_expiration_days: false
+                      no_document_attachment: false
+                      agree_to_be_beta_tester: false
+                      electronic_consent_text: false
+                      flatten_document_fields: false
+                      org_allowed_team_admins: false
+                      document_schema_extended: false
+                      enable_document_comments: false
+                      front_end_session_length: false
+                      no_user_signature_return: false
+                      require_drawn_signatures: false
+                      signature_stamp_position: false
+                      allow_big_attachment_file: false
+                      cloud_export_with_history: false
+                      enable_full_story_tracker: false
+                      require_login_for_signing: false
+                      allow_download_certificate: false
+                      do_no_consent_redirect_url: false
+                      disable_email_notifications: false
+                      electronic_consent_required: false
+                      email_admin_on_banned_login: false
+                      enable_hyperlink_protection: false
+                      enable_team_admin_move_docs: false
+                      invite_decline_redirect_url: false
+                      allow_team_admin_rename_docs: false
+                      emailed_docs_include_history: false
+                      lock_signing_date_by_default: false
+                      no_document_file_attachments: false
+                      add_signature_stamp_with_name: false
+                      digitally_sign_dowloaded_docs: false
+                      watermark_downloaded_document: false
+                      invite_completion_redirect_url: false
+                      required_preset_signature_name: false
+                      signing_link_document_download: false
+                      block_login_via_social_networks: false
+                      hide_upgrade_subscription_button: false
+                      allow_edit_document_after_signing: false
+                      default_field_invite_remind_after: false
+                      disable_download_action_in_editor: false
+                      enable_advanced_threat_protection: false
+                      have_merged_document_group_option: false
+                      auto_deletion_documents_from_trash: false
+                      default_field_invite_remind_before: false
+                      default_field_invite_remind_repeat: false
+                      document_completion_retention_days: false
+                      require_authentication_for_invites: false
+                      save_signer_signature_and_initials: false
+                      signing_link_document_name_formula: false
+                      disable_recipients_list_from_editor: false
+                      document_attachment_only_for_signer: false
+                      default_field_invite_expiration_time: false
+                      unsuccessful_logout_attempts_allowed: false
+                      audit_trail_completion_retention_days: false
+                      block_organization_selfleave_by_member: false
+                      enable_render_pages_in_editor_as_images: false
+                      allow_document_copying_to_other_accounts: false
+                      allow_embedded_extended_token_expiration: false
+                      pending_invite_document_view_notification: false
+                      guide_signers_only_through_required_fields: false
+                      redirect_to_registration_when_fields_saved: false
+                      hide_decline_to_sign_option_in_signing_session: false
+                      max_attachments_for_signnow_fields_per_document: false
+                      only_administrator_is_able_to_invite_to_the_team: false
+                      allow_big_count_of_attachment_fields_per_document: false
+                      agreement_to_test_new_functionality_in_organization: false
+                      auto_apply_signatures_and_initials_to_document_fields: false
+                      block_export_options_when_credit_card_validation_is_used: false
+                      receive_signer_email_after_sent_field_invite_to_yourself: false
+                      enable_document_download_link_for_invite_completion_mails: false
+                      cc_completion_email_contain_only_downloading_document_link: false
+                      invite_update_notifications_for_all_invites_at_invite_create: false
+                      every_signature_and_initials_field_requires_user_authentication: false
+                    parent_id: ebXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    thumbnail:
+                      large: https://example.com/thumbnail?size=large
+                      small: https://example.com/thumbnail?size=small
+                      medium: https://example.com/thumbnail?size=medium
+                    page_count: 1
+                    signatures: []
+                    attachments: []
+                    viewer_roles: []
+                    document_name: sample copy 5
+                    field_invites:
+                    - id: 77XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      role: Recipient 1
+                      email: signer@email.com
+                      status: pending
+                      created: 1652070930
+                      role_id: 9bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      updated: 1652070931
+                      declined: []
+                      reassign: false
+                      reminder: true
+                      id_verified: UNVERIFIED
+                      is_embedded: false
+                      delivery_type: email
+                      password_type: ''
+                      signer_user_id: a7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      expiration_time: 1654662931
+                      is_draft_exists: false
+                      password_method: ''
+                      payment_request: null
+                      is_full_declined: false
+                      is_document_locked: false
+                      password_protected: false
+                      email_sent_statuses:
+                      - status: sent
+                        created_at: 1652070932
+                        last_reaction_at: 1652070932
+                      force_new_signature: null
+                      signer_phone_invite: null
+                      decline_by_signature: '0'
+                      signing_instructions: null
+                      electronic_consent_id: null
+                      prefill_signature_name: null
+                      id_verification_required: 'NO'
+                      electronic_consent_required: 0
+                      required_preset_signature_name: null
+                    origin_user_id: fcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    routing_details:
+                    - cc: []
+                      id: 99XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      data:
+                      - name: Recipient 1
+                        role_id: 9bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        reassign: false
+                        reminder:
+                          remind_after: 10
+                          remind_before: 11
+                          remind_repeat: 7
+                        inviter_role: false
+                        default_email: ''
+                        delivery_type: email
+                        signing_order: 1
+                        expiration_days: 30
+                        decline_by_signature: false
+                      cc_step: []
+                      created: 1652070929
+                      updated: 1652070929
+                      viewers: []
+                      invite_link_instructions: ''
+                    original_filename: sample copy 5.pdf
+                    origin_document_id: 6aXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    document_group_info: null
+                    enumeration_options: []
+                    viewer_field_invites: []
+                  - id: 78XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    owner: owner@email.com
+                    roles:
+                    - name: Recipient 1
+                      unique_id: e7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      signing_order: 1
+                    fields:
+                    - id: 40XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      role: Recipient 1
+                      type: signature
+                      role_id: e7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_id: fbXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      fulfiller: signer@email.com
+                      element_id: null
+                      originator: sender@email.com
+                      json_attributes:
+                        x: 114
+                        y: 122
+                        name: Signature_1
+                        width: 80
+                        height: 20
+                        required: true
+                        page_number: 0
+                        allowed_types:
+                        - type
+                        - draw
+                        - upload
+                      field_request_id: fbXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      template_field_id: 42XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_request_canceled: null
+                    created: 1652070809
+                    updated: 1652070811
+                    user_id: fcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    requests: []
+                    settings:
+                      mytext: false
+                      mytext1: false
+                      enable_mfa: false
+                      enable_pki: false
+                      copy_export: false
+                      date_format: false
+                      enable_qwer: false
+                      upload_limit: false
+                      document_guide: false
+                      sso-only-login: false
+                      mobileweb_option: false
+                      cloud_auto_export: false
+                      logout_on_signing: false
+                      restrict_download: false
+                      common_experiments: false
+                      enable_experiments: false
+                      add_signature_stamp: false
+                      email_logo_position: false
+                      cfr_title_21_part_11: false
+                      email_btn_bkgd_color: false
+                      email_btn_text_color: false
+                      email_custom_message: false
+                      email_custom_subject: false
+                      email_footer_enabled: false
+                      enable_eu_date_format: false
+                      require_email_subject: false
+                      enable_hyperlink_field: false
+                      invite_expiration_days: false
+                      no_document_attachment: false
+                      agree_to_be_beta_tester: false
+                      electronic_consent_text: false
+                      flatten_document_fields: false
+                      org_allowed_team_admins: false
+                      document_schema_extended: false
+                      enable_document_comments: false
+                      front_end_session_length: false
+                      no_user_signature_return: false
+                      require_drawn_signatures: false
+                      signature_stamp_position: false
+                      allow_big_attachment_file: false
+                      cloud_export_with_history: false
+                      enable_full_story_tracker: false
+                      require_login_for_signing: false
+                      allow_download_certificate: false
+                      do_no_consent_redirect_url: false
+                      disable_email_notifications: false
+                      electronic_consent_required: false
+                      email_admin_on_banned_login: false
+                      enable_hyperlink_protection: false
+                      enable_team_admin_move_docs: false
+                      invite_decline_redirect_url: false
+                      allow_team_admin_rename_docs: false
+                      emailed_docs_include_history: false
+                      lock_signing_date_by_default: false
+                      no_document_file_attachments: false
+                      add_signature_stamp_with_name: false
+                      digitally_sign_dowloaded_docs: false
+                      watermark_downloaded_document: false
+                      invite_completion_redirect_url: false
+                      required_preset_signature_name: false
+                      signing_link_document_download: false
+                      block_login_via_social_networks: false
+                      hide_upgrade_subscription_button: false
+                      allow_edit_document_after_signing: false
+                      default_field_invite_remind_after: false
+                      disable_download_action_in_editor: false
+                      enable_advanced_threat_protection: false
+                      have_merged_document_group_option: false
+                      auto_deletion_documents_from_trash: false
+                      default_field_invite_remind_before: false
+                      default_field_invite_remind_repeat: false
+                      document_completion_retention_days: false
+                      require_authentication_for_invites: false
+                      save_signer_signature_and_initials: false
+                      signing_link_document_name_formula: false
+                      disable_recipients_list_from_editor: false
+                      document_attachment_only_for_signer: false
+                      default_field_invite_expiration_time: false
+                      unsuccessful_logout_attempts_allowed: false
+                      audit_trail_completion_retention_days: false
+                      block_organization_selfleave_by_member: false
+                      enable_render_pages_in_editor_as_images: false
+                      allow_document_copying_to_other_accounts: false
+                      allow_embedded_extended_token_expiration: false
+                      pending_invite_document_view_notification: false
+                      guide_signers_only_through_required_fields: false
+                      redirect_to_registration_when_fields_saved: false
+                      hide_decline_to_sign_option_in_signing_session: false
+                      max_attachments_for_signnow_fields_per_document: false
+                      only_administrator_is_able_to_invite_to_the_team: false
+                      allow_big_count_of_attachment_fields_per_document: false
+                      agreement_to_test_new_functionality_in_organization: false
+                      auto_apply_signatures_and_initials_to_document_fields: false
+                      block_export_options_when_credit_card_validation_is_used: false
+                      receive_signer_email_after_sent_field_invite_to_yourself: false
+                      enable_document_download_link_for_invite_completion_mails: false
+                      cc_completion_email_contain_only_downloading_document_link: false
+                      invite_update_notifications_for_all_invites_at_invite_create: false
+                      every_signature_and_initials_field_requires_user_authentication: false
+                    parent_id: ebXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    thumbnail:
+                      large: https://example.com/thumbnail?size=large
+                      small: https://example.com/thumbnail?size=small
+                      medium: https://example.com/thumbnail?size=medium
+                    page_count: 1
+                    signatures: []
+                    attachments: []
+                    viewer_roles: []
+                    document_name: sample copy 5
+                    entity_labels: []
+                    field_invites:
+                    - id: d4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      role: Recipient 1
+                      email: signer@email.com
+                      status: pending
+                      created: 1652070811
+                      role_id: e7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      updated: 1652070811
+                      declined: []
+                      reassign: false
+                      reminder: true
+                      id_verified: UNVERIFIED
+                      is_embedded: false
+                      delivery_type: email
+                      password_type: ''
+                      signer_user_id: fbXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      expiration_time: 1654662811
+                      is_draft_exists: false
+                      password_method: ''
+                      payment_request: null
+                      is_full_declined: false
+                      is_document_locked: false
+                      password_protected: false
+                      email_sent_statuses:
+                      - status: sent
+                        created_at: 1652070812
+                        last_reaction_at: 1652070812
+                      force_new_signature: null
+                      signer_phone_invite: null
+                      decline_by_signature: '0'
+                      signing_instructions: null
+                      electronic_consent_id: null
+                      prefill_signature_name: null
+                      id_verification_required: 'NO'
+                      electronic_consent_required: 0
+                      required_preset_signature_name: null
+                    origin_user_id: fcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    routing_details:
+                    - cc: []
+                      id: 54XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      data:
+                      - name: Recipient 1
+                        role_id: e7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        reassign: false
+                        reminder:
+                          remind_after: 10
+                          remind_before: 11
+                          remind_repeat: 7
+                        inviter_role: false
+                        default_email: ''
+                        delivery_type: email
+                        signing_order: 1
+                        expiration_days: 30
+                        decline_by_signature: false
+                      cc_step: []
+                      created: 1652070809
+                      updated: 1652070809
+                      viewers: []
+                      invite_link_instructions: ''
+                    original_filename: sample copy 5.pdf
+                    origin_document_id: 6aXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    document_group_info: null
+                    enumeration_options: []
+                    viewer_field_invites: []
+                  meta:
+                    pagination:
+                      count: 2
+                      links: []
+                      total: 2
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                Request without query parameters:
+                  data:
+                  - id: 5bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    owner: owner@email.com
+                    roles:
+                    - name: Recipient 1
+                      unique_id: d8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      signing_order: 1
+                    fields:
+                    - id: 13XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      role: Recipient 1
+                      type: signature
+                      role_id: d8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_id: 67XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      fulfiller: signer@email.com
+                      element_id: null
+                      originator: sender@email.com
+                      json_attributes:
+                        x: 131
+                        y: 119
+                        name: Signature_1
+                        width: 80
+                        height: 20
+                        required: true
+                        page_number: 0
+                        allowed_types:
+                        - type
+                        - draw
+                        - upload
+                      field_request_id: 67XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      template_field_id: beXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_request_canceled: null
+                    created: 1651820262
+                    updated: 1651820264
+                    user_id: fcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    requests: []
+                    settings:
+                      mytext: false
+                      mytext1: false
+                      enable_mfa: false
+                      enable_pki: false
+                      copy_export: false
+                      date_format: false
+                      enable_qwer: false
+                      upload_limit: false
+                      document_guide: false
+                      sso-only-login: false
+                      mobileweb_option: false
+                      cloud_auto_export: false
+                      logout_on_signing: false
+                      restrict_download: false
+                      common_experiments: false
+                      enable_experiments: false
+                      add_signature_stamp: false
+                      email_logo_position: false
+                      cfr_title_21_part_11: false
+                      email_btn_bkgd_color: false
+                      email_btn_text_color: false
+                      email_custom_message: false
+                      email_custom_subject: false
+                      email_footer_enabled: false
+                      enable_eu_date_format: false
+                      require_email_subject: false
+                      enable_hyperlink_field: false
+                      invite_expiration_days: false
+                      no_document_attachment: false
+                      agree_to_be_beta_tester: false
+                      electronic_consent_text: false
+                      flatten_document_fields: false
+                      org_allowed_team_admins: false
+                      document_schema_extended: false
+                      enable_document_comments: false
+                      front_end_session_length: false
+                      no_user_signature_return: false
+                      require_drawn_signatures: false
+                      signature_stamp_position: false
+                      allow_big_attachment_file: false
+                      cloud_export_with_history: false
+                      enable_full_story_tracker: false
+                      require_login_for_signing: false
+                      allow_download_certificate: false
+                      do_no_consent_redirect_url: false
+                      disable_email_notifications: false
+                      electronic_consent_required: false
+                      email_admin_on_banned_login: false
+                      enable_hyperlink_protection: false
+                      enable_team_admin_move_docs: false
+                      invite_decline_redirect_url: false
+                      allow_team_admin_rename_docs: false
+                      emailed_docs_include_history: false
+                      lock_signing_date_by_default: false
+                      no_document_file_attachments: false
+                      add_signature_stamp_with_name: false
+                      digitally_sign_dowloaded_docs: false
+                      watermark_downloaded_document: false
+                      invite_completion_redirect_url: false
+                      required_preset_signature_name: false
+                      signing_link_document_download: false
+                      block_login_via_social_networks: false
+                      hide_upgrade_subscription_button: false
+                      allow_edit_document_after_signing: false
+                      default_field_invite_remind_after: false
+                      disable_download_action_in_editor: false
+                      enable_advanced_threat_protection: false
+                      have_merged_document_group_option: false
+                      auto_deletion_documents_from_trash: false
+                      default_field_invite_remind_before: false
+                      default_field_invite_remind_repeat: false
+                      document_completion_retention_days: false
+                      require_authentication_for_invites: false
+                      save_signer_signature_and_initials: false
+                      signing_link_document_name_formula: false
+                      disable_recipients_list_from_editor: false
+                      document_attachment_only_for_signer: false
+                      default_field_invite_expiration_time: false
+                      unsuccessful_logout_attempts_allowed: false
+                      audit_trail_completion_retention_days: false
+                      block_organization_selfleave_by_member: false
+                      enable_render_pages_in_editor_as_images: false
+                      allow_document_copying_to_other_accounts: false
+                      allow_embedded_extended_token_expiration: false
+                      pending_invite_document_view_notification: false
+                      guide_signers_only_through_required_fields: false
+                      redirect_to_registration_when_fields_saved: false
+                      hide_decline_to_sign_option_in_signing_session: false
+                      max_attachments_for_signnow_fields_per_document: false
+                      only_administrator_is_able_to_invite_to_the_team: false
+                      allow_big_count_of_attachment_fields_per_document: false
+                      agreement_to_test_new_functionality_in_organization: false
+                      auto_apply_signatures_and_initials_to_document_fields: false
+                      block_export_options_when_credit_card_validation_is_used: false
+                      receive_signer_email_after_sent_field_invite_to_yourself: false
+                      enable_document_download_link_for_invite_completion_mails: false
+                      cc_completion_email_contain_only_downloading_document_link: false
+                      invite_update_notifications_for_all_invites_at_invite_create: false
+                      every_signature_and_initials_field_requires_user_authentication: false
+                    parent_id: ebXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    thumbnail:
+                      large: https://example.com/thumbnail?size=large
+                      small: https://example.com/thumbnail?size=small
+                      medium: https://example.com/thumbnail?size=medium
+                    page_count: 1
+                    signatures: []
+                    attachments: []
+                    viewer_roles: []
+                    document_name: sample copy 11
+                    entity_labels: []
+                    field_invites:
+                    - id: d5XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      role: Recipient 1
+                      email: signer@email.com
+                      status: pending
+                      created: 1651820263
+                      role_id: d8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      updated: 1651820264
+                      declined: []
+                      reassign: false
+                      reminder: true
+                      id_verified: UNVERIFIED
+                      is_embedded: false
+                      delivery_type: email
+                      password_type: ''
+                      signer_user_id: 50XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      expiration_time: 1654412264
+                      is_draft_exists: false
+                      password_method: ''
+                      payment_request: null
+                      is_full_declined: false
+                      is_document_locked: false
+                      password_protected: false
+                      email_sent_statuses:
+                      - status: sent
+                        created_at: 1651820264
+                        last_reaction_at: 1651820264
+                      force_new_signature: null
+                      signer_phone_invite: null
+                      decline_by_signature: '0'
+                      signing_instructions: null
+                      electronic_consent_id: null
+                      prefill_signature_name: null
+                      id_verification_required: 'NO'
+                      electronic_consent_required: 0
+                      required_preset_signature_name: null
+                    origin_user_id: fcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    routing_details:
+                    - cc: []
+                      id: e2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      data:
+                      - name: Recipient 1
+                        role_id: d8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        reassign: false
+                        reminder:
+                          remind_after: 10
+                          remind_before: 11
+                          remind_repeat: 7
+                        inviter_role: false
+                        default_email: ''
+                        delivery_type: email
+                        signing_order: 1
+                        expiration_days: 30
+                        decline_by_signature: false
+                      cc_step: []
+                      created: 1651820263
+                      updated: 1651820263
+                      viewers: []
+                      invite_link_instructions: ''
+                    original_filename: sample copy 11.pdf
+                    origin_document_id: 3eXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    document_group_info: null
+                    enumeration_options: []
+                    viewer_field_invites: []
+                  meta:
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+        '400':
+          description: '* Request with incorrect {template_id}
+
+            * Request with {template_id} where the user is not owner of the template
+
+            * Request with Incorrect or missing token
+
+            * Invalid sort_by format, incorrect value
+
+            * Invalid sort_order format, incorrect value
+
+            * Invalid per_page format, incorrect value
+
+            * Invalid page format, incorrect value
+
+            * Invalid filters[signing_status] format, incorrect value'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 13034001
+                      message: Document template `6a100ccb58c34989a47d2d5f0a51c730569448e1` is not found.
+              example:
+                Example 1:
+                  errors:
+                  - code: 13034001
+                    message: Document template `6a100ccb58c34989a47d2d5f0a51c730569448e1` is not found.
+                Invalid page value:
+                  errors:
+                  - code: 13003004
+                    message: Query parameter `page` must be a digit
+                  - code: 13003005
+                    message: Query parameter `page` must be more than 0
+                Incorrect template_id:
+                  errors:
+                  - code: 13034001
+                    message: Document template `{template_id}` is not found.
+                Invalid sort_by value:
+                  errors:
+                  - code: 13003008
+                    message: Query parameter `sort_by` must be a value of (`updated`, `created` or `document_name`).
+                Invalid per_page value:
+                  errors:
+                  - code: 13003001
+                    message: Query parameter `per_page` must be a digit
+                  - code: 13003002
+                    message: Query parameter `per_page` must be more than 0
+                Invalid sort_order value:
+                  errors:
+                  - code: 13003009
+                    message: Query parameter `sort_order` must be a value of (`desc` or `asc`).
+                Incorrect or missing token:
+                  errors:
+                  - code: 1537
+                    error: invalid_token
+                User is not owner of the template:
+                  errors:
+                  - code: 13049001
+                    message: The user is not owner of the template `{template_id}`.
+                Invalid filters[signing_status] value:
+                  message: Validation Error
+                  _message:
+                    errors:
+                    - code: 13051001
+                      message: The `filters.signing_status` field value must be `waiting-for-me`, `waiting-for-others`, `signed`, `pending`, `has-invites`.
+      security:
+      - Bearer: []
+      tags:
+      - Templates
+  /v2/templates/{template_id}/copy:
+    post:
+      operationId: post-v2-templates-template-id-copy
+      summary: Duplicate a template
+      description: 'This endpoint allows API users to create a new template by making a copy of an existing template and editing the copy.
+
+
+        The result is another template. To collect signatures, generate a document from it with Create document from template and send that document, or reach many signers at once with Bulk invite.'
+      parameters:
+      - in: path
+        name: template_id
+        required: true
+        description: ID of the source template.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully created new template copy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Successfully created new template copy:
+                  id: 29XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  name: New sample template
+        '400':
+          description: '* Request with any of cases: invalid token, expired token, empty header, authorization = null, authorization without value
+
+            * The `template_name` field must be a string.
+
+            * The `template_name` field is required and must not be empty.
+
+            * The `template_name` field must be a valid string.
+
+            * The `folder_id` field must be a string.
+
+            * The `folder_id` field must be a valid unique id.
+
+            * Cannot copy a deleted template.
+
+            * Folder of Templates only available.
+
+            * The `clear_recipient_details` field must be a boolean.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+                Cannot copy a deleted template.:
+                  errors:
+                  - code: 13021009
+                    message: Copy deleted template is not possible.
+                Folder of Templates only available.:
+                  errors:
+                  - code: 13021005
+                    message: Folder of Templates only available.
+                The `folder_id` field must be a string.:
+                  errors:
+                  - code: 13021002
+                    message: The `folder_id` field must be a string.
+                The `template_name` field must be a string.:
+                  errors:
+                  - code: 13021001
+                    message: The `template_name` field must be a string.
+                The `folder_id` field must be a valid unique id.:
+                  errors:
+                  - code: 13021003
+                    message: The `folder_id` field must be a valid unique id.
+                The `template_name` field must be a valid string.:
+                  errors:
+                  - code: 13021011
+                    message: The `template_name` field must be a valid string.
+                The `clear_recipient_details` field must be a boolean.:
+                  errors:
+                  - code: 13021012
+                    message: The `clear_recipient_details` field must be a boolean.
+                The `template_name` field is required and must not be empty.:
+                  errors:
+                  - code: 13021010
+                    message: The `template_name` field is required and must not be empty.
+        '403':
+          description: '* Access denied to specific template.
+
+            * Access denied to specific folder.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Access denied to specific folder.:
+                  errors:
+                  - code: 13021004
+                    message: Access denied to {unique_id} folder.
+                Access denied to specific template.:
+                  errors:
+                  - code: 13021008
+                    message: Access denied to {unique_id} template.
+        '404':
+          description: Template is not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Template is not found.:
+                  errors:
+                  - code: 13021006
+                    message: Template {unique_id} is not found.
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - template_name
+              properties:
+                folder_id:
+                  type: string
+                  description: ID of the folder where the new template copy must be saved. If not specified, the new template will be saved to a Template folder.
+                template_name:
+                  type: string
+                  description: The new template name.
+                clear_recipient_details:
+                  type: boolean
+                  description: Whether or not to overwrite the recipients roles and actions in the template. `True` - yes, delete the recipients details from the template copy, `false` - no overwriting, use the recipients' details from the source template.
+              x-examples:
+                Example 1:
+                  folder_id: 586ef233a1f9ec860bb0221e58ee5c57f760e39e
+                  template_name: new template
+                  clear_recipient_details: false
+        required: true
+      tags:
+      - Templates
+  /v2/templates/{template_id}/roles:
+    post:
+      operationId: post-v2-templates-template-id-roles
+      summary: Share template
+      description: 'This endpoint allows an owner of a template to share it with other users (as a viewer or sender).
+
+
+        **Note**: A template can be shared only once with the same user. The user will receive an email notification about the shared template.'
+      parameters:
+      - in: path
+        name: template_id
+        required: true
+        description: ID of the template.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID of the user with whom the template has been shared.
+                  role:
+                    type: string
+                    description: Role of the user. Can be `sender` or `viewer`.
+                  email:
+                    type: string
+                    description: Email of the user with whom the template has been shared.
+                x-examples:
+                  Example 1:
+                    id: a0XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    role: sender
+                    email: user@email.com
+              example:
+                Example 1:
+                  id: a0XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  role: sender
+                  email: user@email.com
+                Successful request:
+                  id: a0XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  role: sender
+                  email: user@mail.com
+        '400':
+          description: '- The template has already been shared with this user.
+
+            - You are not a template owner.
+
+            - Trial users can share up to 10 entities.
+
+            - The user email is not valid.
+
+            - `email` is not a string.
+
+            - `email` is required.
+
+            - `role` must be one of: `viewer`, `sender`.
+
+            - `role` is not a string.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 12029008
+                      message: Template can only be shared once.
+              example:
+                Example 1:
+                  errors:
+                  - code: 12029008
+                    message: Template can only be shared once.
+                Invalid role:
+                  errors:
+                  - code: 12029006
+                    message: 'Role must be one of the choices: `viewer`, `sender`.'
+                Invalid email:
+                  errors:
+                  - code: 12029003
+                    message: Email is not valid.
+                Limit exceeded:
+                  errors:
+                  - code: 12029018
+                    message: Shared entities limit exceeded.
+                Multiple sharing:
+                  errors:
+                  - code: 12029008
+                    message: Entity can only be shared once.
+                email is required:
+                  errors:
+                  - code: 12029002
+                    message: Email is required
+                role not a string:
+                  errors:
+                  - code: 12029005
+                    message: Role must be a string.
+                Not template owner:
+                  errors:
+                  - code: 65582
+                    message: Accessor is not a document owner.
+                email not a string:
+                  errors:
+                  - code: 12029001
+                    message: Email must be a string
+        '404':
+          description: Incorrect `template_id`.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  '404':
+                    type: string
+                x-examples:
+                  Example 1:
+                    '404': 'Unable to find a route to match the URI: v2/templates/inc/roles/39656a89512a42e6b156b4f5558f3c73c5dc15d5'
+              example:
+                Example 1:
+                  '404': 'Unable to find a route to match the URI: v2/templates/inc/roles/39656a89512a42e6b156b4f5558f3c73c5dc15d5'
+                Incorrect template_id:
+                  '404': 'Unable to find a route to match the URI: v2/templates/inc/roles/39656a89512a42e6b156b4f5558f3c73c5dc15d5'
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              - role
+              properties:
+                role:
+                  type: string
+                  example: sender
+                  description: The role assigned to the user. Allowed values are `sender` and `viewer`.
+                email:
+                  type: string
+                  example: user@mail.com
+                  description: The email address of the user you want to share the template with.
+              x-examples:
+                Example 1:
+                  role: sender
+                  email: user@email.com
+        required: true
+      tags:
+      - Templates
+  /v2/templates/{template_id}/roles/{user_id}:
     put:
-      tags:
-      - Templates
-      summary: Update a document group template
-      operationId: updateGroupTemplate
+      operationId: put-v2-templates-template-id-roles-user-id
+      summary: Update role for template
+      description: 'This endpoint allows an owner of the template to change a user role for a specific shared template.
+
+
+        **Note**: Only the template owner can make role changes.'
       parameters:
-      - name: template_id
-        in: path
+      - in: path
+        name: template_id
         required: true
+        description: ID of the template.
+        schema:
+          type: string
+      - in: path
+        name: user_id
+        required: true
+        description: ID of the user.
         schema:
           type: string
       responses:
         '200':
-          description: OK
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  role:
+                    type: string
+                  email:
+                    type: string
+                x-examples:
+                  Example 1:
+                    id: a0XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    role: viewer
+                    email: user@email.com
+              example:
+                Example 1:
+                  id: a0XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  role: viewer
+                  email: user@email.com
+                Successful request:
+                  id: a0XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  role: viewer
+                  email: user@mail.com
+        '400':
+          description: '- You are not a template owner.
+
+            - `role` must be one of: `viewer`, `sender`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 65582
+                      message: Accessor is not a document owner.
+              example:
+                Example 1:
+                  errors:
+                  - code: 65582
+                    message: Accessor is not a document owner.
+                Incorrect role:
+                  errors:
+                  - code: 12029006
+                    message: 'Role must be one of the choices: `viewer`, `sender`.'
+                Not a template owner:
+                  errors:
+                  - code: 65582
+                    message: Accessor is not a document owner.
+        '404':
+          description: '- Incorrect `template_id`.
+
+            - Incorrect `user_id`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  '404':
+                    type: string
+                x-examples:
+                  Example 1:
+                    '404': 'Unable to find a route to match the URI: v2/templates/inc/roles/39656a89512a42e6b156b4f5558f3c73c5dc15d5'
+              example:
+                Example 1:
+                  '404': 'Unable to find a route to match the URI: v2/templates/inc/roles/39656a89512a42e6b156b4f5558f3c73c5dc15d5'
+                Incorrect user_id:
+                  '404': 'Unable to find a route to match the URI: v2/templates/2274bf62786844e981584543275cdc0c88d67d45/roles/39656a8952a42e6b156b4f5558f3c73c5dc15d5'
+                Incorrect template_id:
+                  '404': 'Unable to find a route to match the URI: v2/templates/2274bf62786844e981584543275cdcc88d67d45/roles/39656a89512a42e6b156b4f5558f3c73c5dc15d5'
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - role
+              properties:
+                role:
+                  type: string
+                  example: viewer
+                  description: 'The role assigned to the user. Allowed values are `sender` and `viewer`.
+
+                    '
+              x-examples:
+                Example 1:
+                  role: viewer
+        required: true
+      tags:
+      - Templates
+    get:
+      operationId: get-v2-templates-template-id-roles-user-id
+      summary: Get user role for template
+      description: 'This endpoint retrieves the role of a user for a specific shared template.
+
+
+        **Note**: This endpoint is accessible to the template owner and users with access (sender or viewer).'
+      parameters:
+      - in: path
+        name: template_id
+        required: true
+        description: ID of the template.
+        schema:
+          type: string
+      - in: path
+        name: user_id
+        required: true
+        description: ID of the user.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        role:
+                          type: string
+                x-examples:
+                  Example 1:
+                    data:
+                    - role: sender
+              example:
+                Example 1:
+                  data:
+                  - role: sender
+                Successful request:
+                  data:
+                  - role: sender
+        '400':
+          description: '- You are not the template owner.
+
+            - User with `user_id` doesn''t have access to the template.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 12029012
+                      message: You don't have access to the entity.
+              example:
+                Example 1:
+                  errors:
+                  - code: 12029012
+                    message: You don't have access to the entity.
+                User role not found:
+                  errors:
+                  - code: 12029011
+                    message: User role not found.
+                Not a template owner:
+                  errors:
+                  - code: 12029012
+                    message: You don't have access to the entity.
+        '404':
+          description: '- Incorrect `template_id`.
+
+            - Incorrect `user_id`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  '404':
+                    type: string
+                x-examples:
+                  Example 1:
+                    '404': 'Unable to find a route to match the URI: v2/templates/8f050906ff0b40f8ae40eb9d82540d28ec86576d/roles/2274bf6278644e981584543275cdc0c88d67d45'
+              example:
+                Example 1:
+                  '404': 'Unable to find a route to match the URI: v2/templates/8f050906ff0b40f8ae40eb9d82540d28ec86576d/roles/2274bf6278644e981584543275cdc0c88d67d45'
+                Incorrect user_id:
+                  '404': 'Unable to find a route to match the URI: v2/templates/8f050906ff0b40f8ae40eb9d82540d28ec86576d/roles/2274bf6278644e981584543275cdc0c88d67d45'
+                Incorrect template_id:
+                  '404': 'Unable to find a route to match the URI: v2/templates/8f050906ff0b40f8ae40eb9d82540d28ec86576d/roles/2274bf6278644e981584543275cdc0c88d67d45'
+      security:
+      - Bearer: []
+      tags:
+      - Templates
+    delete:
+      operationId: delete-v2-templates-template-id-roles-user-id
+      summary: Remove access to template
+      description: 'This endpoint allows a user to revoke access to a specific template.
+
+
+        **Note**: The template owner can revoke access for all users with whom the template was shared. A user with whom the template was shared can only revoke their own access to the template.'
+      parameters:
+      - in: path
+        name: template_id
+        required: true
+        description: ID of the template.
+        schema:
+          type: string
+      - in: path
+        name: user_id
+        required: true
+        description: ID of the user.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Access removed.
+        '400':
+          description: '- User with `user_id` doesn''t have access to the template.
+
+            - You are not the template owner.
+
+            - The entity owners cannot remove access from themselves.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 12029012
+                      message: You don't have access to the entity.
+              example:
+                Example 1:
+                  errors:
+                  - code: 12029012
+                    message: You don't have access to the entity.
+                Entity owner:
+                  errors:
+                  - code: 12029022
+                    message: Entity owner can't unshare it from himself.
+                Not a template owner:
+                  errors:
+                  - code: 12029012
+                    message: You don't have access to the entity.
+                user_id doesn't have access:
+                  errors:
+                  - code: 12029011
+                    message: User role not found.
+        '404':
+          description: '- Incorrect `template_id`.
+
+            - Incorrect `user_id`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  '404':
+                    type: string
+                x-examples:
+                  Example 1:
+                    '404': 'Unable to find a route to match the URI: v2/templates/8f050906ff0b40f8ae40eb9d82540d28ec86576d/roles/39656a89512a42e6b156b4f5558f3c73c5dc15d5'
+              example:
+                Example 1:
+                  '404': 'Unable to find a route to match the URI: v2/templates/8f050906ff0b40f8ae40eb9d82540d28ec86576d/roles/39656a89512a42e6b156b4f5558f3c73c5dc15d5'
+                Incorrect user_id:
+                  '404': 'Unable to find a route to match the URI: v2/templates/8f050906ff0b40f8ae40eb9d82540d28ec86576d/roles/2274bf6278644e981584543275cdc0c88d67d45'
+                Incorrect template_id:
+                  '404': 'Unable to find a route to match the URI: v2/templates/8f050906ff0b40f8ae40eb9d82540d28ec86576/roles/39656a89512a42e6b156b4f5558f3c73c5dc15d5'
+      security:
+      - Bearer: []
+      tags:
+      - Templates
 components:
   securitySchemes:
-    BasicAuth:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
       type: http
       scheme: basic
-      description: 'HTTP Basic auth carrying the application Basic Token (base64 of
-
-        client_id:client_secret) used against POST /oauth2/token.
-
-        '
-    BearerAuth:
-      type: http
-      scheme: bearer
-      description: 'OAuth 2.0 bearer access token issued by /oauth2/token. Required on
-
-        all resource endpoints.
-
-        '

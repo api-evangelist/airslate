@@ -1,0 +1,314 @@
+openapi: 3.2.0
+info:
+  title: SignNow Search API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Search
+paths:
+  /v2/search:
+    get:
+      operationId: get-v2-search
+      summary: Search for documents, templates, and document groups
+      description: 'This endpoint allows users to search across their documents, templates, document groups, and document group templates. Search covers all folders accessible to the user, including own, shared, and team folders. Results are sorted by the date updated, from newest to oldest.
+
+
+        Each `search_by` value uses its own matching logic and minimum `search_key` length:
+
+
+        | `search_by` value | Searches | Matching | Min `search_key` length |
+
+        |---|---|---|---|
+
+        | `name` | Entity name | Contains | 1 |
+
+        | `id` | Entity ID | Exact match | — |
+
+        | `inviter-email` | Inviter email | Prefix | 2 |
+
+        | `signer-email` | Signer email | Prefix | 2 |
+
+        | `document-text` | Text inside the document | Substring | 3 |
+
+
+        Matching is case-insensitive. Leading and trailing whitespace in `search_key` is trimmed before the length check. If `search_key` is shorter than the minimum for a given field, that field returns no results without a validation error. For `inviter-email` and `signer-email`, the prefix match applies to the first 40 characters of the email; a longer `search_key` matches by exact email value.
+
+
+        The maximum number of results before pagination is 1,000.'
+      parameters:
+      - in: query
+        name: search_key
+        required: true
+        description: Search phrase. Must be a non-empty string.
+        schema:
+          type: string
+      - in: query
+        name: search_by
+        required: true
+        description: 'Comma-separated list of fields to search by. Possible values: `name`, `id`, `inviter-email`, `signer-email`, `document-text`.'
+        schema:
+          type: string
+      - in: query
+        name: per_page
+        required: false
+        description: 'Number of results per page. Possible values: 1–20.'
+        schema:
+          type: integer
+          default: 15
+      - in: query
+        name: page
+        required: false
+        description: Page number. Must be greater than 0.
+        schema:
+          type: integer
+          default: 1
+      responses:
+        '200':
+          description: Success. `entity_properties` content depends on `entity_type`. An empty result returns HTTP 200 with an empty `data` array and `meta.pagination.total` set to `0`. Document text and emails are used for matching only and are not returned in the response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: ID of the entity.
+                        name:
+                          type: string
+                          description: Name of the entity.
+                        owner:
+                          type: string
+                          description: Email address of the entity owner.
+                        created:
+                          type: string
+                          description: Unix timestamp of when the entity was created.
+                        updated:
+                          type: string
+                          description: Unix timestamp of when the entity was last updated.
+                        folder_id:
+                          type: string
+                          description: ID of the folder the entity belongs to.
+                        entity_type:
+                          type: string
+                          description: 'Type of the entity. Possible values: `document`, `template`, `document-group`, `dgt`.'
+                        entity_properties:
+                          type: object
+                          description: Type-specific properties of the entity. Content varies by `entity_type`.
+                    description: List of matching entities.
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                            description: Number of results on the current page.
+                          links:
+                            type: object
+                            description: Pagination links.
+                          total:
+                            type: integer
+                            description: Total number of matching results.
+                          per_page:
+                            type: integer
+                            description: Number of results per page.
+                          total_pages:
+                            type: integer
+                            description: Total number of pages.
+                          current_page:
+                            type: integer
+                            description: Current page number.
+              example:
+                application/json:
+                  data:
+                  - id: 4fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: Sales invoice.pdf
+                    owner: owner@email.com
+                    created: '1696492112'
+                    updated: '1696492114'
+                    folder_id: e6XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    entity_type: document-group
+                    entity_properties:
+                      state: created
+                      documents:
+                      - id: 60XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        owner:
+                          id: 57XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          email: owner@email.com
+                        roles: []
+                        updated: 1696492113
+                        folder_id: null
+                        thumbnail:
+                          large: https://api.signnow.com/document/60XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                          small: https://api.signnow.com/document/60XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                          medium: https://api.signnow.com/document/60XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                        has_fields: false
+                        page_count: 1
+                        signatures: []
+                        document_name: Sales invoice.pdf
+                        field_invites: []
+                        freeform_invites: []
+                      invite_id: null
+                      origin_dgt: null
+                      entity_labels: []
+                      sign_as_merged: null
+                      scheduled_invite: null
+                      freeform_invite_id: null
+                  - id: d0XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: Contract
+                    owner: owner@email.com
+                    created: '1696492100'
+                    updated: '1696492110'
+                    folder_id: e6XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    entity_type: document
+                    entity_properties:
+                      roles:
+                      - name: Signer 1
+                        unique_id: 59XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        signing_order: '1'
+                      thumbnail:
+                        large: https://api.signnow.com/document/d0XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                        small: https://api.signnow.com/document/d0XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                        medium: https://api.signnow.com/document/d0XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                      page_count: '1'
+                      signatures: []
+                      entity_labels: []
+                      field_invites: []
+                      scheduled_invite: null
+                      origin_document_id: null
+                  meta:
+                    pagination:
+                      count: 2
+                      links:
+                        next: https://api.signnow.com/v2/search?search_key=invoice&search_by=name&per_page=15&page=2
+                      total: 118
+                      per_page: 15
+                      total_pages: 8
+                      current_page: 1
+        '400':
+          description: '* Incorrect or missing token.
+
+            * The `search_key` field is not a string.
+
+            * The `search_key` field is empty.
+
+            * The `search_by` field is not a string.
+
+            * The `search_by` field is empty.
+
+            * The `search_by` field values are not in the available value list: `name`, `id`, `inviter-email`, `signer-email`, `document-text`.
+
+            * The `per_page` field is not a digit.
+
+            * The `per_page` field value is 0 or less.
+
+            * The `per_page` field value is greater than 20.
+
+            * The `page` field is not a digit.
+
+            * The `page` field value is 0 or less.
+
+            * Could not find search info.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+              example:
+                search_by is empty:
+                  errors:
+                  - code: 26003010
+                    message: The `search_by` field is empty.
+                page is not a digit:
+                  errors:
+                  - code: 26003015
+                    message: The `page` field is not a digit.
+                search_key is empty:
+                  errors:
+                  - code: 26003008
+                    message: The `search_key` field is empty.
+                Search info not found:
+                  errors:
+                  - code: 26003021
+                    message: Could not find search info.
+                page value is 0 or less:
+                  errors:
+                  - code: 26003016
+                    message: The `page` field value is 0 or less.
+                per_page is not a digit:
+                  errors:
+                  - code: 26003012
+                    message: The `per_page` field is not a digit.
+                search_by is not a string:
+                  errors:
+                  - code: 26003009
+                    message: The `search_by` field is not a string.
+                Incorrect or missing token:
+                  code: 1537
+                  error: invalid_token
+                search_key is not a string:
+                  errors:
+                  - code: 26003007
+                    message: The `search_key` field is not a string.
+                per_page value is 0 or less:
+                  errors:
+                  - code: 26003013
+                    message: The `per_page` field value is 0 or less.
+                search_by value is not valid:
+                  errors:
+                  - code: 26003011
+                    message: 'The `search_by` field values are not in the available value list: `name`, `id`, `inviter-email`, `signer-email`, `document-text`.'
+                per_page value is greater than 20:
+                  errors:
+                  - code: 26003014
+                    message: The `per_page` field value is greater than 20.
+        '500':
+          description: '* Internal API error.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+              example:
+                Internal server error:
+                  error:
+                  - code: 26000005
+                    message: Internal Api Error
+      security:
+      - Bearer: []
+      tags:
+      - Search
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

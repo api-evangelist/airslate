@@ -1,0 +1,187 @@
+openapi: 3.2.0
+info:
+  title: SignNow Field Invite API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Field Invite
+paths:
+  /field_invite:
+    post:
+      operationId: post-field-invite
+      summary: 'Replace signer: Step 2 - Replace'
+      description: 'To replace a signer in the invite, API user should follow three steps: delete the invite to the current signer(1), replace a signer(2), and send the invite to the new signer(3). This endpoint allows you to replace a signer in the invite.'
+      responses:
+        '200':
+          description: 'Returns a new invite ID if the request is successful. Returns an error when the request is sent with an incorrect email or role ID.
+
+
+            * Incorrect access token, "code": 1537. Message: "invalid_token"
+
+            * Incorrect email, "code": 65538. Message: "Email must be a valid email."
+
+            * Incorrect role id, "code": 65582. Message: "Role does not exist."
+
+            * Send correct request for the second time, "code": 65615. Message: "Invite already exists."'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - id
+                properties:
+                  id:
+                    type: string
+                    minLength: 1
+                x-examples:
+                  example-1:
+                    id: 30e0ffbfe8d344d2ac97e47726160e722397543f
+                description: ''
+              example:
+                example-1:
+                  id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              - role_id
+              - is_replace
+              - password
+              - phone
+              properties:
+                email:
+                  type: string
+                  minLength: 1
+                  description: New signer's email address.
+                phone:
+                  type: string
+                  description: 'required if `"authentication_type": "phone"`.
+
+                    Phone number requested for identity verification.'
+                role_id:
+                  type: string
+                  minLength: 1
+                  description: The role id for the new signer. You can find it in the response from `GET /document/{{document_id}}` request as the `role_id` parameter in the `field_invites` array.
+                password:
+                  type: string
+                  minLength: 1
+                  description: 'required if `"authentication_type": "password"`.
+
+                    Password requested for identity verification.'
+                reminder:
+                  type: number
+                  description: In how many days to send a reminder to the signer; 30 days max.
+                is_replace:
+                  type: boolean
+                  description: 'Boolean: determines whether to use the subject, message, and order of signing specified in the invite to the previous signer. Possible values: `"true"` - yes, keep the subject, message, and order of signing from the previous signer''s invite; `"false"` - use the subject, message, and the order of signing from this payload.'
+                expiration_days:
+                  type: number
+                  description: In how many days the invite expires; 30 days max.
+                authentication_type:
+                  type: string
+                  minLength: 1
+                  description: 'Type of recipient''s identity verification. Possible values: `"password"` or `"phone"`.'
+                decline_by_signature:
+                  type: number
+                  description: 'Adds the `Decline` button to the Signature field for the signer. Possible values: 0 - no `Decline` button, 1- add the `Decline` button.'
+              x-examples:
+                example-1:
+                  email: new_signer@email.com
+                  role_id: d9b491bd632e25cc5ec1a3b0b83dfccc164382bd
+                  password: '123456'
+                  reminder: 0
+                  is_replace: true
+                  expiration_days: 30
+                  authentication_type: password
+                  decline_by_signature: 0
+              description: ''
+        required: true
+      tags:
+      - Field Invite
+  /field_invite/{field_invite_id}:
+    delete:
+      operationId: delete-field-invite-field-invite-id
+      summary: 'Replace signer: Step 1 - Delete'
+      description: 'To replace a signer in the invite, API user should follow three steps: delete the invite to the current signer(1), replace a signer(2), and send the invite to the new signer(3). This endpoint allows you to delete the invite to the current signer.'
+      parameters:
+      - in: path
+        name: field_invite_id
+        required: true
+        description: 'Path parameter: ID of invite to sign the document. You can find it in the response from `GET /document/{{document_id}}` request as the `id` parameter in the `field_invites` array.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Returns success if the request is correct. Returns an error when:'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - status
+                properties:
+                  status:
+                    type: string
+                    minLength: 1
+                x-examples:
+                  example-1:
+                    status: success
+                description: ''
+              example:
+                example-1:
+                  status: success
+        '400':
+          description: '* Incorrect access token, "code": 1537. Message: "invalid_token"
+
+            * Send to a different email address, "code": 65536. Message: "Could not resend: routing out of order."
+
+            * The invite has expired, "code": 65536. Message: "Could not resend expired invite."
+
+            * Incorrect field invite id, "code": 65536. Message: "could not resend"
+
+            * Forbidden to delete the field invite with email group'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Incorrect access token:
+                  errors:
+                  - code: 1537
+                    message: invalid token
+                The invite has expired:
+                  errors:
+                  - code: 65536
+                    message: Could not resend expired invite.
+                Incorrect field invite id:
+                  errors:
+                  - code: 65536
+                    message: could not resend
+                Send to a different email address:
+                  errors:
+                  - code: 65536
+                    message: 'Could not resend: routing out of order.'
+                Forbidden to delete the field invite with email group:
+                  errors:
+                  - code: 65536
+                    message: Forbidden to delete the field invite with email group
+      security:
+      - Bearer: []
+      tags:
+      - Field Invite
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

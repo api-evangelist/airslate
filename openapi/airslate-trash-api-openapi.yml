@@ -1,0 +1,65 @@
+openapi: 3.2.0
+info:
+  title: SignNow Trash API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Trash
+paths:
+  /v2/trash:
+    delete:
+      operationId: delete-v2-trash
+      summary: Empty trash bin folder
+      description: 'This endpoint allows API users to empty the `Trash Bin` folder.
+
+
+        **Notes**
+
+
+        * All entities in the `Trash Bin` folder are permanently deleted and cannot be restored.'
+      responses:
+        '204':
+          description: Trash Bin folder cleared successfully.
+        '400':
+          description: 'Invalid token response will be sent with any of cases:
+
+            - invalid token of user
+
+            - expired token of user
+
+            - empty header
+
+            - authorization = null
+
+            - authorization without value
+
+            - somesing went wrong during the clearing process.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: Error code.
+                  error:
+                    type: string
+                    description: Error message.
+              example:
+                Invalid token:
+                  code: 1537
+                  error: invalid_token
+      security:
+      - Bearer: []
+      tags:
+      - Trash
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

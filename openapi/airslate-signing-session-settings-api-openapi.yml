@@ -1,0 +1,230 @@
+openapi: 3.2.0
+info:
+  title: SignNow Signing Session Settings API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Signing Session Settings
+paths:
+  /v2/signing-session-settings:
+    post:
+      operationId: post-v2-signing-session-settings
+      summary: Customize welcome message
+      description: This endpoint allows users to add a welcome message to field invites sent from this application. A welcome message appears when a user clicks the welcome message button in the signing session.
+      parameters:
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Success request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: "- Request with any of cases:\n\n    - incorrect token of user\n    - expired token of user\n    - empty header\n    - authorization = null\n    - authorization without value\n- Setting already exists\n- `welcome_message` not received\t\n- `welcome_message` received with empty value\n- `welcome_message` is not received as a string (it received like array or integer, etc.)\n- `welcome_message` value contains less than 3 symbols\n- `welcome_message` value contains more than 200 symbols\n- `welcome_message` value contains incorrect symbol(s)\n"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 1537
+                    message: invalid_token
+              example:
+                Example 1:
+                  code: 1537
+                  message: invalid_token
+                Incorrect access token:
+                  code: 1537
+                  message: invalid_token
+                Setting already exists:
+                  errors:
+                  - code: 0
+                    message: Signing session setting already exists
+                '`welcome_message` < 3 symbols':
+                  errors:
+                  - code: 0
+                    message: '`welcome_message` must be at least 3 characters long.'
+                welcome_message > 200 symbols:
+                  errors:
+                  - code: 0
+                    message: '`welcome_message` cannot be longer than 200 characters.'
+                '`welcome_message` isn''t string':
+                  errors:
+                  - code: 0
+                    message: '`welcome_message` field data must be a string'
+                '`welcome_message` not received.':
+                  errors:
+                  - code: 0
+                    message: '`welcome_message` field is required'
+                '`welcome_message` with empty value':
+                  errors:
+                  - code: 0
+                    message: '`welcome_message` must not be empty'
+                welcome_message with incorrect symbol(s):
+                  errors:
+                  - code: 0
+                    message: 'Unsupported symbol was met. Allowed symbols: A-Z, a-z, 0-9, plain brackets ''()'', dot ''.'', dash ''-'', space '' '' and comma '','''
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - welcome_message
+              properties:
+                welcome_message:
+                  type: string
+              x-examples:
+                Example 1:
+                  welcome_message: Hi! Please sign this document.
+        required: true
+      tags:
+      - Signing Session Settings
+    get:
+      operationId: get-v2-signing-session-settings
+      summary: Get welcome message
+      description: This endpoint allows users to get information about the signing session settings (Custom signing welcome message).
+      parameters:
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      welcome_message:
+                        type: string
+                x-examples:
+                  Example 1:
+                    data:
+                      welcome_message: Hi! Please sign this document.
+              example:
+                Example 1:
+                  data:
+                    welcome_message: Hi! Please sign this document.
+                Success request:
+                  data:
+                    welcome_message: Hi! Please sign this document.
+        '400':
+          description: "\t\nRequest with any of cases:\n\n- incorrect token of user\n- expired token of user\n- empty header\n- authorization = null\n- authorization without value"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 1537
+                    message: invalid_token
+              example:
+                Example 1:
+                  code: 1537
+                  message: invalid_token
+                Incorrect access token:
+                  code: 1537
+                  message: invalid_token
+      security:
+      - Bearer: []
+      tags:
+      - Signing Session Settings
+    delete:
+      operationId: delete-v2-signing-session-settings
+      summary: Reset welcome message to default
+      description: This endpoint allow to reset signing session settings to default values (default signing welcome message).
+      parameters:
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Signing session settings reset successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: 'Request with any of cases:
+
+
+            - incorrect token of user
+
+            - expired token of user
+
+            - empty header
+
+            - authorization = null
+
+            - authorization without value'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 1537
+                    message: invalid_token
+              example:
+                Example 1:
+                  code: 1537
+                  message: invalid_token
+                Incorrect access token:
+                  code: 1537
+                  message: invalid_token
+        '404':
+          description: Signing session settings have default values.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security:
+      - Bearer: []
+      tags:
+      - Signing Session Settings
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

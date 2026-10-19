@@ -1,0 +1,362 @@
+openapi: 3.2.0
+info:
+  title: SignNow Oauth2 API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: OAuth2
+paths:
+  /oauth2/terminate:
+    post:
+      operationId: post-oauth2-terminate
+      summary: Terminate access token
+      description: This endpoint allows users to terminate the current access token from the authorization header. The token will no longer be available for Bearer authentication.
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: '- Incorrect or expired access token.
+
+            - Token authentication is missing.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                x-examples:
+                  Example 1:
+                    error: invalid_request
+              example:
+                Example 1:
+                  error: invalid_request
+                Token authentication missing:
+                  error: invalid_request
+                Incorrect or expired access token:
+                  error: invalid_token
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+        required: true
+      tags:
+      - OAuth2
+  /oauth2/token:
+    post:
+      operationId: post-oauth2-token
+      summary: Generate access token
+      description: 'This endpoint generates an access token for a user.
+
+
+        In the request, specify the `grant_type` to use:
+
+
+        - `password`: generate an access token using the password grant.
+
+
+        - `refresh_token`: generate an access token using the refresh token grant.
+
+
+        - `authorization_code`: generate an access token using the authorization code grant.
+
+
+        See also: Authentication.'
+      responses:
+        '200':
+          description: Returns an `access_token` for the user, along with its type, scope, expiration time, and `refresh_token`.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scope:
+                    type: string
+                  expires_in:
+                    type: integer
+                  last_login:
+                    type: integer
+                  token_type:
+                    type: string
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+              example:
+                application/json:
+                  scope: '*'
+                  expires_in: 2592000
+                  last_login: 1
+                  token_type: bearer
+                  access_token: 7cXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  refresh_token: 59XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        '400':
+          description: '* The basic authorization token is incorrect.
+
+            * A required parameter is missing.
+
+            * The scope is incorrect.
+
+            * The password or email is incorrect.
+
+            * The `expiration_time` parameter must be greater than 0.
+
+            * The user is permanently banned.
+
+            * The user is temporarily banned.
+
+            * The user is subject to SSO rules or added to an organization.
+
+            * The user’s email is not verified.
+
+            * Refresh token is incorrect.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  error:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 1538
+                    error: invalid_client
+              example:
+                Example 1:
+                  code: 1538
+                  error: invalid_client
+                Unverified email:
+                  code: 1545
+                  error: unverified_email
+                Scope is incorrect:
+                  error: invalid_scope.
+                Refresh token incorrect:
+                  code: 997
+                  error: Invalid refresh token. Please log out and log back in again.
+                User is permanently banned:
+                  code: 65681
+                  error: This account has been deactivated permanently. Please contact SignNow Customer Service to reactivate your account.
+                User is temporarily banned:
+                  code: 65681
+                  error: This account has been deactivated temporarily for %N% minutes. To reactivate the account sooner, please contact SignNow Customer Service.
+                expiration_time is incorrect:
+                  error: The `expiration_time` parameter must be greater than 0.
+                Required parameter is missing:
+                  error: invalid_request.
+                Password or email is incorrect:
+                  code: 826
+                  error: Invalid credentials.
+                Basic authorization token is incorrect:
+                  error: invalid_client.
+                User is restricted by SSO or organization:
+                  error: Please use your corporate login page to login to SignNow.
+        '403':
+          description: User is not the application owner.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 11005001
+                      message: Access denied.
+              example:
+                Example 1:
+                  errors:
+                  - code: 11005001
+                    message: Access denied.
+                User not an owner:
+                  errors:
+                  - code: 11005001
+                    message: Access denied.
+      security:
+      - Basic: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: 'User email. Required if `grant_type`: `password`.'
+                password:
+                  type: string
+                  description: 'User password. Required if `grant_type`: `password`.'
+                grant_type:
+                  type: string
+                  description: 'Specifies the grant type for authorization. Possible values: `password`, `refresh_token`, `authorization_code`.'
+                scope:
+                  type: string
+                  default: '*'
+                  description: 'Permissions for the issued token; `*` grants all permissions. Using scope, you can define a custom list of accessible URLs.  For example: `document/* GET/user` will allow access to:  1) all routes starting with `/document/` 2) `GET /user` route'
+                refresh_token:
+                  type: string
+                  description: 'The refresh token value, obtained from the `Generate access token` response. Required if `grant_type`: `refresh_token`.'
+                code:
+                  type: string
+                  description: 'The authorization code, obtained from the [Get authorization code](/docs/oauth2/operations/get-oauth2-userauth) response. Required if `grant_type`: `authorization_code`.'
+                expiration_time:
+                  type: integer
+                  default: 2592000
+                  description: Time until the token expires in seconds. Default value is 2592000  seconds (30 days).
+              required:
+              - username
+              - password
+              - grant_type
+      tags:
+      - OAuth2
+    get:
+      operationId: get-oauth2-token
+      summary: Verify access token
+      description: This endpoint verifies an access token for a user.
+      responses:
+        '200':
+          description: Returns the access_token itself as well as its' scope, expiration date, and type.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scope:
+                    type: string
+                  expires_in:
+                    type: string
+                  token_type:
+                    type: string
+                  access_token:
+                    type: string
+              example:
+                application/json:
+                  scope: '*'
+                  expires_in: '2517898'
+                  token_type: bearer
+                  access_token: 8dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        '400':
+          description: '"invalid_token" - either incorrect or expired token provided'
+          content:
+            application/json:
+              example:
+                invalid_token:
+                  error: invalid_token
+      security:
+      - Bearer: []
+      tags:
+      - OAuth2
+  /oauth2/userauth:
+    get:
+      operationId: get-oauth2-userauth
+      summary: Get authorization code via redirect
+      description: 'This endpoint allows API users to obtain an authorization code via an application redirect link. The code can then be used to generate an access token (bearer token) to make API requests on behalf of the user — without using their SignNow credentials.
+
+
+        For more information, see Generate access token.'
+      parameters:
+      - in: query
+        name: response_type
+        required: true
+        description: Must be equal to `code`.
+        schema:
+          type: string
+      - in: query
+        name: redirect_uri
+        required: true
+        description: URL to which the user is redirected after authorizing your app. The authorization code is sent to this URL.
+        schema:
+          type: string
+      - in: query
+        name: client_id
+        required: true
+        description: Your application’s client ID, found in the [API Dashboard](https://app.signnow.com/webapp/api-dashboard/keys).
+        schema:
+          type: string
+      - in: query
+        name: access_token
+        required: true
+        description: An application-level access token. Used to request the user authorization page, which contains a link to obtain the authorization code.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns an HTML page that contains a link with the authorization code.
+          content:
+            application/json:
+              schema:
+                type: string
+                format: html
+              example:
+                text/html: '<!DOCTYPE html> <html>
+
+                  <head> <meta charset="UTF-8" /> <meta http-equiv="refresh" content="0;url=''https://www.example.com?code={{authorization_code}}''" />
+
+                  <title>Redirecting to https://www.example.com?code={{authorization_code}} </title> </head>
+
+                  <body> Redirecting to <a href="https://www.example.com?code={{authorization_code}}">https://www.example.com?code={{authorization_code}}</a>. </body>
+
+                  </html>'
+        '400':
+          description: '* Incorrect `client_id`.
+
+            * `access_token` is missing.
+
+            * `client_id` is missing.
+
+            * `response_type` is missing.
+
+            * `redirect_url` is missing.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  error:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 65536
+                    error: internal api error
+              example:
+                Example 1:
+                  code: 65536
+                  error: internal api error
+                Missing parameter:
+                  code: 1537
+                  error: invalid_request
+                Incorrect client_id:
+                  code: 65536
+                  error: internal api error
+      security:
+      - Bearer: []
+      tags:
+      - OAuth2
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

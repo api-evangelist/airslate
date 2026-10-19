@@ -1,72 +1,399 @@
 openapi: 3.2.0
 info:
-  title: airSlate signNow REST Folders API
-  version: v2
-  description: 'Best-effort OpenAPI 3.1 representation of the airSlate signNow REST API.
-
-    airSlate exposes its developer API primarily through the signNow product
-
-    family. Endpoint paths and request shapes are derived from the official
-
-    signNow Python SDK (github.com/signnow/SNPythonSDK) and public docs at
-
-    https://docs.signnow.com/. Authentication uses OAuth 2.0 with a Basic
-
-    token for the application credential and resource-owner password or
-
-    client credentials grant for the access token.'
-  contact:
-    name: airSlate signNow
-    url: https://docs.signnow.com/
+  title: SignNow Folders API
+  version: 1.0.0
 servers:
-- url: https://api.signnow.com
-  description: signNow production API
-- url: https://api-eval.signnow.com
-  description: signNow evaluation/sandbox API
-security:
-- BearerAuth: []
+- url: https://api.signnow.com/
 tags:
 - name: Folders
 paths:
-  /folder:
+  /v2/folders/{folder_id}/document-templates/pinned:
     get:
-      tags:
-      - Folders
-      summary: List folders
-      operationId: listFolders
-      responses:
-        '200':
-          description: OK
-  /folder/{folder_id}:
-    get:
-      tags:
-      - Folders
-      summary: List documents in folder
-      operationId: getFolderDocuments
+      operationId: get-v2-folders-folder-id-document-templates-pinned
+      summary: Get pinned templates
+      description: 'This endpoint allows API users to get the pinned templates in the `Templates` folder or one of its subfolders.
+
+
+        **Notes**
+
+
+        * `folder_id` must be the ID of the `Templates` folder or one of its subfolders. For any other folder, the endpoint returns `400`.
+
+        * To get the ID of the `Templates` folder, call `GET /user/folder`.'
       parameters:
-      - name: folder_id
-        in: path
+      - in: path
+        name: folder_id
         required: true
+        description: ID of the `Templates` folder or one of its subfolders.
         schema:
           type: string
       responses:
         '200':
-          description: OK
+          description: 'The pinned templates in the folder. `data` is empty if no templates are pinned.
+
+
+            * User has 1 pinned template
+
+            * User has no pinned templates'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: ID of the template.
+                        tags:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                                description: Name of the tag.
+                              type:
+                                type: string
+                                description: Type of the tag, for example `system`.
+                              unique_id:
+                                type: string
+                                description: ID of the tag.
+                          description: Tags assigned to the template.
+                        owner:
+                          type: string
+                          description: Email address of the template owner.
+                        roles:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                                description: Name of the role.
+                              unique_id:
+                                type: string
+                                description: ID of the role.
+                              signing_order:
+                                type: integer
+                                description: Position of the role in the signing order.
+                          description: Signer roles defined in the template.
+                        created:
+                          type: integer
+                          description: Unix timestamp of when the template was created.
+                        updated:
+                          type: integer
+                          description: Unix timestamp of the last template update.
+                        user_id:
+                          type: string
+                          description: ID of the template owner.
+                        thumbnail:
+                          type: object
+                          properties:
+                            large:
+                              type: string
+                              description: URL of the large thumbnail.
+                            small:
+                              type: string
+                              description: URL of the small thumbnail.
+                            medium:
+                              type: string
+                              description: URL of the medium thumbnail.
+                          description: Links to the template thumbnail images.
+                        page_count:
+                          type: integer
+                          description: Number of pages in the template.
+                        signatures:
+                          type: array
+                          items:
+                            type: object
+                          description: Signatures applied to the template.
+                        attachments:
+                          type: array
+                          items:
+                            type: object
+                          description: File attachments in the template.
+                        version_time:
+                          type: integer
+                          description: Unix timestamp of the template version.
+                        viewer_roles:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                                description: Name of the role.
+                              unique_id:
+                                type: string
+                                description: ID of the role.
+                              signing_order:
+                                type: integer
+                                description: Position of the role in the signing order.
+                          description: Viewer roles defined in the template.
+                        document_name:
+                          type: string
+                          description: Name of the template.
+                        recently_used:
+                          type: integer
+                          description: Unix timestamp of when the template was last used to send an invite.
+                        routing_details:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              cc:
+                                type: array
+                                items:
+                                  type: string
+                                description: Email addresses that receive a copy of the completed document.
+                              id:
+                                type: string
+                                description: ID of the routing details record.
+                              data:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                      description: Name of the role.
+                                    role_id:
+                                      type: string
+                                      description: ID of the role.
+                                    attributes:
+                                      type: array
+                                      items:
+                                        type: object
+                                      description: Additional attributes of the role.
+                                    inviter_role:
+                                      type: boolean
+                                      description: '`true` if the template owner is the recipient for this role.'
+                                    default_email:
+                                      type: string
+                                      description: Default email address of the recipient for this role. Empty if not set.
+                                    signing_order:
+                                      type: integer
+                                      description: Position of the role in the signing order.
+                                    decline_by_signature:
+                                      type: boolean
+                                      description: Whether the recipient can decline by signature.
+                                description: Signer roles and their invite settings.
+                              cc_step:
+                                type: array
+                                items:
+                                  type: object
+                                description: Steps after which `cc` recipients are notified.
+                              created:
+                                type: integer
+                                description: Unix timestamp of when the routing details were created.
+                              updated:
+                                type: integer
+                                description: Unix timestamp of the last update.
+                              viewers:
+                                type: array
+                                items:
+                                  type: object
+                                description: Viewer roles and their invite settings.
+                              approvers:
+                                type: array
+                                items:
+                                  type: object
+                                description: Approver roles and their invite settings.
+                              invite_link_instructions:
+                                type:
+                                - string
+                                - 'null'
+                                description: Instructions shown with the invite link. Can be `null`.
+                          description: Invite routing configuration saved in the template.
+                        original_filename:
+                          type: string
+                          description: Original filename of the uploaded file.
+                        document_group_template_info:
+                          type: array
+                          items:
+                            type: object
+                          description: Document group templates that include this template.
+                    description: Pinned templates.
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                            description: Number of templates on this page.
+                          links:
+                            type: array
+                            items:
+                              type: object
+                            description: Links to other pages. Empty if there is one page.
+                          total:
+                            type: integer
+                            description: Total number of pinned templates.
+                          per_page:
+                            type: integer
+                            description: Maximum number of templates per page.
+                          total_pages:
+                            type: integer
+                            description: Total number of pages.
+                          current_page:
+                            type: integer
+                            description: Number of the current page.
+                        description: Pagination details.
+                    description: Response metadata.
+              example:
+                User has 1 pinned template:
+                  data:
+                  - id: a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0
+                    tags:
+                    - name: fields
+                      type: system
+                      unique_id: d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3
+                    - name: field_signature
+                      type: system
+                      unique_id: e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4
+                    - name: template
+                      type: system
+                      unique_id: f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5
+                    owner: user@example.com
+                    roles:
+                    - name: Role 1
+                      unique_id: c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2
+                      signing_order: 1
+                    created: 1792405293
+                    updated: 1792405294
+                    user_id: b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1
+                    thumbnail:
+                      large: https://api.signnow.com/document/a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0/thumbnail?size=large
+                      small: https://api.signnow.com/document/a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0/thumbnail?size=small
+                      medium: https://api.signnow.com/document/a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0/thumbnail?size=medium
+                    page_count: 1
+                    signatures: []
+                    attachments: []
+                    version_time: 1792405294
+                    viewer_roles: []
+                    document_name: Purchase order terms
+                    recently_used: 1792405294
+                    routing_details:
+                    - cc: []
+                      id: a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6
+                      data:
+                      - name: Role 1
+                        role_id: c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2
+                        attributes: []
+                        inviter_role: false
+                        default_email: signer@example.com
+                        signing_order: 1
+                        decline_by_signature: false
+                      cc_step: []
+                      created: 1792405294
+                      updated: 1792405294
+                      viewers: []
+                      approvers: []
+                      invite_link_instructions: null
+                    original_filename: purchase-order-terms.pdf
+                    document_group_template_info: []
+                  meta:
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                User has no pinned templates:
+                  data: []
+                  meta:
+                    pagination:
+                      count: 0
+                      links: []
+                      total: 0
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+        '400':
+          description: User folder {folder_id} is not Template folder or Template sub-folder
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                          description: Error code.
+                        message:
+                          type: string
+                          description: Error message.
+                    description: List of errors.
+              example:
+                User folder {folder_id} is not Template folder or Template sub-folder:
+                  errors:
+                  - code: 13033002
+                    message: User folder `a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0` is not Template folder or Template sub-folder.
+        '403':
+          description: Folder {folder_id} doesn’t belong to a user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                          description: Error code.
+                        message:
+                          type: string
+                          description: Error message.
+                    description: List of errors.
+              example:
+                Folder {folder_id} doesn’t belong to a user:
+                  errors:
+                  - code: 13033001
+                    message: User is not owner of the `a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0` user folder.
+        '404':
+          description: The folder does not exist.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                          description: Error message.
+                    description: List of errors.
+              example:
+                Folder not found:
+                  errors:
+                  - message: UserFolder `a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0` not found
+      security:
+      - Bearer: []
+      tags:
+      - Folders
 components:
   securitySchemes:
-    BasicAuth:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
       type: http
       scheme: basic
-      description: 'HTTP Basic auth carrying the application Basic Token (base64 of
-
-        client_id:client_secret) used against POST /oauth2/token.
-
-        '
-    BearerAuth:
-      type: http
-      scheme: bearer
-      description: 'OAuth 2.0 bearer access token issued by /oauth2/token. Required on
-
-        all resource endpoints.
-
-        '

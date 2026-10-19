@@ -1,0 +1,63 @@
+openapi: 3.2.0
+info:
+  title: SignNow Fieldinvite API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Fieldinvite
+paths:
+  /fieldinvite/{field_request__id}/resend:
+    put:
+      operationId: put-fieldinvite-field-request-unique-id-resend
+      summary: Resend email invite
+      description: Resends an invite to sign a document.
+      parameters:
+      - in: path
+        name: field_request__id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Returns success if the request is correct. Returns an error when:
+
+
+            * Incorrect access token, "code": 1537. Message: "invalid_token"
+
+            * Send to a different email address, "code": 65536. Message: "Could not resend: routing out of order."
+
+            * The invite has expired, "code": 65536. Message: "Could not resend expired invite."
+
+            * Incorrect field invite id, "code": 65536. Message: "could not resend"'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - status
+                properties:
+                  status:
+                    type: string
+                    minLength: 1
+                x-examples:
+                  example-1:
+                    status: success
+                description: ''
+              example:
+                example-1:
+                  status: success
+      security:
+      - Bearer: []
+      tags:
+      - Fieldinvite
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

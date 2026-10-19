@@ -1,0 +1,83 @@
+openapi: 3.2.0
+info:
+  title: SignNow Paid Request Totals API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Paid Request Totals
+paths:
+  /v2/paid-request-totals:
+    get:
+      operationId: get-v2-paid-request-totals
+      summary: Get paid requests
+      description: Retrieve statistics about total, used, and remaining API limits.
+      responses:
+        '200':
+          description: 'Returns total, used, and remaining API limits in case of successful response. Returns an error when:
+
+
+            * User doesn''t have any API subscription plan, "code": 0. Message: "User does not have any API Plan"'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: object
+                    required:
+                    - total
+                    - used
+                    - remaining
+                    - expired
+                    - status
+                    - subscription_id
+                    properties:
+                      used:
+                        type: number
+                      total:
+                        type: number
+                      status:
+                        type: string
+                        minLength: 1
+                      expired:
+                        type: number
+                      remaining:
+                        type: number
+                      subscription_id:
+                        type: string
+                        minLength: 1
+                x-examples:
+                  example-1:
+                    data:
+                      used: 2
+                      total: 10
+                      status: canceled
+                      expired: 1605830400
+                      remaining: 8
+                      subscription_id: '5669503709575433796771245877368750673476045434115951839053246345'
+                description: ''
+              example:
+                example-1:
+                  data:
+                    used: 2
+                    total: 10
+                    status: canceled
+                    expired: 1605830400
+                    remaining: 8
+                    subscription_id: 56XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      security:
+      - Bearer: []
+      tags:
+      - Paid Request Totals
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

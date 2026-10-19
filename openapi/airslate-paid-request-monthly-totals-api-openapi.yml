@@ -1,0 +1,96 @@
+openapi: 3.2.0
+info:
+  title: SignNow Paid Request Monthly Totals API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Paid Request Monthly Totals
+paths:
+  /v2/paid-request-monthly-totals:
+    get:
+      operationId: get-v2-paid-request-monthly-totals
+      summary: Get monthly request totals
+      description: Retrieve statistics about total used monthly requests during the subscription period.
+      responses:
+        '200':
+          description: 'Returns monthly totals in case of successful response. Returns an error when:
+
+
+            * Request with expired subscription/user does not have subscription, "code": 0. Message: "User does not have active subscription"'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      properties:
+                        '201911':
+                          type: object
+                          required:
+                          - invite_to_sign
+                          - bulk_invite
+                          - document_group_invite
+                          - free_form_invite
+                          - signing_link
+                          properties:
+                            bulk_invite:
+                              type: number
+                            signing_link:
+                              type: number
+                            invite_to_sign:
+                              type: number
+                            free_form_invite:
+                              type: number
+                            document_group_invite:
+                              type: number
+                    minItems: 1
+                    uniqueItems: true
+                x-examples:
+                  example-1:
+                    data:
+                    - '201911':
+                        bulk_invite: 0
+                        signing_link: 0
+                        invite_to_sign: 0
+                        free_form_invite: 12
+                        document_group_invite: 0
+                    - '201912':
+                        bulk_invite: 0
+                        signing_link: 0
+                        invite_to_sign: 0
+                        free_form_invite: 0
+                        document_group_invite: 0
+                description: ''
+              example:
+                example-1:
+                  data:
+                  - '201911':
+                      bulk_invite: 0
+                      signing_link: 0
+                      invite_to_sign: 0
+                      free_form_invite: 12
+                      document_group_invite: 0
+                  - '201912':
+                      bulk_invite: 0
+                      signing_link: 0
+                      invite_to_sign: 0
+                      free_form_invite: 0
+                      document_group_invite: 0
+      security:
+      - Bearer: []
+      tags:
+      - Paid Request Monthly Totals
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

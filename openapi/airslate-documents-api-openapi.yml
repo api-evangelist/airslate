@@ -1,179 +1,3119 @@
 openapi: 3.2.0
 info:
-  title: airSlate signNow REST Documents API
-  version: v2
-  description: 'Best-effort OpenAPI 3.1 representation of the airSlate signNow REST API.
-
-    airSlate exposes its developer API primarily through the signNow product
-
-    family. Endpoint paths and request shapes are derived from the official
-
-    signNow Python SDK (github.com/signnow/SNPythonSDK) and public docs at
-
-    https://docs.signnow.com/. Authentication uses OAuth 2.0 with a Basic
-
-    token for the application credential and resource-owner password or
-
-    client credentials grant for the access token.'
-  contact:
-    name: airSlate signNow
-    url: https://docs.signnow.com/
+  title: SignNow Documents API
+  version: 1.0.0
 servers:
-- url: https://api.signnow.com
-  description: signNow production API
-- url: https://api-eval.signnow.com
-  description: signNow evaluation/sandbox API
-security:
-- BearerAuth: []
+- url: https://api.signnow.com/
 tags:
 - name: Documents
 paths:
-  /document:
-    post:
-      tags:
-      - Documents
-      summary: Upload a document
-      operationId: createDocument
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
-      responses:
-        '201':
-          description: Created
-  /document/{document_id}:
+  /v2/documents/{document_id}/free-form-invites:
     get:
-      tags:
-      - Documents
-      summary: Retrieve a document
-      operationId: getDocument
+      operationId: get-v2-documents-document-id-free-form-invites
+      summary: Get freeform invites
+      description: Retrieve the list of FreeForm invites by document ID.
       parameters:
-      - name: document_id
-        in: path
+      - in: query
+        name: per_page
+        required: false
+        description: 'How many search items to view per page. Allowed values: positive integers from 1 to 100.'
+        schema:
+          type: integer
+      - in: query
+        name: page
+        required: false
+        description: 'How many pages to fit the results in. Allowed values: any positive integer starting from 1.'
+        schema:
+          type: integer
+      - in: query
+        name: filters
+        required: false
+        description: JSON encoded array of filters.
+        schema:
+          type: array
+      - in: path
+        name: document_id
         required: true
+        description: ID of the document.
         schema:
           type: string
       responses:
         '200':
-          description: OK
+          description: '* Correct request (invite has been sent)
+
+            * Invite has been canceled
+
+            * No invites
+
+            * Invite is accepted, document is signed'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        email:
+                          type: string
+                        status:
+                          type: string
+                        created:
+                          type: integer
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                          links:
+                            type: array
+                            items:
+                              type: object
+                              properties: {}
+                          total:
+                            type: integer
+                          per_page:
+                            type: integer
+                          total_pages:
+                            type: integer
+                          current_page:
+                            type: integer
+                x-examples:
+                  Example 1:
+                    data:
+                    - id: 395a2cd89d3048a1856dbe1cdb144f519b82857e
+                      email: jessicamoorejm843@gmail.com
+                      status: canceled
+                      created: 1735658991
+                    meta:
+                      pagination:
+                        count: 1
+                        links: []
+                        total: 1
+                        per_page: 15
+                        total_pages: 1
+                        current_page: 1
+              example:
+                Example 1:
+                  data:
+                  - id: 395a2cd89d3048a1856dbe1cdb144f519b82857e
+                    email: jessicamoorejm843@gmail.com
+                    status: canceled
+                    created: 1735658991
+                  meta:
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                No invites:
+                  meta:
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                Invite has been canceled:
+                  data:
+                  - id: 5bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: signer1@email.com
+                    status: canceled
+                    created: 1578561895
+                  meta:
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                Correct request (invite sent):
+                  data:
+                  - id: 5bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: signer1@email.com
+                    status: pending
+                    created: 1578561895
+                  meta:
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                Invite accepted, document signed:
+                  data:
+                  - id: 96XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: signer1@email.com
+                    status: fulfilled
+                    created: 1578562606
+                  meta:
+                    pagination:
+                      count: 2
+                      links: []
+                      total: 2
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+        '400':
+          description: '* Invalid authorization
+
+            * Document not found'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Document not found:
+                  errors:
+                  - code: 65582
+                    message: Document not found
+                Invalid authorization:
+                  code: 1537
+                  error: invalid_token
+      security:
+      - Bearer: []
+      tags:
+      - Documents
+  /v2/documents/{document_id}/fields:
+    get:
+      operationId: get-v2-documents-document-unique-id-fields
+      summary: Get fields data from completed document
+      description: Retrieve contents from the fields completed by the signer.
+      parameters:
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      - in: path
+        name: document_id
+        required: true
+        description: ID of the document.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: "* Correct request for a document with fields filled in \n* If there are no fields in the document\n* If there are non-filled fields in the document"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                If there are no fields in document:
+                  data: []
+                  meta:
+                    pagination:
+                      count: 4
+                      links: []
+                      total: 4
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                If there are non-filled fields in the document:
+                  data:
+                  - id: 88XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: TextName
+                    type: text
+                    value: null
+                  - id: 93XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: datetime
+                    type: text
+                    value: 10/11/2021
+                  - id: c9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: CalculatedName
+                    type: text
+                    value: '25'
+                  - id: 11XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: Dropdown_1
+                    type: enumeration
+                    value: aa
+                  meta:
+                    pagination:
+                      count: 4
+                      links: []
+                      total: 4
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                'Correct request for a document with fields filled in ':
+                  data:
+                  - id: 350b5dce53694e2eb17b432ad75cc1d288827831
+                    name: TextName
+                    type: text
+                    value: dev test search
+                  - id: 9320dbacf5cf4d208deabd62dd1a7b4f0b9eed68
+                    name: datetime
+                    type: text
+                    value: 10/11/2021
+                  - id: c9f7c33cf3734572bb94352a5157bd6f40db4ba8
+                    name: CalculatedName
+                    type: text
+                    value: '25'
+                  - id: 11a1b00380044b86b346da6c6fbc4dd7eb2c9cb0
+                    name: Dropdown_1
+                    type: enumeration
+                    value: aa
+                  meta:
+                    pagination:
+                      count: 4
+                      links: []
+                      total: 4
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+        '400':
+          description: '* Incorrect or missing token
+
+            * Document with this `document_id` doesn''t exist
+
+            * This user has no rights to access the document'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                document_id doesn't exist:
+                  code: 65544
+                  message: internal api error
+                Incorrect or missing token:
+                  code: 1537
+                  error: invalid_token
+                User has no rights for this document:
+                  code: 65610
+                  message: not readable
+        '403':
+          description: If user's email is not verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                If user's email is not verified:
+                  code: 9001
+                  message: Email verification required
+        '404':
+          description: "* If the document has been deleted or is in the trash bin \n* If {document_id} has incorrect format (too many or not enough symbols)"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                'If the document has been deleted or is in the trash bin ':
+                  '404': Document not found
+                If {document_id} has incorrect format (too many or not enough symbols):
+                  _message:
+                    '404': 'Unable to find a route to match the URI: v2/documents/bade662638c640b5b7b712cf4fbec9afd5ffc0a/fields'
+      security:
+      - Bearer: []
+      tags:
+      - Documents
+  /v2/documents/{document_id}/prefill-texts:
     put:
-      tags:
-      - Documents
-      summary: Update document fields/metadata
-      operationId: updateDocument
+      operationId: put-v2-documents-document-id-prefill-texts
+      summary: Prefill text fields
+      description: 'This endpoint allows users to prefill text fields that signers can edit. Only fields of type `text` can be prefilled.
+
+
+        **Example**'
       parameters:
-      - name: document_id
-        in: path
+      - in: path
+        name: document_id
         required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          description: OK
-    delete:
-      tags:
-      - Documents
-      summary: Delete document
-      operationId: deleteDocument
-      parameters:
-      - name: document_id
-        in: path
-        required: true
+        description: ' ID of the requested document.'
         schema:
           type: string
       responses:
         '204':
-          description: Deleted
-  /document/{document_id}/download:
+          description: 'Returns 204: Success, no content, when the text fields have been successfully prefilled. Returns an error when the request is sent with an invalid ID, or the added value doesn''t pass the field validation setting.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                example-1:
+                  Status: 204 Success, no content
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - fields
+              properties:
+                fields:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - field_name
+                    - prefilled_text
+                    properties:
+                      field_name:
+                        type: string
+                        minLength: 1
+                        description: The unique field name that identifies the field. Can be found in the `name` parameter of the field in response from `GET /document/{document_id}`.
+                      prefilled_text:
+                        type: string
+                        minLength: 1
+                        description: The value that should appear on the document.
+                  minItems: 1
+                  description: The array that contains field objects to add values to. Each field object is identified by the `field_name`.
+                  uniqueItems: true
+              x-examples:
+                example-1:
+                  fields:
+                  - field_name: first_name
+                    prefilled_text: Jane
+                  - field_name: last_name
+                    prefilled_text: Mitchell
+              description: ''
+        required: true
+      tags:
+      - Documents
+  /v2/documents/url:
+    post:
+      operationId: post-v2-documents-url
+      summary: Upload document from URL
+      description: 'This endpoint allows users to upload a document to their SignNow account.
+
+
+        Accepts .pdf, .doc, .docx, .odt, .rtf, .png, .jpg, .jpeg, .gif, .bmp, .xml, .xls, .xlsx, .ppt, .pptx, .ps, and .eps file types.
+
+
+        Maximum file size per upload is 50 MB.
+
+
+        > The link to the document must be publicly accessible.'
+      responses:
+        '200':
+          description: 'Success: ID of the uploaded document.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                x-examples:
+                  Example 1:
+                    id: 4c8ddf3fe55e496bb332b4cc98c513b18903c048
+              example:
+                Example 1:
+                  id: 4c8ddf3fe55e496bb332b4cc98c513b18903c048
+                'Document ID ':
+                  id: ccXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        '400':
+          description: "\t\nSomething wrong with generating document dimensions"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 21004000
+                      message: Error during upload
+              example:
+                Example 1:
+                  errors:
+                  - code: 21004000
+                    message: Error during upload
+                Upload error:
+                  errors:
+                  - code: 21004000
+                    message: Error during upload
+                Restricted URL:
+                  code: 21004004
+                  message: Restricted url
+                Parameter name is too long:
+                  code: 65581
+                  message: Document name is too long. Max size is 255 symbols
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - url
+              properties:
+                url:
+                  type: string
+                  example: https://example.com/path/to/your/document.{file_extension}
+                  description: URL with the file to upload. The link to the file must be publicly accessible.
+                  x-stoplight:
+                    id: mrvqtsr47wvwh
+                check_fields:
+                  type: boolean
+                  description: If true, you can upload a document with simple text tags. For more information, see [Upload document with tags](/docs/document/operations/upload-document-with-text-tags).
+                  x-stoplight:
+                    id: 08br87vyow68f
+        required: true
+      tags:
+      - Documents
+  /v2/documents/{document_id}/roles:
     get:
-      tags:
-      - Documents
-      summary: Download document
-      operationId: downloadDocument
+      operationId: get-document-roles
+      summary: Get document users
+      description: 'This endpoint allows API users to retrieve a paginated list of users who have access to the document, including their emails, roles, names, and avatars.
+
+
+        **Notes**
+
+
+        * The owner sees all users with roles (including themselves as `owner`).
+
+        * A non-owner (shared user) sees only the owner and themselves.'
       parameters:
-      - name: document_id
-        in: path
+      - in: query
+        name: per_page
+        required: false
+        description: 'Number of items per page. Min: `1`, Max: `100`. Default: `15`.'
+        schema:
+          type: integer
+      - in: query
+        name: page
+        required: false
+        description: 'Page number. Min: `1`. Default: `1`.'
+        schema:
+          type: integer
+      - in: path
+        name: document_id
         required: true
+        description: Document ID.
         schema:
           type: string
       responses:
         '200':
-          description: OK
-  /document/{document_id}/download/link:
+          description: Success. Returns a paginated list of users with access to the document.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Unique identifier of the user.
+                        role:
+                          type: string
+                          description: User's role in the document (`owner`, `viewer`, or `sender`).
+                        email:
+                          type: string
+                          description: Email address of the user.
+                        full_name:
+                          type: string
+                          description: Full name of the user.
+                        avatar_url:
+                          type:
+                          - string
+                          - 'null'
+                          description: URL of the user's avatar image.
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                          total:
+                            type: integer
+                          per_page:
+                            type: integer
+                          total_pages:
+                            type: integer
+                          current_page:
+                            type: integer
+                        description: Pagination details for the response.
+                x-examples:
+                  Example 1:
+                    data:
+                    - id: abc123def456abc123def456abc123def456abc1
+                      role: owner
+                      email: owner@example.com
+                      full_name: John Doe
+                      avatar_url: https://example.com/avatars/abc123/download
+                    - id: def456abc123def456abc123def456abc123def4
+                      role: viewer
+                      email: viewer@example.com
+                      full_name: Jane Smith
+                      avatar_url: null
+                    meta:
+                      pagination:
+                        count: 2
+                        total: 2
+                        per_page: 15
+                        total_pages: 1
+                        current_page: 1
+              example:
+                Example 1:
+                  data:
+                  - id: abc123def456abc123def456abc123def456abc1
+                    role: owner
+                    email: owner@example.com
+                    full_name: John Doe
+                    avatar_url: https://example.com/avatars/abc123/download
+                  - id: def456abc123def456abc123def456abc123def4
+                    role: viewer
+                    email: viewer@example.com
+                    full_name: Jane Smith
+                    avatar_url: null
+                  meta:
+                    pagination:
+                      count: 2
+                      total: 2
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                application/json:
+                  data:
+                  - id: abc123def456abc123def456abc123def456abc1
+                    role: owner
+                    email: owner@example.com
+                    full_name: John Doe
+                    avatar_url: https://example.com/avatars/abc123/download
+                  - id: def456abc123def456abc123def456abc123def4
+                    role: viewer
+                    email: viewer@example.com
+                    full_name: Jane Smith
+                    avatar_url: null
+                  meta:
+                    pagination:
+                      count: 2
+                      total: 2
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+        '400':
+          description: 'Bad request. Possible errors:
+
+
+            * Document not found.
+
+            * You don''t have access to the entity.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 12029021
+                      message: Document not found.
+              example:
+                Example 1:
+                  errors:
+                  - code: 12029021
+                    message: Document not found.
+                Document not found:
+                  errors:
+                  - code: 12029021
+                    message: Document not found.
+                No access to entity:
+                  errors:
+                  - code: 12029012
+                    message: You don't have access to the entity.
+        '401':
+          description: Incorrect or missing bearer token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  error:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 1537
+                    error: invalid_token
+              example:
+                Example 1:
+                  code: 1537
+                  error: invalid_token
+                Unauthorized:
+                  code: 1537
+                  error: invalid_token
+        '404':
+          description: Incorrect document ID.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  '404':
+                    type: string
+                x-examples:
+                  Example 1:
+                    '404': 'Unable to find a route to match the URI: V2/documents/a8a70c6f26744bcfa6f03abfb5ae00694fed5d73/roles'
+              example:
+                Example 1:
+                  '404': 'Unable to find a route to match the URI: V2/documents/a8a70c6f26744bcfa6f03abfb5ae00694fed5d73/roles'
+                Incorrect document ID:
+                  '404': 'Unable to find a route to match the URI: V2/documents/{document_id}/roles'
+      security:
+      - Bearer: []
+      tags:
+      - Documents
+    delete:
+      operationId: unshare-document-all
+      summary: Unshare document from all users
+      description: 'This endpoint allows API users to remove sharing access for all users from the document.
+
+
+        **Notes**
+
+
+        * Only the owner of the document can perform this action.
+
+        * All shared users are removed.'
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        description: Document ID.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: All users successfully unshared. No content returned.
+        '400':
+          description: 'Bad request. Possible errors:
+
+
+            * Document not found.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 12029021
+                    message: Document not found.
+              example:
+                Example 1:
+                  code: 12029021
+                  message: Document not found.
+                Document not found:
+                  code: 12029021
+                  message: Document not found.
+        '401':
+          description: Incorrect or missing bearer token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  error:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 1537
+                    error: invalid_token
+              example:
+                Example 1:
+                  code: 1537
+                  error: invalid_token
+                Unauthorized:
+                  code: 1537
+                  error: invalid_token
+        '403':
+          description: User is not the document owner.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 12029012
+                    message: You don't have access to the entity.
+              example:
+                Example 1:
+                  code: 12029012
+                  message: You don't have access to the entity.
+                Not an owner:
+                  code: 12029012
+                  message: You don't have access to the entity.
+      security:
+      - Bearer: []
+      tags:
+      - Documents
+  /v2/documents/{document_id}/roles/{user_id}:
+    delete:
+      operationId: unshare-document-from-user
+      summary: Unshare document from user
+      description: 'This endpoint allows API users to remove sharing access for a specific user from the document.
+
+
+        **Notes**
+
+
+        * The owner can unshare any user except themselves.
+
+        * A shared user can unshare only themselves (self-unshare).'
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        description: Document ID.
+        schema:
+          type: string
+      - in: path
+        name: user_id
+        required: true
+        description: ID of the user to unshare.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: User successfully unshared. No content returned.
+        '400':
+          description: 'Bad request. Possible errors:
+
+
+            * Document not found.
+
+            * User role not found.
+
+            * Managing user not found.
+
+            * Entity owner can''t unshare it from himself.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 12029021
+                      message: Document not found.
+              example:
+                Example 1:
+                  errors:
+                  - code: 12029021
+                    message: Document not found.
+                Document not found:
+                  errors:
+                  - code: 12029021
+                    message: Document not found.
+                User role not found:
+                  errors:
+                  - code: 12029011
+                    message: User role not found.
+                Managing user not found:
+                  errors:
+                  - code: 12029023
+                    message: Managing user not found.
+                Owner can't unshare themselves:
+                  errors:
+                  - code: 12029022
+                    message: Entity owner can't unshare it from himself.
+        '401':
+          description: Incorrect or missing bearer token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  error:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 1537
+                    error: invalid_token
+              example:
+                Example 1:
+                  code: 1537
+                  error: invalid_token
+                Unauthorized:
+                  code: 1537
+                  error: invalid_token
+        '403':
+          description: You don't have access to the entity.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 12029012
+                    message: You don't have access to the entity.
+              example:
+                Example 1:
+                  code: 12029012
+                  message: You don't have access to the entity.
+                Forbidden:
+                  code: 12029012
+                  message: You don't have access to the entity.
+      security:
+      - Bearer: []
+      tags:
+      - Documents
+  /v2/documents/{document_id}/embedded-invites:
     post:
+      operationId: create-embedded-signing-invite
+      summary: Create embedded invite
+      description: 'This endpoint allows users to create an embedded signing invite for a document. Once the invite is created, generate an embedded signing link using `POST v2/documents/{{document_id}}/embedded-invites/{{embedded_invite_id}}/link` with the ID you got in the response. Before sending your request, ensure the following:
+
+        - You are the owner of the document to be signed. - The invite is being created for a document (not a template). - Your document contains fields. - The document is not part of any other invite (pending or signed). - Signers'' email addresses are unique and do not exceed 150 characters. - All roles or role IDs in the document are included in the invite (specifying extra roles will result in an error). - The document owner cannot be assigned as a signer. You can also include `approvers`. These recipients review the document without signing or filling fields. Each approver requires `email`, `role`, `order`, and `auth_method`. Note that `order` values must be unique across `invites` and `approvers`. Parameters `role` and `role_id` can be retrieved from the response from `GET /document/{{document_id}}`. Specify a role either by `role` (unique role name, e.g. “Signer 1”), `role_id` (unique role identifier), or both `role` and `role_id`. Ensure they correspond to each other. Use these parameters to customize the request:
+
+
+        Recipient authentication for the signing session
+
+
+        Use the `authentication` object to set up the signer''s authentication for the signing session. * Authentication type: `phone`, method: `sms`. Note that `sms_message` parameter must contain `{password}` placeholder. This method is used to authenticate the signer using a password sent via SMS. ```json
+
+        "authentication": {
+
+        "type": "phone",
+
+        "method": "sms",
+
+        "phone": "+1XXXXXXXXX",
+
+        "sms_message": "Custom test message with {password}"
+
+        }
+
+        ```
+
+
+        * Authentication type: `phone`, method: `phone_call`
+
+        This method is used to authenticate the signer with a password delivered via a phone call. ```json
+
+        "authentication": {
+
+        "type": "phone",
+
+        "method": "phone_call",
+
+        "phone": "+1XXXXXXXXX"
+
+        }
+
+        ```
+
+        * Authentication type: `password`
+
+        This method is used to authenticate the signer using a pre-set password. ```json
+
+        "authentication": {
+
+        "type": "password",
+
+        "password": "123456"
+
+        }
+
+        ```
+
+
+        name_formula parameter
+
+
+        Use the `name_formula` parameter to generate a completed document name based on the `text_prefix` (can be any text) and fillable field data. For example, let''s set the first part of the completed document name as `Contract` and use data from two document fields (we can use up to five fields):
+
+        * `signer_name` (filled as `John Smith`)
+
+        * `signed_date` (filled as `20.01.2023`)
+
+
+        After the signer completes the document, the document will have the name `Contract John Smith 20.01.2023`. Note that you can not use signature fields for `name_formula`. auth_method used in the integrated application
+
+
+        The `auth_method` parameter is defined by the application owner to specify the method used to authenticate the signer within the integrated application. Possible values are: `password`, `email`, `social`, `mfa`, `biometric`, `other`, `none`. **Note**: The `auth_method` parameter does not influence the signer''s authentication method during the signing session. Use the `authentication` object to configure authentication for the signing session. from_email, from_name
+
+
+        Use `from_email` and `from_name` parameters to customize the appearance of the sender''s email address and name. Note that both parameters are optional and applicable only when `delivery_type`=`email`. Explore the three scenarios of passing the from_name and from_email parameters:
+
+
+        **When both `from_email` and `from_name` are passed:**
+
+
+        The custom `from_name` appears:
+
+
+        - in email subject of the invite, reassign, reminder, and completed emails. The custom `from_email` appears:
+
+
+        - in email body of the invite, reassign, reminder, and completed emails. - when clicking **Contact Sender** and in **Reply-to** in the emails.'
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        description: Document ID.
+        schema:
+          type: string
+      responses:
+        '201':
+          description: '* Response to a correct request
+
+            * Response to a correct request with `name_formula` parameter to change the completed document name.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: ID of the created embedded invite.
+                        email:
+                          type: string
+                        order:
+                          type: integer
+                        status:
+                          type: string
+                        role_id:
+                          type: string
+                    description: Data object with the embedded invite info.
+              example:
+                application/json:
+                  data:
+                  - id: 03XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: signer1@email.com
+                    order: 1
+                    status: pending
+                    role_id: 33XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  - id: b9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: signer2@email.com
+                    order: 1
+                    status: pending
+                    role_id: 88XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  - id: c7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: signer3@email.com
+                    order: 1
+                    status: pending
+                    role_id: 99XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  - id: a4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: approver1@email.com
+                    order: 4
+                    status: created
+                    role_id: 44XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  - id: a5XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: approver2@email.com
+                    order: 5
+                    status: created
+                    role_id: 55XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Response to a correct request:
+                  data:
+                  - id: 13XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    link: https://example.com
+                    email: signer@email.com
+                    order: 1
+                    status: pending
+                    role_id: c8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    expires_at: 1589546224
+                    redirect_uri: https://example.com
+                    redirect_target: blank
+                    decline_redirect_uri: https://signnow.com
+                  - id: a7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: approver@email.com
+                    order: 2
+                    status: created
+                    role_id: 44XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                'With "name_formula" parameter ':
+                  data:
+                  - id: 5fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: signer@email.com
+                    order: 1
+                    status: pending
+                    role_id: 58XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        '400':
+          description: "* Document has active invites.\n* Email addresses in embedded invites are not unique.\n* Document has no active fields.\n* The role doesn't exist in the document.\n* Document owner's email was used as a signer's email.\n* Not all of the document roles were used.\n* Invite for the role already exists.\n\n\n**Validation errors**:\n* The `prefill_signature_name` contains unsupported characters.\n* The `authentication.type` is not a string.\n* The `authentication.type` is not valid. Possible values: `phone`, `password`.\n* The `phone` is not a string.\n* The `phone` format is not valid.\n* The `phone` field is required when `authentication.type` = `phone`.\n* The `method` is not valid. Possible values: `sms`, `phone_call`.\n* The`method` parameter can be used if `authentication.type` = `phone`.\n* The `password` is not a string.\n* The `password` parameter is required when `authentication.type` = `password`.\n* The `sms_message` is not a string.\n* The `sms_message` value is empty.\n* The `sms_message` value is too long (must have 154 characters or less).\n* The `sms_message` contains unsupported characters.\n* The `phone` parameter is required when `authentication.type` = `phone`.\n* The `method` parameter is required when `authentication.type` = `phone`.  \n* The `sms_message` parameter can be used only when `authentication.type` = `phone` and `method` = `sms`. \n* The `password` field is required when `authentication.type` = `password`.\n* The `method` field is not a string.\n* The `authentication.type` is empty.\n* The `name_formula` field is not a string.\n* The `name_formula` value is empty.\n* The `name_formula` contains unsupported characters.\n* The `name_formula` contains more than 5 fields.\n* The `name_formula` have `{field_name}` that does not exist in document or field type is not text.\n* The `name_formula` have duplicate `{field_name}` values.\n* The `required_preset_signature_name` is not a string.\n* The `required_preset_signature_name` value is empty.\n* The `required_preset_signature_name` is too long (must not exceed 255 characters).\n* The `required_preset_signature_name` contains unsupported characters.\n* Parameter `required_preset_signature_name` is used with `prefill_signature_name` for the same role.\n* Parameter `required_preset_signature_name` is used with `force_new_signature` for the same role.\n* The `language` is not a string.\n* The`language` is incorrect. Possible values: `en`, `fr`, `es`.\n* The `decline_redirect_uri` is not a string.\n* The `decline_redirect_uri` is empty.\n* The`decline_redirect_uri` is not a correct URL.\n* The`redirect_target` is not a string.\n* The`redirect_target` is incorrect. Possible values: self, blank.\n* One of `redirect_uri` fields is required when `redirect_target` is added.\n* The `redirect_uri` is too long (must not exceed 2048 characters).\n* The `decline_redirect_uri` is too long (must not exceed 2048 characters).\n* The `delivery_type` is not a string.\n* Incorrect `delivery_type`. Possible values: `email`, `link`.\n* The `link_expiration` is not an integer.\n* The `link_expiration` is incorrect (must be 15 or more).\n* The `link_expiration` is incorrect (must be 45 or less).\n* The `link_expiration` can only be used if `delivery_type=email`.\n* The `session_expiration` is not an integer.\n* The `session_expiration` is out of range.\n* The `session_expiration` can only be used if `delivery_type=email`.\n* Parameter `subject` in `invites` is not a string.\n* Parameter `subject` in `invites` is empty.\n* Parameter `subject` in `invites` contains unsupported characters.\n* Parameter `subject` in `invites` is too long.\n* Parameter `subject` in `invites` is used when `delivery_type` is not `email`.\n* Parameter `message` in `invites` is not a string.\n* Parameter `message` in `invites` is empty.\n* Parameter `message` in `invites` contains unsupported characters.\n* Parameter `message` in `invites` is too long.\n* Parameter `message` in `invites` is used when `delivery_type` is not `email`.\n* Your subscription plan does not include email invite customization.\n\n\n**QES-specific errors**:\n\n* The organization has no advanced sign provider enabled.\n* The user is not part of the organization.\n* Multiple signers were found in a single step.\n* Different signature providers assigned to signers.\n* The `signature` field type is incorrect.\n* The `signature.type` value  is empty.\n* The `signature.type` value type is incorrect.\n* The `signature.type` value is not supported.\n\n\n**Approver-specific errors**:\n\n* The `approvers` field is not an array.\n* The `approvers` field items are not arrays.\n* In `approvers`, multiple approvers share the same `order`.\n* An approver's `order` is shared with another role.\n* In `approvers`, role names are not unique.\n* The `email` field in `approvers` is not a string / is blank / is not a valid email.\n* The `role` field in `approvers` is not a string / is blank / exceeds 255 characters / contains 4-byte characters.\n* The `order` field in `approvers` is not an integer / is blank / is not between 1 and 127.\n* The `auth_method` field in `approvers` is not a string / is blank / is not one of the allowed values.\n* The `first_name` field in `approvers` is not a string / contains 4-byte characters / exceeds the character limit.\n* The `last_name` field in `approvers` is not a string / contains 4-byte characters / exceeds the character limit.\n* The `language` field in `approvers` is not a string / is invalid (allowed: `en`, `fr`, `es`).\n* The `delivery_type` field in `approvers` is not a string / is invalid (allowed: `email`, `link`).\n* The `link_expiration` field in `approvers` is not an integer / is less than 15 minutes / is set when `delivery_type` is not `email`.\n* The `session_expiration` field in `approvers` is not an integer / is out of range / is set when `delivery_type` is not `email`.\n* The `subject` field in `approvers` is not a string / is blank / contains 4-byte characters / exceeds the character limit / is set when `delivery_type` is not `email`.\n* The `message` field in `approvers` is not a string / is blank / contains 4-byte characters / exceeds the character limit / is set when `delivery_type` is not `email`."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: '19003095'
+                      message: 'The `signature.type` attribute is not valid. Allowed values: “eideasy”, “nom151.'
+              example:
+                Example 1:
+                  errors:
+                  - code: '19003095'
+                    message: 'The `signature.type` attribute is not valid. Allowed values: “eideasy”, “nom151.'
+                Unused role:
+                  errors:
+                  - code: 19002019
+                    message: Role {role_id} was not specified in any invite. All roles must be used.
+                Message is empty:
+                  errors:
+                  - code: 19003106
+                    message: The `message` field in `invites` must not be an empty string.
+                More than 1 step:
+                  errors:
+                  - code: 19002004
+                    message: Can send an embedded invite with only one step.
+                No active fields:
+                  errors:
+                  - code: 19002016
+                    message: Cannot send an invite. This document does not contain fields.
+                Subject is empty:
+                  errors:
+                  - code: 19003101
+                    message: The `subject` field in `invites` must not be an empty string.
+                Duplicated emails:
+                  errors:
+                  - code: 19002005
+                    message: Emails in embedded invites must be unique.
+                Non-existent role:
+                  errors:
+                  - code: 19002018
+                    message: Role {role_id} does not exist in the document.
+                Owner is a signer:
+                  errors:
+                  - code: 19002021
+                    message: The document owner cannot send invite to himself.
+                Approver role blank:
+                  errors:
+                  - code: 19003123
+                    message: The `role` field in `approvers` must not be blank.
+                Different providers:
+                  errors:
+                  - code: 19003096
+                    message: The `signature.type` fields must be the same for all signers.
+                Message is too long:
+                  errors:
+                  - code: 19003108
+                    message: The `message` field in `invites` must not exceed 5000 characters.
+                Subject is too long:
+                  errors:
+                  - code: 19003103
+                    message: The `subject` field in `invites` must not exceed 1000 characters.
+                Approver email blank:
+                  errors:
+                  - code: 19003120
+                    message: The `email` field in `approvers` must not be blank.
+                Approver order blank:
+                  errors:
+                  - code: 19003127
+                    message: The `order` field in `approvers` must not be blank.
+                Authentication errors:
+                  invites:
+                  - email: signer1@email.com
+                    order: 1
+                    role_id: role_id
+                    last_name: qwerty
+                    first_name: qwerty
+                    auth_method: email
+                    authentication:
+                      type: phone
+                      phone: +1XXX-XXXXXXX
+                      method: sms
+                      sms_message: message
+                  - email: signer2@email.com
+                    order: 1
+                    role_id: role_id
+                    last_name: qwerty
+                    first_name: qwerty
+                    auth_method: email
+                    authentication:
+                      type: password
+                      password: password
+                Message is not string:
+                  errors:
+                  - code: 19003105
+                    message: The `message` field in `invites` must be a string.
+                Subject is not string:
+                  errors:
+                  - code: 19003100
+                    message: The `subject` field in `invites` must be a string.
+                Approver email invalid:
+                  errors:
+                  - code: 19003121
+                    message: The `email` field in `approvers` must be a valid email.
+                Approver message empty:
+                  errors:
+                  - code: 19003157
+                    message: The `message` field in `approvers` must not be an empty string.
+                Approver role too long:
+                  errors:
+                  - code: 19003124
+                    message: The `role` field in `approvers` must contain no more than 255 characters.
+                Approver subject empty:
+                  errors:
+                  - code: 19003152
+                    message: The `subject` field in `approvers` must not be an empty string.
+                approvers is not array:
+                  errors:
+                  - code: 19003117
+                    message: The `approvers` field must be an array.
+                Incorrect delivery_type:
+                  errors:
+                  - code: 19003083
+                    message: 'The `delivery_type field` in `invites` is invalid, allowed values: email, link.'
+                link_expiration too big:
+                  errors:
+                  - code: 19004009
+                    message: The `link_expiration` field in `invites` must be less than or equal to 45 minutes.
+                signature.type is empty:
+                  errors:
+                  - code: 19003094
+                    message: The `signature.type` cannot be null.
+                Approver role not string:
+                  errors:
+                  - code: 19003122
+                    message: The `role` field in `approvers` must be a string.
+                Approver role not unique:
+                  errors:
+                  - code: 19003134
+                    message: In the `approvers` field, each role name must be unique.
+                User not in organization:
+                  errors:
+                  - code: 19004011
+                    message: Organization is required to send an invite with advanced signing.
+                delivery_type not string:
+                  errors:
+                  - code: 19003082
+                    message: The `delivery_type` field in `invites` must be a string.
+                Approver email not string:
+                  errors:
+                  - code: 19003119
+                    message: The `email` field in `approvers` must be a string.
+                Approver language invalid:
+                  errors:
+                  - code: 19003142
+                    message: 'The `language` field in `approvers` is invalid. Allowed values: en, fr, es.'
+                Approver message too long:
+                  errors:
+                  - code: 19003159
+                    message: The `message` field in `approvers` must not exceed 5000 characters.
+                Approver subject too long:
+                  errors:
+                  - code: 19003154
+                    message: The `subject` field in `approvers` must not exceed 1000 characters.
+                No advanced sign provider:
+                  errors:
+                  - code: 19004012
+                    message: The sender organization’s advanced sign provider is not valid.
+                Redundant link_expiration:
+                  errors:
+                  - code: 19003086
+                    message: In `invites`, the `link_expiration` field must be used if the `delivery_type` field contains `email`.
+                approvers items not array:
+                  errors:
+                  - code: 19003118
+                    message: The `approvers` field items must be arrays.
+                Approver auth_method blank:
+                  errors:
+                  - code: 19003130
+                    message: The `auth_method` field in `approvers` must not be blank.
+                Approver order not integer:
+                  errors:
+                  - code: 19003126
+                    message: The `order` field in `approvers` must be an integer.
+                link_expiration too little:
+                  errors:
+                  - code: 19003085
+                    message: The `link_expiration` field in `invites` must be greater than or equal to 15 minutes.
+                Approver last_name too long:
+                  errors:
+                  - code: 19003140
+                    message: The `last_name` field in `approvers` must not exceed 64 characters.
+                Approver message not string:
+                  errors:
+                  - code: 19003156
+                    message: The `message` field in `approvers` must be a string.
+                Approver order out of range:
+                  errors:
+                  - code: 19003128
+                    message: The `order` field in `approvers` must be between 1 and 127.
+                Approver subject not string:
+                  errors:
+                  - code: 19003151
+                    message: The `subject` field in `approvers` must be a string.
+                Document has active invites:
+                  errors:
+                  - code: 19002017
+                    message: An invite already exists for this document.
+                Signature type is incorrect:
+                  errors:
+                  - code: 19003099
+                    message: The `signature` field in `invites` must be an array.
+                link_expiration not integer:
+                  errors:
+                  - code: 19003084
+                    message: The `link_expiration` field in `invites` must be an integer.
+                signature.type is incorrect:
+                  errors:
+                  - code: 19003098
+                    message: The `signature.type` must be a string.
+                Approver auth_method invalid:
+                  errors:
+                  - code: 19003131
+                    message: The `auth_method` field in `approvers` must be one of the allowed values.
+                Approver first_name too long:
+                  errors:
+                  - code: 19003137
+                    message: The `first_name` field in `approvers` must not exceed 64 characters.
+                Approver language not string:
+                  errors:
+                  - code: 19003141
+                    message: The `language` field in `approvers` must be a string.
+                Redundant session_expiration:
+                  errors:
+                  - code: 19003093
+                    message: In `invites`, the `session_expiration` field must be used if the `delivery_type` field contains `email`.
+                Approver last_name not string:
+                  errors:
+                  - code: 19003138
+                    message: The `last_name` field in `approvers` must be a string.
+                Approver message 4-byte chars:
+                  errors:
+                  - code: 19003158
+                    message: UTF-8 4-byte characters in the `message` field in `approvers` are not supported.
+                Approver subject 4-byte chars:
+                  errors:
+                  - code: 19003153
+                    message: UTF-8 4-byte characters in the `subject` field in `approvers` are not supported.
+                Multiple signers for one step:
+                  errors:
+                  - code: 19003097
+                    message: Must have only one signer per step if a signature field exists.
+                Approver delivery_type invalid:
+                  errors:
+                  - code: 19003144
+                    message: 'The `delivery_type` field in `approvers` is invalid. Allowed values: email, link.'
+                Approver first_name not string:
+                  errors:
+                  - code: 19003135
+                    message: The `first_name` field in `approvers` must be a string.
+                session_expiration not integer:
+                  errors:
+                  - code: 19003091
+                    message: The `session_expiration` field in `invites` must be an integer.
+                Approver auth_method not string:
+                  errors:
+                  - code: 19003129
+                    message: The `auth_method` field in `approvers` must be a string.
+                Approver last_name 4-byte chars:
+                  errors:
+                  - code: 19003139
+                    message: UTF-8 4-byte characters in the `last_name` field in `approvers` are not supported.
+                session_expiration out of range:
+                  errors:
+                  - code: 19003092
+                    message: The `session_expiration` field in `invites` must be between 15 and 1440 minutes.
+                signature.type is not supported:
+                  errors:
+                  - code: 19003095
+                    message: 'The `signature.type` attribute is not valid. Allowed values: “eideasy”, “nom151.'
+                Approver first_name 4-byte chars:
+                  errors:
+                  - code: 19003136
+                    message: UTF-8 4-byte characters in the `first_name` field in `approvers` are not supported.
+                Approver delivery_type not string:
+                  errors:
+                  - code: 19003143
+                    message: The `delivery_type` field in `approvers` must be a string.
+                Email customization not available:
+                  errors:
+                  - code: 19004014
+                    message: Upgrade your subscription plan to customize the invite subject and message.
+                Approver link_expiration too small:
+                  errors:
+                  - code: 19003146
+                    message: The `link_expiration` field in `approvers` must be greater than or equal to 15 minutes.
+                Approver link_expiration not integer:
+                  errors:
+                  - code: 19003145
+                    message: The `link_expiration` field in `approvers` must be an integer.
+                Approver order shared with another role:
+                  errors:
+                  - code: 19003133
+                    message: An approver's `order` must not be shared with other roles.
+                Approver session_expiration not integer:
+                  errors:
+                  - code: 19003148
+                    message: The `session_expiration` field in `approvers` must be an integer.
+                Message contains unsupported characters:
+                  errors:
+                  - code: 19003107
+                    message: UTF-8 4-byte characters in the `message` field are not supported.
+                Subject contains unsupported characters:
+                  errors:
+                  - code: 19003102
+                    message: UTF-8 4-byte characters in the `subject` field are not supported.
+                Approver order conflict within approvers:
+                  errors:
+                  - code: 19003132
+                    message: In the `approvers` field, each `order` must have only one approver.
+                Approver role contains 4-byte characters:
+                  errors:
+                  - code: 19003125
+                    message: The `role` field in `approvers` must not contain 4-byte characters.
+                Approver session_expiration out of range:
+                  errors:
+                  - code: 19003149
+                    message: The `session_expiration` field in `approvers` must be between 15 and 1440 minutes.
+                Message is used with wrong delivery_type:
+                  errors:
+                  - code: 19003109
+                    message: The `message` field in `invites` must be used only if the `delivery_type` field is set to `email`.
+                Subject is used with wrong delivery_type:
+                  errors:
+                  - code: 19003104
+                    message: The `subject` field in `invites` must be used only if the `delivery_type` field is set to `email`.
+                Approver message with wrong delivery_type:
+                  errors:
+                  - code: 19003160
+                    message: The `message` field in `approvers` must be used only if the `delivery_type` field is set to `email`.
+                Approver subject with wrong delivery_type:
+                  errors:
+                  - code: 19003155
+                    message: The `subject` field in `approvers` must be used only if the `delivery_type` field is set to `email`.
+                Approver link_expiration with wrong delivery_type:
+                  errors:
+                  - code: 19003147
+                    message: The `link_expiration` field in `approvers` must be used only if the `delivery_type` field is set to `email`.
+                Approver session_expiration with wrong delivery_type:
+                  errors:
+                  - code: 19003150
+                    message: The `session_expiration` field in `approvers` must be used only if the `delivery_type` field is set to `email`.
+        '403':
+          description: User doesn't own the document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 19001002
+                      message: User is not document owner.
+              example:
+                Example 1:
+                  errors:
+                  - code: 19001002
+                    message: User is not document owner.
+                User doesn't own the document:
+                  code: 19001002
+                  message: User is not document owner.
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Document not found:
+                  errors:
+                  - code: 19002001
+                    message: Document not found
+        '422':
+          description: Document is template
+          content:
+            application/json:
+              example:
+                Document is template:
+                  errors:
+                  - code: 19001003
+                    message: Cannot send invites for templates.
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invites:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - email
+                    - role_id
+                    - order
+                    - auth_method
+                    properties:
+                      role:
+                        type: string
+                        example: Recipient 1
+                        description: Recipient's role name.
+                      email:
+                        type: string
+                        example: signer@email.com
+                        description: Email address of the recipient.
+                      order:
+                        type: integer
+                        example: 1
+                        description: The order of signing.
+                      message:
+                        type: string
+                        example: Please review the invoice and sign it at your earliest convenience.
+                        maxLength: 5000
+                        description: Invite email message. Available if the `delivery_type` = `email`. Overrides branding settings when sending emails.
+                        x-stoplight:
+                          id: p6qdwelzotcow
+                      subject:
+                        type: string
+                        example: Review and sign the invoice
+                        maxLength: 1000
+                        description: Invite email subject. Available if the `delivery_type` = `email`. Overrides branding settings when sending emails.
+                        x-stoplight:
+                          id: hweqz6janu23i
+                      language:
+                        type: string
+                        example: en
+                        description: 'Sets the language of the signing session for the recipient. Possible values: `en` for English, `es` for Spanish, `fr` for French.'
+                      last_name:
+                        type: string
+                        example: Doe
+                        description: Signer's last name.
+                      signature:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            example: eideasy
+                            description: Type of the QES. Allowed vaules are `eideasy`, `nom151`. For more information, see [QES user guide](/docs/qualified-electronic-signature).
+                            x-stoplight:
+                              id: chg74gqg704ir
+                        description: This object is used to request QES signatures from signers. To create an embedded invite with QES, a user must be a member of an organization with QES settings enabled. If QES is specified, it must be used for all signers in the invite.
+                        x-stoplight:
+                          id: i44p23xv82csv
+                      first_name:
+                        type: string
+                        example: John
+                        description: Signer's first name.
+                      auth_method:
+                        type: string
+                        example: none
+                        description: 'Defines the method used to authenticate the recipient within the integrated application. Allowed values: `password`, `email`, `mfa`, `biometric`, `social`, `other`, `none`.'
+                      redirect_uri:
+                        type: string
+                        example: https://example.com
+                        description: The link that opens after the signing session has been completed.
+                      authentication:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            example: phone
+                            description: 'Authentication type used for the recipient authentication during the signing session. Required inside `authentication` object. Allowed values: `phone`, `password`.'
+                          phone:
+                            type: string
+                            example: +1XXXXXXXXX
+                            description: Phone number used to authenticate the recipient. Required inside `authentication` object with the `phone` method.
+                          method:
+                            type: string
+                            example: sms
+                            description: 'Method of the `phone` authentication type. Required inside `authentication` object with the `phone` authentication type. Allowed values: `sms`, `phone_call`.
+
+                              '
+                          password:
+                            type: string
+                            example: '123456'
+                            description: Password set for the recipient authentication. Required inside the  `authentication`  object with the  `password`  authentication type.
+                          sms_message:
+                            type: string
+                            example: Enter the password {password} to unlock your document.
+                            maxLength: 140
+                            description: 'Custom sms message sent to the recipient, containing the {password} placeholder. Used with the `sms` method. Without this parameter, the recipient receives a default sms with an autogenerated password (unlock code) - "SignNow document invite unlock code: 123456".'
+                        description: Authentication settings used to verify the recipient identity.
+                      'delivery_type ':
+                        type: string
+                        default: link
+                        description: 'Defines how the invite is sent. Allowed values: `email`, `link`.
+
+                          '
+                      redirect_target:
+                        type: string
+                        default: self
+                        description: 'Determines whether to open the redirect link in the new tab in the browser, or in the same tab after the signing session. Possible values: `blank` - opens the link in the new tab, `self` - opens the link in the same tab.'
+                      'link_expiration ':
+                        type: integer
+                        maximum: 43200
+                        minimum: 15
+                        description: In how many minutes the email invite expires. Can be used only if `delivery_type`=`email`.
+                      close_redirect_uri:
+                        type: string
+                        example: https://example.com
+                        description: The link that opens when a signer clicks **Save Progress and Finish Later** during a signing session or **Close** in view mode.
+                      session_expiration:
+                        type: integer
+                        maximum: 1440
+                        minimum: 15
+                        description: In how many minutes the signing session expires. If a link is generated for this invite, the session expiration is reset. Can be used only if `delivery_type=email`.
+                        x-stoplight:
+                          id: 2xz1y3kaq2nha
+                      force_new_signature:
+                        type: integer
+                        example: 0
+                        description: 'Defines whether the signer can use their saved signature or not. If set to `1`, the signer has to add a new signature. If set to `0`, the signer can use the saved signature.
+
+                          '
+                      decline_redirect_uri:
+                        type: string
+                        example: https://example.com
+                        description: The link that opens after the signing session has been declined by the signer.
+                      prefill_signature_name:
+                        type: string
+                        example: John Doe
+                        maxLength: 255
+                        description: The text displayed in the Signature field. The signer can edit this value.
+                      required_preset_signature_name:
+                        type: string
+                        example: Jane Smith
+                        description: The text displayed in the Signature field. The signer cannot edit this value. Can not be used simultaneously with `prefill_signature_name` or `force_new_signature` for the same role.
+                  description: The object that holds the attributes of the invite.
+                approvers:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - email
+                    - role
+                    - order
+                    - auth_method
+                    properties:
+                      role:
+                        type: string
+                        example: Approver 1
+                        maxLength: 255
+                        description: Approver's role name. Must be unique within `approvers`.
+                      email:
+                        type: string
+                        example: approver@email.com
+                        description: Email address of the approver.
+                      order:
+                        type: integer
+                        example: 2
+                        maximum: 127
+                        minimum: 1
+                        description: The order of approval. Each `order` value in `approvers` must be unique within the array and must not be shared with signer roles.
+                      message:
+                        type: string
+                        example: Please review the invoice and approve it at your earliest convenience.
+                        maxLength: 5000
+                        description: Invite email message. Available if the `delivery_type` = `email`. Overrides branding settings when sending emails.
+                      subject:
+                        type: string
+                        example: Review and approve the invoice
+                        maxLength: 1000
+                        description: Invite email subject. Available if the `delivery_type` = `email`. Overrides branding settings when sending emails.
+                      language:
+                        type: string
+                        example: en
+                        description: 'Sets the language of the approval session for the approver. Possible values: `en` for English, `es` for Spanish, `fr` for French.'
+                      last_name:
+                        type: string
+                        example: Doe
+                        description: Approver's last name.
+                      first_name:
+                        type: string
+                        example: John
+                        description: Approver's first name.
+                      auth_method:
+                        type: string
+                        example: none
+                        description: 'Defines the method used to authenticate the approver within the integrated application. Allowed values: `password`, `email`, `mfa`, `biometric`, `social`, `other`, `none`.'
+                      delivery_type:
+                        type: string
+                        default: link
+                        description: 'Defines how the invite is sent. Allowed values: `email`, `link`.'
+                      authentication:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            example: phone
+                            description: 'Authentication type used for the approver authentication during the approval session. Required inside `authentication` object. Allowed values: `phone`, `password`.'
+                          phone:
+                            type: string
+                            example: +1XXXXXXXXX
+                            description: Phone number used to authenticate the approver. Required inside `authentication` object with the `phone` method.
+                          method:
+                            type: string
+                            example: sms
+                            description: 'Method of the `phone` authentication type. Required inside `authentication` object with the `phone` authentication type. Allowed values: `sms`, `phone_call`.'
+                          password:
+                            type: string
+                            example: '123456'
+                            description: Password set for the approver authentication. Required inside the `authentication` object with the `password` authentication type.
+                          sms_message:
+                            type: string
+                            example: Enter the password {password} to unlock your document.
+                            maxLength: 140
+                            description: Custom SMS message sent to the approver, containing the {password} placeholder. Used with the `sms` method.
+                        description: Authentication settings used to verify the approver identity.
+                      link_expiration:
+                        type: integer
+                        maximum: 43200
+                        minimum: 15
+                        description: In how many minutes the email invite expires. Can be used only if `delivery_type`=`email`.
+                      session_expiration:
+                        type: integer
+                        maximum: 1440
+                        minimum: 15
+                        description: In how many minutes the approval session expires. If a link is generated for this invite, the session expiration is reset. Can be used only if `delivery_type=email`.
+                  description: The object that holds the attributes of the approver. Approvers review the document but do not sign or fill in fields. `order` values must be unique across `invites` and `approvers`.
+                from_name:
+                  type: string
+                  example: Jane Doe
+                  maxLength: 300
+                  description: 'Use this attribute to customize the name that appears in email subject of the invite, reassign, reminder, and completed emails. Note: applicable when `delivery_type`=`email`.'
+                from_email:
+                  type: string
+                  example: sender@email.com
+                  maxLength: 255
+                  description: 'Use this attribute to customize the email address that appears: 1) in the invite, reassign, reminder, and completed emails: in email subject (part before @) and email body; when clicking Contact Sender, and in Reply-to; 2) in the signing session: when clicking the Contact Sender button in the More Actions menu. Note: applicable when `delivery_type`=`email`.'
+                name_formula:
+                  type: string
+                  example: Contract|signer_name|signed_date
+                  description: Used to generate a completed document name based on `text_prefix` (can be any text) and field data (excluding signature fields). You can use up to 5 fields.
+              x-examples:
+                Example 1:
+                  invites:
+                  - role: Recipient 1
+                    email: signer1@email.com
+                    order: 1
+                    language: en
+                    last_name: Smith
+                    first_name: John
+                    auth_method: none
+                    redirect_uri: https://example.com/redirect
+                    authentication:
+                      type: password
+                      password: password
+                    prefill_signature_name: Recipient signature
+                  - role: Recipient 2
+                    email: signer2@email.com
+                    order: 1
+                    language: en
+                    last_name: Johnson
+                    first_name: Emily
+                    auth_method: biometric
+                    authentication:
+                      type: phone
+                      phone: '+1111111111'
+                      method: phone_call
+                  - role: Recipient 3
+                    email: signer3@email.com
+                    order: 2
+                    language: en
+                    last_name: Brown
+                    first_name: Michael
+                    auth_method: password
+                    authentication:
+                      type: phone
+                      phone: '+1111111111'
+                      method: sms
+                      sms_message: Your custom test message with {password}
+                  approvers:
+                  - role: Approver 1
+                    email: approver1@email.com
+                    order: 3
+                    message: Review and approve the document.
+                    subject: Please approve the document
+                    language: en
+                    last_name: Williams
+                    first_name: Sarah
+                    auth_method: none
+                    delivery_type: email
+                    authentication:
+                      type: phone
+                      phone: '+1111111111'
+                      method: phone_call
+                    link_expiration: 15
+                    session_expiration: 15
+                  name_formula: some text|field1_name|field2_name|field3_name|field4_name|field5_name
+        required: true
       tags:
       - Documents
-      summary: Generate a one-time download link
-      operationId: createDownloadLink
+    delete:
+      operationId: delete-embedded-signing-invite
+      summary: Delete embedded invites
+      description: Deletes embedded invites for a document.
       parameters:
-      - name: document_id
-        in: path
+      - in: path
+        name: document_id
         required: true
+        description: Document ID.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Current user is not the document owner.
+          content:
+            application/json:
+              example:
+                application/json:
+                  errors:
+                  - code: 19001002
+                    message: User is not document owner.
+        '404':
+          description: Document not found.
+          content:
+            application/json:
+              example:
+                application/json:
+                  errors:
+                  - code: 19000001
+                    message: Document not found
+        '422':
+          description: The document has no active embedded invites.
+          content:
+            application/json:
+              example:
+                application/json:
+                  errors:
+                  - code: 19001006
+                    message: Document has no pending or created embedded invites.
+      security:
+      - Bearer: []
+      tags:
+      - Documents
+  /v2/documents/{document_id}/embedded-invites/{embedded_invite_id}/link:
+    post:
+      operationId: generate-link-for-embedded-invite
+      summary: Generate embedded invite link
+      description: 'This endpoint allows users to generate a link for the document embedded invite.
+
+
+        Retrieve the field invite `id` from the response `POST /v2/documents/{{document_id}}/embedded-invites`.
+
+
+        In your request specify:
+
+
+        `auth_method`: Pre-defined in `POST /v2/documents/{{document_id}}/embedded-invites` request method used to authenticate a recipient within the integrated application.'
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        description: Document ID.
+        schema:
+          type: string
+      - in: path
+        name: embedded_invite_id
+        required: true
+        description: ID of the embedded invite.
         schema:
           type: string
       responses:
         '200':
-          description: OK
-  /document/{document_id}/historyfull:
+          description: Success. Returns the generated embedded invite link for the document.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      link:
+                        type: string
+              example:
+                application/json:
+                  data:
+                    link: https://example.com/document/01XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        '400':
+          description: '* `session_expiration` is not an integer.
+
+            * `session_expiration` is out of range.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                session_expiration not integer:
+                  errors:
+                  - code: 19016006
+                    message: The `session_expiration` field must be an integer.
+                session_expiration out of range:
+                  errors:
+                  - code: 19016007
+                    message: The `session_expiration` field must be between 15 and 1440 minutes.
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - auth_method
+              properties:
+                auth_method:
+                  type: string
+                  example: none
+                  description: 'Defines the method used to authenticate the recipient within the integrated application. Allowed values: `password`, `email`, `mfa`, `social`, `biometric`, `other`, `none`. Must match the value specified when creating the embedded invite.'
+                link_expiration:
+                  type: integer
+                  maximum: 45
+                  minimum: 15
+                  description: Specifies how many minutes the link will remain active. The allowed range is 15 to 45 minutes.
+                session_expiration:
+                  type: integer
+                  maximum: 1440
+                  minimum: 15
+                  description: Specifies how many minutes the signing session will remain active.
+                  x-stoplight:
+                    id: xrygn5ah56dle
+        required: true
+      tags:
+      - Documents
+  /v2/documents/{document_id}/field-invites/{field_invite_id}/full-decline:
+    post:
+      operationId: post-v2-documents-document-id-field-invites-field-invite-id-full-decline
+      summary: Decline to sign a field invite
+      description: Allows API users to decline signing a field invite.
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        description: ID of the document.
+        schema:
+          type: string
+      - in: path
+        name: field_invite_id
+        required: true
+        description: ID of the field invite.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Success, no content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: The access token is incorrect.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Incorrect access token:
+                  code: 1537
+                  error: invalid_token
+        '404':
+          description: '* Requested document or field invite not found.
+
+            * The document is in the Trash folder. This action is forbidden.
+
+            * User does not have read access to this document.
+
+            * Requested field invite not in pending status.
+
+            * Document must not be part of a document group.
+
+            * Invite has expired.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Invite has expired:
+                  errors:
+                  - code: 19001035
+                    message: Invite has expired.
+                Field invite does not belong to document:
+                  errors:
+                  - code: 19001018
+                    message: Field invite does not belong to document
+                Requested document or field invite not found:
+                  errors:
+                  - code: 19002001
+                    message: Document not found
+                Requested field invite not in pending status.:
+                  errors:
+                  - code: 19001030
+                    message: Requested field invite not in pending status.
+                Document must not be part of a document group.:
+                  errors:
+                  - code: 19001033
+                    message: Document must not be part of a document group.
+                User does not have read access to this document:
+                  errors:
+                  - code: 19001031
+                    message: User does not have read access to this document
+                Document is full declined. Please cancel the invite first.:
+                  errors:
+                  - code: 19001034
+                    message: Document is full declined. Please cancel the invite first.
+                The document is in the Trash folder. This action is forbidden.:
+                  errors:
+                  - code: 19001032
+                    message: The document is in the Trash folder. This action is forbidden.
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              properties:
+                reason:
+                  type: string
+                  description: The reason for decline.
+                client_timestamp:
+                  type: integer
+                  description: Unix timestamp of decline.
+              x-examples:
+                Example 1:
+                  reason: decline reason
+                  client_timestamp: 1586523305
+        required: true
+      tags:
+      - Documents
     get:
-      tags:
-      - Documents
-      summary: Get full document history
-      operationId: getDocumentHistory
+      operationId: get-v2-documents-document-id-field-invites-field-invite-id-full-decline
+      summary: Get the declined invite
+      description: Allows document owners to retrieve the recipient who declined the invite, the time and reason for decline.
       parameters:
-      - name: document_id
-        in: path
+      - in: path
+        name: document_id
         required: true
+        description: ID of the document.
+        schema:
+          type: string
+      - in: path
+        name: field_invite_id
+        required: true
+        description: ID of the field invite.
         schema:
           type: string
       responses:
         '200':
-          description: OK
-  /document/merge:
-    post:
+          description: Success
+          content:
+            application/json:
+              example:
+                Success:
+                  data:
+                    text: Decline reason text
+                    email: recipient@email.com
+                    created: 1604418352
+        '400':
+          description: The access token is incorrect.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Incorrect access token:
+                  code: 1537
+                  error: invalid_token
+        '403':
+          description: Is document owner
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Is document owner:
+                  errors:
+                  - code: 19001002
+                    message: User is not document owner.
+        '404':
+          description: '* Requested document or field invite not found.
+
+            * The document is in the Trash folder. This action is forbidden.
+
+            * Field invite does not belong to document.
+
+            * Requested field invite not in pending status.
+
+            * Document field invite is not full declined.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Field invite does not belong to document:
+                  errors:
+                  - code: 19001018
+                    message: Field invite does not belong to document
+                Document field invite is not full declined.:
+                  errors:
+                  - code: 19018001
+                    message: Document field invite is not full declined.
+                Requested document or field invite not found:
+                  errors:
+                  - code: 19002001
+                    message: Document not found
+                Requested field invite not in pending status.:
+                  errors:
+                  - code: 19001028
+                    message: Requested field invite not in pending status.
+                The document is in the Trash folder. This action is forbidden.:
+                  errors:
+                  - code: 19001030
+                    message: The document is in the Trash folder. This action is forbidden.
+      security:
+      - Bearer: []
       tags:
       - Documents
-      summary: Merge documents into one
-      operationId: mergeDocuments
-      responses:
-        '200':
-          description: OK
-  /document/{document_id}/move:
+  /v2/documents/{document_id}/embedded-editor:
     post:
-      tags:
-      - Documents
-      summary: Move document to a folder
-      operationId: moveDocument
+      operationId: post-v2-documents-document-unique-id-embedded-editor
+      summary: Create link for document
+      description: 'This endpoint allows API users to generate a link to embed the SignNow document editor into their app, allowing their customers to edit documents without sending them for signing.
+
+
+        To generate an embedded editor link, make sure that:
+
+
+        - the document has not been sent for signing or signed.
+
+        - the document is not deleted or archived.'
       parameters:
-      - name: document_id
-        in: path
+      - in: path
+        name: document_id
         required: true
+        description: ID of the document to open in the embedded editor.
         schema:
           type: string
       responses:
         '200':
-          description: OK
+          description: Returns a link in case of correct request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                x-examples:
+                  example-1:
+                    data:
+                      url: https://app3.signnow/webapp/document/9dcff427c3694e0294d412736bd68466529eb720?access_token=1be4687037b9c34291f91e7b1821337d91fb6c9be671fc79f8e2a6fb72d54aba&redirect_uri=https%3A%2F%2Fwww.google.com&embedded=1
+              example:
+                Correct request:
+                  data:
+                    url: https://example.com/document/9dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX?access_token={access_token}&redirect_uri=https%3A%2F%2Fwww.example.com&embedded=1&redirect_target=blank
+        '400':
+          description: '* Incorrect or missing token.
+
+            * Document was already sent.
+
+
+            **Validation errors:**
+
+
+            * `redirect_uri` is not a string.
+
+            * Empty `redirect_uri`.
+
+            * `redirect_uri` is longer than 2048 characters.
+
+            * `redirect_uri` is not a correct URL.
+
+            * `link_expiration` is not an integer.
+
+            * `link_expiration` must be between 15 and 45.
+
+            * Custom `link_expiration` is more than 43200 minutes.
+
+            * `redirect_target` is not a string.
+
+            * Incorrect `redirect_target`. Allowed values: `self`, `blank`.
+
+            * `redirect_uri` is required if `redirect_target` is added.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Empty redirect_uri:
+                  errors:
+                  - code: 19046002
+                    message: Parameter `redirect_uri` must not be an empty string.
+                Missing redirect_uri:
+                  errors:
+                  - code: 19046009
+                    message: The `redirect_uri` field is required when `redirect_target` is added.
+                redirect_uri too long:
+                  errors:
+                  - code: 19046003
+                    message: Parameter `redirect_uri` must not exceed 2048 characters.
+                redirect_uri not a URL:
+                  errors:
+                  - code: 19046004
+                    message: Parameter `redirect_uri` must be a valid URL.
+                link_expiration too big:
+                  errors:
+                  - code: 19049001
+                    message: The link expiration should be less than or equal to 45 minutes.
+                redirect_uri not string:
+                  errors:
+                  - code: 19046001
+                    message: Parameter `redirect_uri` must be a string.
+                Document was already sent:
+                  errors:
+                  - code: 19001047
+                    message: Document has been already sent to a signer.
+                Incorrect redirect_target:
+                  errors:
+                  - code: 19046008
+                    message: 'The `redirect_target` field is invalid, allowed values: self, blank.'
+                Incorrect or missing token:
+                  code: 1537
+                  error: invalid_token
+                link_expiration too little:
+                  errors:
+                  - code: 19046006
+                    message: The link expiration should be greater than or equal to 15 minutes.
+                redirect_target not string:
+                  errors:
+                  - code: 19046007
+                    message: The `redirect_target` field must be a string.
+                link_expiration not integer:
+                  errors:
+                  - code: 19046005
+                    message: The link expiration value should be of type int.
+                Custom link_expiration too big:
+                  errors:
+                  - code: 19049001
+                    message: The link expiration should be less than or equal to 43200 minutes.
+        '403':
+          description: User doesn't own the document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                User is not document owner:
+                  code: 19001002
+                  message: User is not document owner.
+        '422':
+          description: "* Document is in the Trash: 19001021\n  Message: \"Cannot fulfill request for the document in Trash folder.\"\n* Document deleted (from the Trash as well): 19001022\n  Message: \"Document not found\"  "
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Document is in the Trash:
+                  errors:
+                  - code: 19001021
+                    message: Cannot fulfill request for the document in Trash folder.
+                Document deleted (from the Trash as well):
+                  errors:
+                  - code: 19001022
+                    message: Document not found
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                redirect_uri:
+                  type: string
+                  description: The page that opens after the signing session ends.
+                  x-stoplight:
+                    id: kxpmc6cagjvqz
+                link_expiration:
+                  type: integer
+                  description: 15 minutes by default. Can be set max to 43200 minutes by a user with Admin level of access.
+                redirect_target:
+                  type: string
+                  description: 'Determines whether to open the redirect link in the new tab in the browser, or in the same tab after the signing session. Possible values: `blank` - opens the link in the new tab, `self` - opens the link in the same tab, default value.'
+                  x-stoplight:
+                    id: lxwrbfcdu3pnc
+              x-examples:
+                example-1:
+                  redirect_uri: some_valid_url
+                  link_expiration: 15
+                  redirect_target: blank
+        required: true
+      tags:
+      - Documents
+  /v2/documents/{document_id}/embedded-sending:
+    post:
+      operationId: post-v2-documents-document-id-embedded-sending
+      summary: Create link for document
+      description: 'This endpoint allows users to create a link for embedded document sending.
+
+
+        Use the request body attributes to define where the link opens (the editor or the Send Invite page), configure redirect options, specify link expiration, and customize the sender’s email and name appearance.
+
+
+        For more information, see Embedded sending guide and check out our video tutorial.
+
+
+        **Video tutorial**
+
+
+        Note: The design shown in the video is outdated, but the flow is still accurate. You can go ahead and follow the steps as demonstrated.
+
+
+        Video tutorial'
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        description: ID of the requested document.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Returns the link for embedded sending in case of correct request.
+
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: object
+                    required:
+                    - url
+                    properties:
+                      url:
+                        type: string
+                        minLength: 1
+                x-examples:
+                  example-1:
+                    data:
+                      url: http://app-eval.signnow.com/webapp/invite/16df19211b354cb5b4beeb830803f3f4abd79c55?access_token={token}&redirect_uri=http%3A%2F%2Fyour.redirect.uri.com&embedded_sending=1
+                description: ''
+              example:
+                Success:
+                  data:
+                    url: http://example.com/invite/16XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX?access_token={token}&redirect_uri=http%3A%2F%2Fyour.redirect.uri.com&embedded_sending=1&redirect_target=blank
+                example-1:
+                  data:
+                    url: http://app-eval.signnow.com/webapp/invite/16df19211b354cb5b4beeb830803f3f4abd79c55?access_token={token}&redirect_uri=http%3A%2F%2Fyour.redirect.uri.com&embedded_sending=1
+        '400':
+          description: '* Incorrect or missing token.
+
+            * User doesn''t own the document.
+
+            * Document not found.
+
+            * Document was already sent.
+
+            * Cannot send an invite for the document from Trash folder.
+
+            * Incorrect payload.
+
+
+            **Validation errors:**
+
+
+            * Missing `type`.
+
+            * Incorrect `type`. Allowed values: `document`, `invite`.
+
+            * `redirect_uri` is not a string.
+
+            * `redirect_uri` is longer than 2048 characters.
+
+            * `redirect_uri` is not a correct URL.
+
+            * UTF 4-byte characters in `redirect_uri` are not supported.
+
+            * `link_expiration` is not an integer.
+
+            * `link_expiration` must be between 15 and 45.
+
+            * Custom `link_expiration` is more than 43200 minutes.
+
+            * `redirect_target` is not a string.
+
+            * Incorrect `redirect_target`. Allowed values: `self`, `blank`.
+
+            * `redirect_uri` is required if `redirect_target` is added.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                missing type:
+                  errors:
+                  - code: 19038001
+                    message: The `type` value should not be blank.
+                Incorrect type:
+                  errors:
+                  - code: 19038002
+                    message: 'The `type` attribute is invalid, allowed values: document, invite.'
+                Incorrect payload:
+                  errors:
+                  - code: 19001000
+                    message: Invalid payload
+                Document not found:
+                  errors:
+                  - code: 19002001
+                    message: Document not found
+                Missing redirect_uri:
+                  errors:
+                  - code: 19038011
+                    message: The `redirect_uri` field is required when `redirect_target` is added.
+                redirect_uri too long:
+                  errors:
+                  - code: 19038004
+                    message: Parameter `redirect_uri` must not exceed 2048 characters.
+                redirect_uri not a URL:
+                  errors:
+                  - code: 19038006
+                    message: Parameter `redirect_uri` must be a valid URL.
+                User not document owner:
+                  errors:
+                  - code: 19001002
+                    message: User is not document owner.
+                link_expiration too big:
+                  errors:
+                  - code: 19047001
+                    message: The link expiration should be less than or equal to 45 minutes.
+                redirect_uri not string:
+                  errors:
+                  - code: 19038003
+                    message: Parameter `redirect_uri` must be a string.
+                Document in Trash folder:
+                  errors:
+                  - code: 19001021
+                    message: Cannot send an invite for the document from Trash folder.
+                Document was already sent:
+                  errors:
+                  - code: 19001047
+                    message: Document has been already sent to a signer.
+                Incorrect redirect_target:
+                  errors:
+                  - code: 19038010
+                    message: 'The `redirect_target` field is invalid, allowed values: self, blank.'
+                Incorrect or missing token:
+                  errors:
+                  - code: 1537
+                    message: Invalid token
+                link_expiration too little:
+                  errors:
+                  - code: 19038008
+                    message: The link expiration should be greater than or equal to 15 minutes.
+                redirect_target not string:
+                  errors:
+                  - code: 19038009
+                    message: The `redirect_target` field must be a string.
+                link_expiration not integer:
+                  errors:
+                  - code: 19038007
+                    message: The link expiration value should be of type int.
+                Custom link_expiration too big:
+                  errors:
+                  - code: 19047001
+                    message: The link expiration should be less than or equal to 43200 minutes.
+                4-byte characters in redirect_uri:
+                  errors:
+                  - code: 19038005
+                    message: 4-byte characters in `redirect_uri` are not supported.
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - type
+              properties:
+                type:
+                  type: string
+                  minLength: 1
+                  description: 'The type of invite settings available by the link. Possible values: `invite` - the Send Invite page opens for the document where user add the signer''s address, email subject and message etc.; `document` - the document opens in the editor for adding fillable fields, and then the Send Invite page opens.'
+                from_name:
+                  type: string
+                  example: Anna Green
+                  maxLength: 300
+                  description: 'Use this attribute to customize the name that appears: 1) on the Send Invite page (From, Invite Email Subject, and Invite Email Message); 2) in the invite and reassign emails: in email subject and email body; 3) in the signing session: as the name in From in the header and on the detailed From card.'
+                from_email:
+                  type: string
+                  example: sender@email.com
+                  maxLength: 255
+                  description: 'Use this attribute to customize the email address that appears: 1) [part before @]on the Send Invite page (From, Invite Email Subject, and Invite Email Message) 2) in the invite and reassign emails: [part before @] in email subject and email body; when clicking Contact Sender and in Reply-to; 3) in the signing session: as the email in From in the header and on the detailed From card; when clicking Contact Sender in the More Actions menu and on the detailed From card.'
+                redirect_uri:
+                  type: string
+                  minLength: 1
+                  description: The page that opens after the signing session ends.
+                link_expiration:
+                  type: integer
+                  default: 15
+                  maximum: 45
+                  minimum: 15
+                  description: Specifies how many minutes the link remains active. The allowed range is 15 to 45 minutes.
+                redirect_target:
+                  type: string
+                  description: 'Determines whether to open the redirect link in the new tab in the browser, or in the same tab after the signing session. Possible values: `blank` - opens the link in the new tab, `self` - opens the link in the same tab, default value.'
+                  x-stoplight:
+                    id: 0twi4weakxf1z
+              x-examples:
+                example-1:
+                  type: document
+                  redirect_uri: https://your.redirect.uri.com
+        required: true
+      tags:
+      - Documents
+  /v2/documents/{document_id}/embedded-view:
+    post:
+      operationId: embedded-view
+      summary: Create document embedded view link
+      description: 'This endpoint allows users to create an embedded view link for the specified document. The link opens the document in embedded view mode, enabling users to review and download it without logging in to SignNow. Embedded view links can only be generated for documents and document groups.
+
+
+        **Additional information**
+
+
+        - Authentication is not required to open the link.
+
+        - The link can be used multiple times until it expires.
+
+        - The link can be generated for a document in any status (e.g., waiting for others, signed, etc.).
+
+
+        You can customize the view mode experience in the editor and on the **You’ve viewed a document** page. Available options include:
+
+
+        - Set a custom logo in the editor and on the **You’ve viewed a document** page using `logo.url`.
+
+        - Customize the **Download Document** button style on the **You’ve viewed a document** page using `general.buttons.secondary`.
+
+        - Show or hide the **More Actions** menu in the editor using `settings.visibility`.
+
+        - Show or hide the **Close** button in the editor using `close-button.visibility`.
+
+        - Show or hide the **Download Document** button in the editor using `download-button.visibility`.
+
+        - Show or hide the sidebar navigation buttons in the editor using `icons`.
+
+        - Show or hide the **Download Document** button on the **You’ve viewed a document** page using `complete-page.button-download.visibility`.
+
+
+        Learn more about branding.'
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        description: Document ID.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The link has been created.
+        '400':
+          description: '- The bearer token is incorrect.
+
+            - The payload is incorrect.
+
+            - The `link_expiration` value type is incorrect.
+
+            - The `link_expiration` range value is incorrect.  Must be between 43200 minutes (30 days) and 518400 minutes (360 days).
+
+            - The `redirect_uri` value type is incorrect.
+
+            - The `redirect_uri` field is empty.
+
+            - The `redirect_uri` value is too long.
+
+            - The `redirect_uri` has an incorrect format.
+
+            - The `redirect_target` field value is incorrect.
+
+            - The `redirect_uri` field is required when `redirect_target` is added.'
+        '403':
+          description: '- The application is not external.
+
+            - The user is not a document owner.'
+        '404':
+          description: '
+
+            The document is not found.'
+        '422':
+          description: '- The specified document is a template.
+
+            - The specified document has been deleted.
+
+            - The specified document has been archived.'
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                redirect_uri:
+                  type: string
+                  example: https://www.signnow.com/
+                  description: 'The link that opens after a user clicks the **Close** button. If not set, the default page **You’ve viewed a document** page will be used.
+
+                    '
+                  x-stoplight:
+                    id: m2sqpk22ey5jo
+                link_expiration:
+                  type: integer
+                  default: 43200
+                  maximum: 518400
+                  minimum: 43200
+                  description: 'Link expiration time in minutes. '
+                  x-stoplight:
+                    id: 9m305v788jfgj
+                redirect_target:
+                  type: string
+                  default: self
+                  description: 'Specifies where to open the redirect link. Can only be used if `redirect_url` is set. Possible values: `blank` - opens the link in the new tab, `self` - opens the link in the same tab.'
+                  x-stoplight:
+                    id: 26epj7lys211h
+        required: true
+      tags:
+      - Documents
+  /v2/documents/{document_id}/favorites:
+    post:
+      operationId: post-v2-documents-document-id-favorites
+      summary: Mark document as favorite
+      description: The endpoint is used to add the document to favorites.
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        description: The ID of the document (40 characters).
+        schema:
+          type: string
+      responses:
+        '201':
+          description: 'Valid document unique id. '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: '* Invalid request with {document_unique_id} where user is not owner of document (The user did not upload the document)
+
+            * Request with Incorrect or missing token
+
+            * Invalid request with {document_unique_id} when Document placed not in the Documents folder(s)(Archive, Trash or Shared folders)'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Request with Incorrect or missing token:
+                  code: 1537
+                  error: invalid_token
+                Invalid request with {document_unique_id} where user is not owner of document (The user did not upload the document):
+                  errors:
+                  - code: 13044002
+                    message: The user does not have access to the document.
+                ? Invalid request with {document_unique_id} when Document placed not in the Documents folder(s)(Archive, Trash or Shared folders)
+                : errors:
+                  - code: 13044004
+                    message: The document must be in the Documents folder or its sub-folder.
+        '403':
+          description: Invalid request with {document_unique_id} when user does not have access to the Document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Invalid request with {document_unique_id} when user does not have access to the Document:
+                  errors:
+                  - code: 13044003
+                    message: The user does not have permission to the document.
+        '404':
+          description: Invalid request with non-existent document unique id.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Invalid request with non-existent document unique id.:
+                  errors:
+                  - code: 13047001
+                    message: Document `bd54c722946d4361a1818ae8964867189f29ced1` is not found.
+      security:
+      - Bearer: []
+      tags:
+      - Documents
+    delete:
+      operationId: delete-v2-documents-document-id-favorites
+      summary: Remove document from favorites
+      description: This endpoint allows users to delete a document from favorites.
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        description: The ID of the document (40 characters).
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Success, no content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: '* Invalid request with {document_unique_id} where user is not owner of document (The user did not upload the document)
+
+            * Request with Incorrect or missing token
+
+            * Invalid request with {document_unique_id} when Document placed not in the Documents folder(s)(Archive, Trash or Shared folders)'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Request with Incorrect or missing token:
+                  code: 1537
+                  error: invalid_token
+                Invalid request with {document_unique_id} where user is not owner of document (The user did not upload the document):
+                  errors:
+                  - code: 13044002
+                    message: The user does not have access to the document.
+                ? Invalid request with {document_unique_id} when Document placed not in the Documents folder(s)(Archive, Trash or Shared folders)
+                : errors:
+                  - code: 13044004
+                    message: The document must be in the Documents folder or its sub-folder.
+        '403':
+          description: Invalid request with {document_unique_id} when user does not have access to the Document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Invalid request with {document_unique_id} when user does not have access to the Document:
+                  errors:
+                  - code: 13044003
+                    message: The user does not have permission to the document.
+        '404':
+          description: Invalid request with non-existent document unique id.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Invalid request with non-existent document unique id.:
+                  errors:
+                  - code: 13047001
+                    message: Document `bd54c722946d4361a1818ae8964867189f29ced1` is not found.
+      security:
+      - Bearer: []
+      tags:
+      - Documents
+  /v2/documents/{document_id}/brand:
+    put:
+      operationId: put-v2-documents-document-id-brand
+      summary: Assign brand to document
+      description: 'This endpoint allows users to assign branding to a document.
+
+
+        > Members of an organization (workspace) cannot apply branding to documents when the `disable_branding_setup` setting is enabled (set to `1`). To check the organization (workspace) settings, use the Get organization settings request.'
+      parameters:
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      - in: path
+        name: document_id
+        required: true
+        description: ID of the document.
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: '* Incorrect or missing token.
+
+            * Incorrect payload.
+
+            * `brand_id` is not a string.
+
+            * Empty `brand_id`.
+
+            * Missing or incorrect `brand_id`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Empty brand_id:
+                  code: 25002071
+                  message: Brand id must not be an empty string.
+                Incorrect payload:
+                  code: 25002002
+                  message: Invalid payload given.
+                brand_id not string:
+                  code: 25002070
+                  message: Brand id must be a string.
+                Incorrect or missing token:
+                  code: 1537
+                  error: invalid_token
+                Missing or incorrect brand_id:
+                  code: 25002069
+                  message: Brand id is required
+        '403':
+          description: '* The user is authorized with a token from an app they don’t own.
+
+            * The bearer token is valid but it belongs to another user.
+
+            * Brand with this `brand_id` doesn''t exist.
+
+            * User doesn''t own this brand.'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Brand doesn't exist:
+                  code: 25002077
+                  message: You are not allowed to assign provided brand.
+                Another user's token:
+                  code: 25002075
+                  message: Brand assign to provided application is not allowed.
+                User doesn't own the app:
+                  code: 25002001
+                  message: Brand action not allowed.
+                User doesn't own this brand:
+                  code: 25002001
+                  message: Brand action not allowed.
+        '404':
+          description: '`document_id` doesn''t exist'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                document_id doesn't exist:
+                  code: 25002062
+                  message: Document unique identifier does not exist.
+        '422':
+          description: '`document_id` has been deleted'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Example 1:
+                  code: 25002065
+                  message: Document deleted.
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - brand_id
+              properties:
+                brand_id:
+                  type: string
+                  description: ID of the brand that will be assigned.
+              x-examples:
+                Example 1:
+                  brand_id: '{{brand_id}}'
+        required: true
+      tags:
+      - Documents
+    get:
+      operationId: get-v2-documents-document-id-brand
+      summary: Get brand of document
+      description: This endpoint allows users to retrieve branding that has been assigned to a document.
+      parameters:
+      - in: query
+        name: use_hierarchy
+        required: false
+        description: 'Retrieve branding assigned specifically to the document with or without branding of its parent application/organization. Possible values: `true` - show application/organization branding if no specific branding is assigned to the document; `false` - show only the branding specifically assigned to the document (if any). '
+        schema:
+          type: boolean
+      - in: path
+        name: document_id
+        required: true
+        description: ID of the document.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: '* Correct request with `use_hierarchy = true` if there is no brand assigned directly to the `document_id`. The response retrieves the branding that is lower in the hierarchy.
+
+            * Correct request with `use_hierarchy=false` if there is no brand assigned directly to the `document_id`. The response is empty.
+
+            * Correct request with a bearer token from a user authorized under application with no brand assigned.'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                use_hierarchy=false:
+                  data: []
+                use_hierarchy = true:
+                  data:
+                    title: Brand number 2 name
+                    resources: {}
+                    unique_id: 45XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    owner_type: user
+                Application without brand_id:
+                  data: []
+        '400':
+          description: Incorrect or missing token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Incorrect or missing token:
+                  code: 1537
+                  error: invalid_token
+        '404':
+          description: '* Incorrect `document_id`
+
+            * `document_id` doesn''t exist'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Incorrect document_id:
+                  '404': 'Unable to find a route to match the URI: v2/documents/567/brand'
+                document_id doesn't exist:
+                  code: 25002062
+                  message: Document unique identifier does not exist.
+        '422':
+          description: '`document_id` has been deleted'
+          content:
+            application/json:
+              example:
+                Example 1:
+                  code: 25002065
+                  message: Document deleted.
+      security:
+      - Bearer: []
+      tags:
+      - Documents
+    delete:
+      operationId: delete-v2-documents-document-id-brand
+      summary: Unassign brand from document
+      description: This endpoint allows users to delete branding assignment from a document.
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        description: ID of the document.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Success, no content
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: '* Incorrect or missing token
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Incorrect or missing token:
+                  code: 1537
+                  error: invalid_token
+        '403':
+          description: '* The bearer token is valid but it belongs to another user.
+
+            * The user is authorized with a token from an app they don’t own.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Another user's token:
+                  code: 25002075
+                  message: Brand assign to provided application is not allowed.
+                User doesn't own the app:
+                  code: 25002001
+                  message: Brand action not allowed.
+        '404':
+          description: '`document_id` doesn''t exist'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Example 1:
+                  code: 25002062
+                  message: Document unique identifier does not exist.
+        '422':
+          description: '`document_id` has been deleted'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Deleted document_id:
+                  code: 25002065
+                  message: Document deleted.
+      security:
+      - Bearer: []
+      tags:
+      - Documents
 components:
   securitySchemes:
-    BasicAuth:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
       type: http
       scheme: basic
-      description: 'HTTP Basic auth carrying the application Basic Token (base64 of
-
-        client_id:client_secret) used against POST /oauth2/token.
-
-        '
-    BearerAuth:
-      type: http
-      scheme: bearer
-      description: 'OAuth 2.0 bearer access token issued by /oauth2/token. Required on
-
-        all resource endpoints.
-
-        '

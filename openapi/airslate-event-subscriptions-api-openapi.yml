@@ -1,0 +1,2364 @@
+openapi: 3.2.0
+info:
+  title: SignNow Event Subscriptions API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Event Subscriptions
+paths:
+  /v2/event-subscriptions/{subscription_id}/callbacks:
+    get:
+      operationId: get-v2-dashboard-event-history
+      summary: Get list of callbacks by event subscription
+      description: 'Allows users to get the list of webhook events (events history) by the subscription ID.
+
+
+        The results can be filtered and sorted. If the `sort` parameter is not indicated, the results are sorted by the `start_time` in descending order. The `filters` and `sort` parameters need URL-encoding.'
+      parameters:
+      - in: path
+        name: subscription_id
+        required: true
+        description: ID of the subscription
+        schema:
+          type: string
+      - in: query
+        name: sort:end_time
+        required: false
+        description: 'Sort results by the end time. Possible values: asc, desc. Format: `?sort[end_time]=desc`'
+        schema:
+          type: string
+      - in: query
+        name: sort:start_time
+        required: false
+        description: 'Sort results by the start time. Possible values: asc, desc. Format: `?sort[start_time]=desc`'
+        schema:
+          type: string
+      - in: query
+        name: sort:code
+        required: false
+        description: 'Sort results by the response code. Possible values: asc, desc. Format: `?sort[code]=desc`'
+        schema:
+          type: string
+      - in: query
+        name: filters:initiator_id
+        required: false
+        description: 'Search for a string in initiator IDs. Format: `?filters=[{"_OR":[{"initiator_id ":{"type":"like","value":"21a28b47"}}]}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:date
+        required: false
+        description: 'Filter results by the timestamps of start time. Format: `?filters=[{"date":{"type":"between","value":[1580719773,1580720509]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:code
+        required: false
+        description: 'Filter results by the response codes. Format: `?filters=[{"code":{"type": "between", "value":[199,299]}}]`'
+        schema:
+          type: string
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correct request
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Correct request:
+                  data:
+                  - id: 12345
+                    duration: 0.0125
+                    entity_id: b9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    event_name: document.delete
+                    entity_type: document
+                    callback_url: http://example.com/handle?hash=XXXXXXXX&Param={"docId":"b9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+                    request_method: post
+                    request_content:
+                      meta:
+                        event: document.delete
+                        timestamp: 1661430933
+                        environment: https://example.com
+                        access_token: '********'
+                        callback_url: http://example.com/handle?hash=XXXXXXXX&Param={"docId":"b9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+                      content:
+                        user_id: b2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        document_id: b9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        initiator_id: b2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        document_name: Sample document
+                        initiator_email: initiator_email@email.com
+                    request_headers:
+                      int_head: 12
+                      bool_head: false
+                      float_head: 12.24
+                      string_head: string_head
+                    application_name: Sample application
+                    request_end_time: 1661430936
+                    response_content: '{"message":"Okay","timestamp":"2022-08-25 12:35:36.486"}'
+                    request_start_time: 1661430936
+                    response_status_code: 200
+                  meta:
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+        '400':
+          description: '* Token issue
+
+            * Incorrect filter format (each filter must contain `type` and `value` fields)
+
+            * Incorrect filter expression (must be a string)
+
+            * Incorrect `code` or `date` filter expression (must be `"type": "between"`)
+
+            * Incorrect `initiator_id` filter expression (must be `"type": "like"`)
+
+            * Incorrect `code` or `date` filter value (must be an array of 2 integers)
+
+            * Incorrect `initiator_id` filter value (must be a string)
+
+
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization error:
+                  code: 1537
+                  error: invalid_token
+                Incorrect filter format:
+                  errors:
+                  - code: 15006011
+                    message: Incorrect filter format, filter must have `type` and `value` fields.
+                Incorrect code filter value:
+                  errors:
+                  - code: 15006015
+                    message: The `code` filter value must be of type array with 2 integer.
+                Incorrect date filter value:
+                  errors:
+                  - code: 15006018
+                    message: The `date` filter value must be of type array with 2 integer.
+                Incorrect filter expression:
+                  errors:
+                  - code: 15006012
+                    message: Incorrect filter format, filter `type` must be a string.
+                Incorrect code filter expression:
+                  errors:
+                  - code: 15006013
+                    message: The `code` filter expression must be equal to `between`.
+                Incorrect date filter expression:
+                  errors:
+                  - code: 15006016
+                    message: The `date` filter expression must be equal to `between`.
+                Incorrect initiator_id filter value:
+                  errors:
+                  - code: 15006020
+                    message: The `initiator_id` filter value must be a string.
+                Incorrect initiator_id filter expression:
+                  errors:
+                  - code: 15006019
+                    message: The `initiator_id` filter expression must be equal to `like`.
+        '403':
+          description: Request with token of another application
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Request with token of another application:
+                  errors:
+                  - message: Access to the subscription data is not allowed
+        '404':
+          description: '* Request with non-existing subscription_id
+
+            * Request with invalid subscription_id'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                ' Invalid subscription_id':
+                  '404': 'Unable to find a route to match the URI: v2/dashboard/event-subscriptions/23@/callbacks/12345'
+                Non-existing subscription_id:
+                  errors:
+                  - message: UserEventSubscription `94XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX` not found
+      security:
+      - Bearer: []
+      tags:
+      - Event Subscriptions
+  /v2/event-subscriptions/{subscription_id}/callbacks/{callback_id}:
+    get:
+      operationId: get-v2-dashboard-event-subscriptions-subscription-id-callbacks
+      summary: Get callback info by ID
+      description: This endpoint allows API users to get detailed info about one webhook by its ID.
+      parameters:
+      - in: path
+        name: callback_id
+        required: true
+        description: ID of the webhook.
+        schema:
+          type: string
+      - in: path
+        name: subscription_id
+        required: true
+        description: ID of the subscription.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: "Depending on the type of event, the `initiator_id` parameter can be placed differently in response body (into the `request_content` object):\n* only in the `meta` object if `event_name` is:\n  * `document.update`\n  * `document.complete`\n  * `document.open`\n  * `template.copy`\n  * `document.fieldinvite.create` etc.\n  * `document_group.update`\n  * `document_group.invite.create` etc.;\n   \n* in the `meta` and in the `content` objects if `event_name` is:\n  * `document.delete`\n  * `document_group.delete`\n  * `document_group.open`\n  * `user.document_group.open`\n  * `document_group.invite.declined`\n  * `user.document_group.invite.declined`\n  * `document_group.complete`\n  * `user.document_group.complete`\n  \nThe type of event also affects the composition of the parameters of the `request_content` object. \n\n<details>\n  <summary>See the callback payload for each event</summary>\n<br>  \n<table>\n<tr>\n<td> Event </td> <td> \"request_content\" object </td>\n</tr>\n<tr>\n<td> <code>document.delete</code> <br> <code>user.document.delete</code> </td>\n<td>\n\n\n```json\n\n{\n   \"meta\": {\n      \"timestamp\": 1748521868,\n      \"event\": \"document.delete\",\n      \"environment\": \"https://api.signnow.com\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"callback_url\": \"https://example.com/webhook?Param={\\\"docId\\\":\\\"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\\"}\",\n      \"access_token\": \"********\",\n      \"metadata\": []\n   },\n   \"content\": {\n      \"document_id\": \"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"document_name\": \"Sample Document\",\n      \"user_id\": \"b2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"initiator_email\": \"signer@example.com\"\n   }\n}\n```\n\n</td>\n</tr>\n<tr>\n<td> <code>document.update</code> <br> <code>user.document.update</code> <br> <code>user.document.create</code> <br> <code>user.document.complete</code> <br> <code>document.complete</code> </td>\n<td>\n\n\n```json\n\n{\n   \"meta\": {\n      \"timestamp\": 1748521868,\n      \"event\": \"document.update\",\n      \"environment\": \"https://api.signnow.com\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"callback_url\": \"https://example.com/webhook?Param={\\\"docId\\\":\\\"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\\"}\",\n      \"access_token\": \"********\",\n      \"metadata\": []\n   },\n   \"content\": {\n      \"document_id\": \"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"document_name\": \"Sample Document\",\n      \"user_id\": \"b2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"\n   }\n}\n```\n\n</td>\n</tr>\n<tr>\n<td> <code>document.open</code> <br> <code>user.document.open</code> </td>\n<td>\n\n\n```json\n\n{\n   \"meta\": {\n      \"timestamp\": 1748521868,\n      \"event\": \"document.open\",\n      \"environment\": \"https://api.signnow.com\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"callback_url\": \"https://example.com/webhook?Param={\\\"docId\\\":\\\"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\\"}\",\n      \"access_token\": \"********\",\n      \"metadata\": []\n   },\n   \"content\": {\n      \"document_id\": \"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"document_name\": \"Sample Document\",\n      \"user_id\": \"b2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"viewer_user_unique_id\": \"h7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"\n   }\n}\n```\n\n</td>\n</tr>\n<tr>\n<td> <code>template.copy</code> <br> <code>user.template.copy</code> </td>\n<td>\n\n\n```json\n\n{\n   \"meta\": {\n      \"timestamp\": 1748521868,\n      \"event\": \"template.copy\",\n      \"environment\": \"https://api.signnow.com\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"callback_url\": \"https://example.com/webhook?Param={\\\"docId\\\":\\\"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\\"}\",\n      \"access_token\": \"********\",\n      \"metadata\": []\n   },\n   \"content\": {\n      \"document_id\": \"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"template_id\": \"g6XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"user_id\": \"b2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"viewer_user_unique_id\": \"h7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"\n   }\n}\n```\n\n</td>\n</tr>\n<tr>\n<td> <code>user.document.fieldinvite.create</code> <br> <code>user.document.fieldinvite.decline</code> <br> <code>user.document.fieldinvite.delete</code> <br> <code>user.document.fieldinvite.signed</code> <br> <code>user.document.fieldinvite.sent</code> <br> <code>user.document.freeform.create</code> <br> <code>user.document.freeform.signed</code> <br> <code>document.fieldinvite.create</code> <br> <code>document.fieldinvite.decline</code> <br> <code>document.fieldinvite.delete</code> <br> <code>document.fieldinvite.signed</code> <br> <code>document.fieldinvite.sent</code> <br> <code>document.freeform.create</code> <br> <code>document.freeform.signed</code> </td>\n<td>\n\n\n```json\n\n{\n   \"meta\": {\n      \"timestamp\": 1748521868,\n      \"event\": \"document.fieldinvite.create\",\n      \"environment\": \"https://api.signnow.com\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"callback_url\": \"https://example.com/webhook?Param={\\\"docId\\\":\\\"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\\"}\",\n      \"access_token\": \"********\",\n      \"metadata\": []\n   },\n   \"content\": {\n      \"document_id\": \"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"invite_id\": \"e5XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"signer\": \"signer@example.com\",\n      \"status\": \"pending\"\n   }\n}\n```\n\n</td>\n</tr>\n<tr>\n<td> <code>user.document.fieldinvite.reassign</code> <br> <code>document.fieldinvite.reassign</code> </td>\n<td>\n\n\n```json\n\n{\n   \"meta\": {\n      \"timestamp\": 1748521868,\n      \"event\": \"document.fieldinvite.reassign\",\n      \"environment\": \"https://api.signnow.com\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"callback_url\": \"https://example.com/webhook?Param={\\\"docId\\\":\\\"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\\"}\",\n      \"access_token\": \"********\",\n      \"metadata\": []\n   },\n   \"content\": {\n      \"document_id\": \"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"invite_id\": \"e5XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"signer\": \"signer@example.com\",\n      \"old_invite_unique_id\": \"i8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"\n   }\n}\n```\n\n</td>\n</tr>\n<tr>\n<td> <code>user.document.fieldinvite.replace</code> <br> <code>document.fieldinvite.replace</code> </td>\n<td>\n\n\n```json\n\n{\n   \"meta\": {\n      \"timestamp\": 1748521868,\n      \"event\": \"document.fieldinvite.replace\",\n      \"environment\": \"https://api.signnow.com\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"callback_url\": \"https://example.com/webhook?Param={\\\"docId\\\":\\\"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\\"}\",\n      \"access_token\": \"********\",\n      \"metadata\": []\n   },\n   \"content\": {\n      \"document_id\": \"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"invite_id\": \"e5XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"signer\": \"signer@example.com\",\n      \"old_invite_unique_id\": \"i8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"group_invite\": true\n   }\n}\n```\n\n</td>\n</tr>\n<tr>\n<td> <code>user.document_group.create</code> <br> <code>user.document_group.update</code> <br> <code>document_group.update</code> </td>\n<td>\n\n\n```json\n\n{\n   \"meta\": {\n      \"timestamp\": 1748521868,\n      \"event\": \"document_group.update\",\n      \"environment\": \"https://api.signnow.com\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"callback_url\": \"https://example.com/webhook?Param={\\\"groupId\\\":\\\"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\\"}\",\n      \"access_token\": \"********\",\n      \"metadata\": []\n   },\n   \"content\": {\n      \"group_id\": \"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"group_name\": \"Sample Document Group\",\n      \"user_id\": \"b2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"\n   }\n}\n```\n\n</td>\n</tr>\n<tr>\n<td> <code>user.document_group.complete</code> <br> <code>document_group.complete</code> </td>\n<td>\n\n\n```json\n\n{\n   \"meta\": {\n      \"timestamp\": 1748521868,\n      \"event\": \"document_group.complete\",\n      \"environment\": \"https://api.signnow.com\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"callback_url\": \"https://example.com/webhook?Param={\\\"groupId\\\":\\\"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\\"}\",\n      \"access_token\": \"********\",\n      \"metadata\": []\n   },\n   \"content\": {\n      \"group_id\": \"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"group_name\": \"Sample Document Group\",\n      \"user_id\": \"b2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"initiator_email\": \"signer@example.com\",\n      \"completed_at\": 1748521868,\n      \"documents\": [\n         {\n            \"document_id\": \"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n            \"document_name\": \"Sample Document\",\n            \"status\": \"completed\"\n         }\n      ],\n      \"invite_steps\": [\n         {\n            \"order\": 1,\n            \"status\": \"completed\",\n            \"signers\": [\n               {\n                  \"email\": \"signer@example.com\",\n                  \"role_name\": \"Signer 1\",\n                  \"action\": \"sign\",\n                  \"status\": \"fulfilled\",\n                  \"document_id\": \"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n                  \"signed_at\": 1748521800\n               }\n            ]\n         }\n      ]\n   }\n}\n```\n\n</td>\n</tr>\n<tr>\n<td> <code>document_group.delete</code> <br> <code>user.document_group.delete</code> </td>\n<td>\n\n\n```json\n\n{\n   \"meta\": {\n      \"timestamp\": 1748521868,\n      \"event\": \"document_group.delete\",\n      \"environment\": \"https://api.signnow.com\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"callback_url\": \"https://example.com/webhook?Param={\\\"groupId\\\":\\\"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\\"}\",\n      \"access_token\": \"********\",\n      \"metadata\": []\n   },\n   \"content\": {\n      \"group_id\": \"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"group_name\": \"Sample Document Group\",\n      \"user_id\": \"b2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"initiator_email\": \"signer@example.com\"\n   }\n}\n```\n\n</td>\n</tr>\n<tr>\n<td> <code>document_group.open</code> <br> <code>user.document_group.open</code> </td>\n<td>\n\n\n```json\n\n{\n   \"meta\": {\n      \"timestamp\": 1748521868,\n      \"event\": \"document_group.open\",\n      \"environment\": \"https://api.signnow.com\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"callback_url\": \"https://example.com/webhook?Param={\\\"groupId\\\":\\\"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\\"}\",\n      \"access_token\": \"********\",\n      \"metadata\": []\n   },\n   \"content\": {\n      \"group_id\": \"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"group_name\": \"Sample Document Group\",\n      \"user_id\": \"b2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"initiator_email\": \"signer@example.com\"\n   }\n}\n```\n\n</td>\n</tr>\n<tr>\n<td> <code>user.document_group.invite.create</code> <br> <code>user.document_group.invite.resend</code> <br> <code>user.document_group.invite.update</code> <br> <code>user.document_group.invite.cancel</code> <br> <code>document_group.invite.create</code> <br> <code>document_group.invite.resend</code> <br> <code>document_group.invite.update</code> <br> <code>document_group.invite.cancel</code> </td>\n<td>\n\n\n```json\n\n{\n   \"meta\": {\n      \"timestamp\": 1748521868,\n      \"event\": \"document_group.invite.create\",\n      \"environment\": \"https://api.signnow.com\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"callback_url\": \"https://example.com/webhook?Param={\\\"groupId\\\":\\\"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\\"}\",\n      \"access_token\": \"********\",\n      \"metadata\": []\n   },\n   \"content\": {\n      \"group_id\": \"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"group_invite_id\": \"d4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"status\": \"pending\"\n   }\n}\n```\n\n</td>\n</tr>\n<tr>\n<td> <code>document_group.invite.declined</code> <br> <code>user.document_group.invite.declined</code> </td>\n<td>\n\n\n```json\n\n{\n   \"meta\": {\n      \"timestamp\": 1748521868,\n      \"event\": \"document_group.invite.declined\",\n      \"environment\": \"https://api.signnow.com\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"callback_url\": \"https://example.com/webhook?Param={\\\"groupId\\\":\\\"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\\"}\",\n      \"access_token\": \"********\",\n      \"metadata\": []\n   },\n   \"content\": {\n      \"group_id\": \"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"group_invite_id\": \"d4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"status\": \"canceled\",\n      \"initiator_id\": \"c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"initiator_email\": \"signer@example.com\"\n   }\n}\n```\n\n> **Note:** For SMS invitees, `initiator_email` contains a system-generated address in the format `sms_signer_{phone_number}@no.reply`.\n\n</td>\n</tr>\n<tr>\n<td> <code>user.document_group.invite.expired</code> </td>\n<td>\n\n\n```json\n\n{\n   \"meta\": {\n      \"timestamp\": 1748521868,\n      \"event\": \"user.document_group.invite.expired\",\n      \"environment\": \"https://api.signnow.com\",\n      \"initiator_id\": null,\n      \"callback_url\": \"https://example.com/webhook?Param={\\\"groupId\\\":\\\"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\\"}\",\n      \"access_token\": \"********\",\n      \"metadata\": []\n   },\n   \"content\": {\n      \"group_id\": \"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"group_name\": \"Sample Document Group\",\n      \"group_invite_id\": \"d4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n      \"step\": 2,\n      \"signers\": [\n         \"signer@example.com\",\n         \"signer2@example.com\"\n      ]\n   }\n}\n```\n\n</td>\n</tr>\n</table>\n\n</details>\n\n<br>\n\n`Param` will be added to `callback_url` parameter, if `docid_queryparam` is `true`:\n\n```\n\"callback_url\":\"{{callback_url}}?Param={\\\"groupId\\\":\\\"{{document_unique_id}}\\\"}\n\n```\nSee [`docid_queryparam`](/docs/manage-event-subscriptions/operations/create-event-subscription-2) details\n\n`access_token` will be added only if `delete_access_token` will be `false`.\n\n<br>\n\nSee [`delete_access_token`](/docs/manage-event-subscriptions/operations/create-event-subscription-2) details.\n\n\n"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Unique ID of the callback record.
+                      duration:
+                        type: number
+                        description: Duration of the callback request in seconds.
+                      entity_id:
+                        type: string
+                        description: ID of the entity (document, document group, or template) that triggered the event.
+                      event_name:
+                        type: string
+                        description: Name of the triggered event (for example, `document.delete`).
+                      entity_type:
+                        type: string
+                        description: 'Type of entity. Possible values: `user`, `document`, `document_group`.'
+                      callback_url:
+                        type: string
+                        description: URL to which the webhook payload was sent.
+                      request_method:
+                        type: string
+                        description: HTTP method used for the callback request. Always `post`.
+                      request_content:
+                        type: object
+                        properties:
+                          meta:
+                            type: object
+                            properties:
+                              event:
+                                type: string
+                                description: Name of the triggered event.
+                              metadata:
+                                type: array
+                                items:
+                                  type: object
+                                description: Custom metadata attached to the entity at the time the event was triggered.
+                              timestamp:
+                                type: integer
+                                description: Unix timestamp of when the event occurred.
+                              environment:
+                                type: string
+                                description: API environment URL.
+                              access_token:
+                                type: string
+                                description: Bearer access token. Present only if `delete_access_token` is `false`.
+                              callback_url:
+                                type: string
+                                description: Callback URL, including any `docid_queryparam` query parameters if configured.
+                              initiator_id:
+                                type: string
+                                description: ID of the user who triggered the event.
+                          content:
+                            type: object
+                            properties:
+                              status:
+                                type: string
+                                description: Status of the invite.
+                              group_id:
+                                type: string
+                                description: ID of the document group.
+                              initiator_id:
+                                type: string
+                                description: ID of the user who triggered the event.
+                              group_invite_id:
+                                type: string
+                                description: ID of the document group invite.
+                              initiator_email:
+                                type: string
+                                description: Email of the user who triggered the event. For SMS invitees, this is a system-generated address in the format `sms_signer_{phone_number}@no.reply`.
+                            description: Event-specific payload. The fields vary depending on the event type. The parameters listed here correspond to the `document_group.invite.declined` and `user.document_group.invite.declined` events. See the response description for per-event payload examples.
+                        description: Full payload sent to the callback URL.
+                      request_headers:
+                        type: object
+                        properties:
+                          int_head:
+                            type: integer
+                          bool_head:
+                            type: boolean
+                          float_head:
+                            type: number
+                          string_head:
+                            type: string
+                        description: HTTP headers sent with the callback request.
+                      application_name:
+                        type: string
+                        description: Name of the application that owns the subscription.
+                      request_end_time:
+                        type: integer
+                        description: Unix timestamp of when the request completed.
+                      response_content:
+                        type: string
+                        description: Response body returned by the callback URL.
+                      request_start_time:
+                        type: integer
+                        description: Unix timestamp of when the request was initiated.
+                      response_status_code:
+                        type: integer
+                        description: HTTP status code returned by the callback URL.
+                      event_subscription_id:
+                        type: string
+                        description: ID of the event subscription that triggered this callback.
+                      event_subscription_active:
+                        type: boolean
+                        description: Indicates whether the event subscription is currently active.
+                      event_subscription_owner_email:
+                        type: string
+                        description: Email of the user who owns the event subscription.
+                x-examples:
+                  Example 1:
+                    data:
+                      id: j9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      duration: 0.0109
+                      entity_id: a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      event_name: document_group.invite.declined
+                      entity_type: document_group
+                      callback_url: https://example.com/webhook?Param={"groupId":"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+                      request_method: post
+                      request_content:
+                        meta:
+                          event: document_group.invite.declined
+                          metadata: []
+                          timestamp: 1748521868
+                          environment: https://api.signnow.com
+                          access_token: '********'
+                          callback_url: https://example.com/webhook?Param={"groupId":"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+                          initiator_id: c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        content:
+                          status: canceled
+                          group_id: a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          initiator_id: c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          group_invite_id: d4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          initiator_email: signer@example.com
+                      request_headers:
+                        Content-Type: application/json
+                      application_name: Sample Application
+                      request_end_time: 1748521868
+                      response_content: '{"message":"Okay","timestamp":"2025-05-29 10:24:28"}'
+                      request_start_time: 1748521868
+                      response_status_code: 200
+                      event_subscription_id: a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      event_subscription_active: true
+                      event_subscription_owner_email: owner@example.com
+              example:
+                Example 1:
+                  data:
+                    id: j9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    duration: 0.0109
+                    entity_id: a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    event_name: document_group.invite.declined
+                    entity_type: document_group
+                    callback_url: https://example.com/webhook?Param={"groupId":"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+                    request_method: post
+                    request_content:
+                      meta:
+                        event: document_group.invite.declined
+                        metadata: []
+                        timestamp: 1748521868
+                        environment: https://api.signnow.com
+                        access_token: '********'
+                        callback_url: https://example.com/webhook?Param={"groupId":"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+                        initiator_id: c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      content:
+                        status: canceled
+                        group_id: a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        initiator_id: c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        group_invite_id: d4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        initiator_email: signer@example.com
+                    request_headers:
+                      Content-Type: application/json
+                    application_name: Sample Application
+                    request_end_time: 1748521868
+                    response_content: '{"message":"Okay","timestamp":"2025-05-29 10:24:28"}'
+                    request_start_time: 1748521868
+                    response_status_code: 200
+                    event_subscription_id: a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    event_subscription_active: true
+                    event_subscription_owner_email: owner@example.com
+                document_group.invite.declined:
+                  data:
+                    id: j9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    duration: 0.0109
+                    entity_id: a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    event_name: document_group.invite.declined
+                    entity_type: document_group
+                    callback_url: https://example.com/webhook?Param={"groupId":"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+                    request_method: post
+                    request_content:
+                      meta:
+                        event: document_group.invite.declined
+                        metadata: []
+                        timestamp: 1748521868
+                        environment: https://api.signnow.com
+                        access_token: '********'
+                        callback_url: https://example.com/webhook?Param={"groupId":"a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+                        initiator_id: c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      content:
+                        status: canceled
+                        group_id: a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        initiator_id: c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        group_invite_id: d4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        initiator_email: signer@example.com
+                    request_headers:
+                      Content-Type: application/json
+                    application_name: Sample Application
+                    request_end_time: 1748521868
+                    response_content: '{"message":"Okay","timestamp":"2025-05-29 10:24:28"}'
+                    request_start_time: 1748521868
+                    response_status_code: 200
+                    event_subscription_id: a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    event_subscription_active: true
+                    event_subscription_owner_email: owner@example.com
+                '`initiator_id` only in `meta` object':
+                  data:
+                    id: j9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    duration: 0.0109
+                    entity_id: f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    event_name: document.update
+                    entity_type: document
+                    callback_url: https://example.com/webhook?Param={"docId":"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+                    request_method: post
+                    request_content:
+                      meta:
+                        event: document.update
+                        metadata: []
+                        timestamp: 1748521868
+                        environment: https://api.signnow.com
+                        access_token: '********'
+                        callback_url: https://example.com/webhook?Param={"docId":"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+                        initiator_id: c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      content:
+                        user_id: b2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        document_id: f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        document_name: Sample Document
+                    request_headers:
+                      Content-Type: application/json
+                    application_name: Sample Application
+                    request_end_time: 1748521868
+                    response_content: '{"message":"Okay","timestamp":"2025-05-29 10:24:28"}'
+                    request_start_time: 1748521868
+                    response_status_code: 200
+                    event_subscription_id: a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    event_subscription_active: true
+                    event_subscription_owner_email: owner@example.com
+                '`initiator_id` in `meta` and `content` objects':
+                  data:
+                    id: j9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    duration: 0.0109
+                    entity_id: f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    event_name: document.delete
+                    entity_type: document
+                    callback_url: https://example.com/webhook?Param={"docId":"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+                    request_method: post
+                    request_content:
+                      meta:
+                        event: document.delete
+                        metadata: []
+                        timestamp: 1748521868
+                        environment: https://api.signnow.com
+                        access_token: '********'
+                        callback_url: https://example.com/webhook?Param={"docId":"f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+                        initiator_id: c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      content:
+                        user_id: b2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        document_id: f7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        initiator_id: c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        document_name: Sample Document
+                        initiator_email: signer@example.com
+                    request_headers:
+                      Content-Type: application/json
+                    application_name: Sample Application
+                    request_end_time: 1748521868
+                    response_content: '{"message":"Okay","timestamp":"2025-05-29 10:24:28"}'
+                    request_start_time: 1748521868
+                    response_status_code: 200
+                    event_subscription_id: a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    event_subscription_active: true
+                    event_subscription_owner_email: owner@example.com
+        '400':
+          description: '* Request with incorrect token
+
+            * Request with valid bearer token but application deactivated/deleted
+
+            * Request authenticated with Basic token'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  error:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 1537
+                    error: invalid_token
+              example:
+                Example 1:
+                  code: 1537
+                  error: invalid_token
+                Authorization error:
+                  code: 1537
+                  error: invalid_token
+        '403':
+          description: Request with token of another application
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+              example:
+                Request with token of another application:
+                  errors:
+                  - message: Access to the subscription data is not allowed
+        '404':
+          description: '* Request with non-existing subscription_id
+
+            * Request if callback_id not found
+
+            * Request with invalid subscription_id
+
+            * Request with invalid callback_id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+              example:
+                Invalid callback_id:
+                  '404': 'Unable to find a route to match the URI: v2/dashboard/event-subscriptions/c4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/callbacks/23a@'
+                Callback_id not found:
+                  errors:
+                  - message: CallbackResponseLog `12345` not found
+                ' Invalid subscription_id':
+                  '404': 'Unable to find a route to match the URI: v2/dashboard/event-subscriptions/23@/callbacks/12345'
+                Non-existing subscription_id:
+                  errors:
+                  - message: UserEventSubscription `94XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX` not found
+      security:
+      - Bearer: []
+      tags:
+      - Event Subscriptions
+  /v2/event-subscriptions/{subscription_id}/callbacks/{callback_id}/resend:
+    post:
+      operationId: post-v2-event-subscriptions-subscription-id-callbacks-callback-id-resend
+      summary: Resend callback
+      description: This endpoint allows users to resend a callback.
+      parameters:
+      - in: path
+        name: callback_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      - in: path
+        name: subscription_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Example 1:
+                  message: Webhook resend successful.
+        '400':
+          description: '* Incorrect or missing token.
+
+            * Either `callback_url` is still unavailable or it returns an error.'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Error persists:
+                  code: 15006043
+                  message: Failed to send callback. Check the current callback info endpoint for details.
+                Incorrect or missing token:
+                  code: 1537
+                  error: invalid_token
+        '403':
+          description: '* User is trying to resend a successful callback.
+
+            * Thus subscription is deactivated.
+
+            * Either access token or subscription ID belongs to another user.'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Incorrect user:
+                  code: 15006004
+                  message: Event subscription is not allowed.
+                Deactivated subscription:
+                  code: 15006041
+                  message: Event subscription has to be active to resend a webhook.
+                Resending successful callback:
+                  code: 15006042
+                  message: Successful webhook resending is not allowed.
+        '404':
+          description: '* `subscription_id` does not exist
+
+            * `callback_id` does not exist
+
+            * Incorrect `subscription_id`
+
+            * Incorrect `callback_id`'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Incorrect callback_id:
+                  '404': 'Unable to find a route to match the URI: /v2/event-subscriptions/1234567890123456789012345678901234567890/callbacks/null/resend '
+                Incorrect subscription_id:
+                  '404': 'Unable to find a route to match the URI: /v2/event-subscriptions/null/callbacks/1234567890123456789012345678901234567890/resend '
+                callback_id does not exist:
+                  code: 15006006
+                  message: CallbackResponseLog `218111` not found
+                subscription_id does not exist:
+                  code: 15006003
+                  message: Event subscription not found.
+      security:
+      - Bearer: []
+      tags:
+      - Event Subscriptions
+  /v2/event-subscriptions/callbacks:
+    get:
+      operationId: get-v2-event-subscriptions-callbacks
+      summary: Get list of callbacks
+      description: 'Allows users to get the list of all webhook events (events history).
+
+
+        The results can be filtered and sorted. If the `sort` parameter is not indicated, the results are sorted by `start_time` in descending order.'
+      parameters:
+      - in: query
+        name: sort:end_time
+        required: false
+        description: 'Sort results by the end time. Possible values: asc, desc. Format: `?sort[end_time]=desc`'
+        schema:
+          type: string
+      - in: query
+        name: sort:start_time
+        required: false
+        description: 'Sort results by the start type. Possible values: asc, desc. Format: `?sort[start_time]=desc`'
+        schema:
+          type: string
+      - in: query
+        name: sort:code
+        required: false
+        description: 'Sort results by the response code. Possible values: asc, desc. Format: `?sort[code]=desc`'
+        schema:
+          type: string
+      - in: query
+        name: sort:event
+        required: false
+        description: 'Sort results by the specific type of event (from A to Z). Possible values: asc, desc. Format: `?sort[event]=desc`'
+        schema:
+          type: string
+      - in: query
+        name: sort:application
+        required: false
+        description: 'Sort results by the application name (from A to Z). Possible values: asc, desc. Format: `?sort[application]=desc`'
+        schema:
+          type: string
+      - in: query
+        name: filters:entity_id, callback_url, initiator_id
+        required: false
+        description: 'Search for a string in entity IDs, callback URLs, and initiator IDs. Format: `?filters=[{"_OR":[{"entity_id":{"type":"like","value":"21a28b47"}},{"callback_url":{"type":"like","value":"21a28b47"}},{"initiator_id":{"type":"like","value":"21a28b47"}}]}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:date
+        required: false
+        description: 'Filter results by the timestamps. Format: `?filters=[{"date":{"type":"between","value":[1580719773,1580720509]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:code
+        required: false
+        description: 'Filter results by the response codes. Format: `?filters=[{"code":{"type": "between", "value":[199,299]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:event
+        required: false
+        description: 'Filter results by the specific type of event. Format: `?filters=[{"event":{"type": "in", "value":["document.create", "document.update"]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:event_type
+        required: false
+        description: 'Filter results by the event type. Possible values: ''user'', ''document'', ''document_group''. Format: `?filters=[{"event_type":{"type": "in", "value":["user", "document", "document_group"]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:application
+        required: false
+        description: 'Filter results by the application. Format: `?filters=[{"application":{"type": "in", "value":["applicationUniqueId1", "applicationUniqueId2"]}}]`'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correct request.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: '* Incorrect filter format (each filter must contain type and value fields)
+
+            * Incorrect filter expression (must be a string)
+
+            * Incorrect `application`, `event`, or `event_type` filter expression (must be `"type": "in"`)
+
+            * Incorrect `code` or `date` filter expression (must be `"type": "between"`)
+
+            * Incorrect `entity_id`, `callback_url`, or `initiator_id` filter expression (must be `"type": "like"`)
+
+            * Incorrect `application`, `event_type`, or `event` filter value (must be an array of strings)
+
+            * Incorrect `application` filter value item (must be 40 symbols long or shorter and can contain only lowercase latin letters and digits)
+
+            * Incorrect `event_type` filter value item (allowed values are `document`, `document_group`, `user`, and `template`)
+
+            * Incorrect `event` filter value item (allowed values are listed [here](/docs/guides-webhooks#entity-events))
+
+            * Incorrect `code` or `date` filter value (must be an array of 2 integers)
+
+            * Incorrect `entity_id`, `callback_url`, or `initiator_id` filter value (must be a string)
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Incorrect filter format:
+                  errors:
+                  - code: 15006011
+                    message: Invalid filter format, filter must have `type` and `value` fields.
+                Incorrect code filter value:
+                  errors:
+                  - code: 15006015
+                    message: The `code` filter value must be of type array with 2 integer.
+                Incorrect date filter value:
+                  errors:
+                  - code: 15006018
+                    message: The `date` filter value must be of type array with 2 integer.
+                Incorrect filter expression:
+                  errors:
+                  - code: 15006012
+                    message: Invalid filter format, filter `type` must be a string.
+                Incorrect event filter value:
+                  errors:
+                  - code: 15006033
+                    message: The `event` filter value must be an array of strings.
+                Incorrect code filter expression:
+                  errors:
+                  - code: 15006013
+                    message: The `code` filter expression must be equal to `between`.
+                Incorrect date filter expression:
+                  errors:
+                  - code: 15006016
+                    message: The `date` filter expression must be equal to `between`.
+                Incorrect entity_id filter value:
+                  errors:
+                  - code: 15006020
+                    message: The `entity_id` filter value must be a string.
+                Incorrect event filter expression:
+                  errors:
+                  - code: 15006031
+                    message: The `event` filter expression must be equal to `in`
+                Incorrect event filter value item:
+                  errors:
+                  - code: 15006034
+                    message: The `event` must be one of valid events.
+                Incorrect event_type filter value:
+                  errors:
+                  - code: 15006029
+                    message: The `event_type` filter value must be an array of strings.
+                Incorrect application filter value:
+                  errors:
+                  - code: 15006023
+                    message: The `application` filter value should be an array of strings.
+                Incorrect callback_url filter value:
+                  errors:
+                  - code: 15006025
+                    message: The `callback_url` filter value must be a string.
+                Incorrect initiator_id filter value:
+                  errors:
+                  - code: 15006027
+                    message: The `initiator_id` filter value must be a string.
+                Incorrect entity_id filter expression:
+                  errors:
+                  - code: 15006019
+                    message: The `entity_id` filter expression must be equal to `like`.
+                Incorrect event_type filter expression:
+                  errors:
+                  - code: 15006037
+                    message: The `event_type` filter expression must be equal to `in`.
+                Incorrect event_type filter value item:
+                  errors:
+                  - code: 15006030
+                    message: The `event_type` must be one of 'document', 'document_group', 'user', 'template'.
+                Incorrect application filter expression:
+                  errors:
+                  - code: 15006021
+                    message: The `application` filter expression must be equal to `in`.
+                Incorrect application filter value item:
+                  errors:
+                  - code: 15006036
+                    message: The `application` filter item length must be 40 and it should contain only characters in [a-z0-9].
+                Incorrect callback_url filter expression:
+                  errors:
+                  - code: 15006024
+                    message: The `callback_url` filter expression must be equal to `like`.
+                Incorrect initiator_id filter expression:
+                  errors:
+                  - code: 15006026
+                    message: The `initiator_id` filter expression must be equal to `like`.
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      tags:
+      - Event Subscriptions
+  /v2/event-subscriptions:
+    get:
+      operationId: get-v2-dashboard-event-subscriptions
+      summary: Get list of event subscriptions
+      description: 'This endpoint allows API users to retrieve the list of events the user account is subscribed to.
+
+
+        The results can be filtered and sorted. If the `sort` parameter is not indicated, the results are sorted by the `created` parameter in descending order. The `filters` and `sort` parameters need URL-encoding.'
+      parameters:
+      - in: query
+        name: page
+        required: false
+        description: In how many pages to display the response.
+        schema:
+          type: string
+          default: '1'
+      - in: query
+        name: sort:created
+        required: false
+        description: 'Sort results by the date. Possible values: asc, desc. Format: `?sort[created]=desc`'
+        schema:
+          type: string
+      - in: query
+        name: sort:event
+        required: false
+        description: 'Sort results by the event type (from A to Z). Possible values: asc, desc. Format: `?sort[event]=desc`'
+        schema:
+          type: string
+      - in: query
+        name: sort:application
+        required: false
+        description: 'Sort results by the application name (from A to Z). Possible values: asc, desc. Format: `?sort[application]=desc`'
+        schema:
+          type: string
+      - in: query
+        name: filters:entity_id, callback_url
+        required: false
+        description: 'Search for a string in entity IDs and callback URLs. Format: `?filters=[{"_OR":[{"entity_id":{"type":"like","value":"21a28b47"}},{"callback_url":{"type":"like","value":"21a28b47"}}]}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:date
+        required: false
+        description: 'Filter results by the timestamps. Format: `?filters=[{"date":{"type":"between","value":[1580719773,1580720509]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:event
+        required: false
+        description: 'Filter results by the specific type of event. Format: `?filters=[{"event":{"type": "in", "value":["document.create", "document.update"]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:application
+        required: false
+        description: 'Filter results by the application. Format: `?filters=[{"application":{"type": "in", "value":["applicationUniqueId1", "applicationUniqueId2"]}}]`'
+        schema:
+          type: string
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      - in: query
+        name: include_event_count
+        required: false
+        description: Include the number of events that triggered the webhook to the response. If set to `true`, the number is returned in the `event_count` field.
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Correct request with the filter by application ID.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Unique identifier of the event subscription.
+                        event:
+                          type: string
+                          description: Event name that triggers the subscription. Check [list of events](/docs/guides-webhooks#entity-events).
+                        action:
+                          type: string
+                          description: Action performed when the event occurs (for example, callback).
+                        active:
+                          type: boolean
+                          description: Indicates whether the subscription is currently active.
+                        created:
+                          type: integer
+                          description: Timestamp (Unix time) indicating when the subscription was created.
+                        version:
+                          type: integer
+                          description: Subscription schema version.
+                        entity_id:
+                          type: integer
+                          description: Internal numeric ID of the entity.
+                        entity_type:
+                          type: string
+                          description: Type of entity the subscription is linked to (`document`, `document_group`, `user`).
+                        event_count:
+                          type: 'null'
+                          description: Number of events sent (null if none or not tracked).
+                        request_method:
+                          type: string
+                          description: HTTP method used for the callback request.
+                        json_attributes:
+                          type: object
+                          properties:
+                            use_tls_12:
+                              type: boolean
+                              description: Whether TLS 1.2 should be used for the callback.
+                            callback_url:
+                              type: string
+                              description: URL that receives the event callback.
+                            docid_queryparam:
+                              type: boolean
+                              description: Whether the document ID is included as a query parameter.
+                            include_metadata:
+                              type: boolean
+                              description: Whether document metadata is included in the callback payload.
+                          description: Additional callback configuration details.
+                        application_name:
+                          type: string
+                          description: Name of the application that owns the subscription.
+                        entity_unique_id:
+                          type: string
+                          description: Unique string ID of the entity.
+                        event_subscription_owner_email:
+                          type: string
+                          description: Email address of the user who created the subscription.
+                    description: List of event subscriptions.
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                            description: Number of items returned in this response.
+                          links:
+                            type: array
+                            items:
+                              type: object
+                              properties: {}
+                            description: Pagination links (next, previous, etc).
+                          total:
+                            type: integer
+                            description: Total number of items available.
+                          per_page:
+                            type: integer
+                            description: Number of items per page.
+                          total_pages:
+                            type: integer
+                            description: Total number of pages.
+                          current_page:
+                            type: integer
+                            description: The current page number.
+                    description: Metadata for pagination.
+                x-examples:
+                  Example 1:
+                    data:
+                    - id: a1b2c3d4e5f67890123456789abcdef012345678
+                      event: document.open
+                      action: callback
+                      active: true
+                      created: 1709210000
+                      version: 2
+                      entity_id: 100100200
+                      entity_type: document
+                      event_count: null
+                      request_method: post
+                      json_attributes:
+                        use_tls_12: true
+                        callback_url: https://api.your-domain.com/callbacks/handle_event
+                        docid_queryparam: false
+                        include_metadata: true
+                      application_name: My_Integration_App
+                      entity_unique_id: d0c1d2d3d4d5d6d7d8d900000000000000000001
+                      event_subscription_owner_email: admin@example.com
+                    - id: f9e8d7c6b5a432109876543210fedcba98765432
+                      event: document.complete
+                      action: callback
+                      active: true
+                      created: 1709215000
+                      version: 2
+                      entity_id: 100100200
+                      entity_type: document
+                      event_count: null
+                      request_method: post
+                      json_attributes:
+                        use_tls_12: true
+                        callback_url: https://api.your-domain.com/callbacks/handle_event
+                        docid_queryparam: false
+                        include_metadata: true
+                      application_name: My_Integration_App
+                      entity_unique_id: d0c1d2d3d4d5d6d7d8d900000000000000000001
+                      event_subscription_owner_email: admin@example.com
+                    meta:
+                      pagination:
+                        count: 2
+                        links: []
+                        total: 2
+                        per_page: 15
+                        total_pages: 1
+                        current_page: 1
+              example:
+                Example 1:
+                  data:
+                  - id: a1b2c3d4e5f67890123456789abcdef012345678
+                    event: document.open
+                    action: callback
+                    active: true
+                    created: 1709210000
+                    version: 2
+                    entity_id: 100100200
+                    entity_type: document
+                    event_count: null
+                    request_method: post
+                    json_attributes:
+                      use_tls_12: true
+                      callback_url: https://api.your-domain.com/callbacks/handle_event
+                      docid_queryparam: false
+                      include_metadata: true
+                    application_name: My_Integration_App
+                    entity_unique_id: d0c1d2d3d4d5d6d7d8d900000000000000000001
+                    event_subscription_owner_email: admin@example.com
+                  - id: f9e8d7c6b5a432109876543210fedcba98765432
+                    event: document.complete
+                    action: callback
+                    active: true
+                    created: 1709215000
+                    version: 2
+                    entity_id: 100100200
+                    entity_type: document
+                    event_count: null
+                    request_method: post
+                    json_attributes:
+                      use_tls_12: true
+                      callback_url: https://api.your-domain.com/callbacks/handle_event
+                      docid_queryparam: false
+                      include_metadata: true
+                    application_name: My_Integration_App
+                    entity_unique_id: d0c1d2d3d4d5d6d7d8d900000000000000000001
+                    event_subscription_owner_email: admin@example.com
+                  meta:
+                    pagination:
+                      count: 2
+                      links: []
+                      total: 2
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                Correct request:
+                  data:
+                  - id: a1b2c3d4e5f67890123456789abcdef012345678
+                    event: document.open
+                    action: callback
+                    active: true
+                    created: 1709210000
+                    version: 2
+                    entity_id: 100100200
+                    entity_type: document
+                    event_count: null
+                    request_method: post
+                    json_attributes:
+                      use_tls_12: true
+                      callback_url: https://api.your-domain.com/callbacks/handle_event
+                      docid_queryparam: false
+                      include_metadata: true
+                    application_name: My_Integration_App
+                    entity_unique_id: d0c1d2d3d4d5d6d7d8d900000000000000000001
+                    event_subscription_owner_email: admin@example.com
+                  - id: f9e8d7c6b5a432109876543210fedcba98765432
+                    event: document.complete
+                    action: callback
+                    active: true
+                    created: 1709215000
+                    version: 2
+                    entity_id: 100100200
+                    entity_type: document
+                    event_count: null
+                    request_method: post
+                    json_attributes:
+                      use_tls_12: true
+                      callback_url: https://api.your-domain.com/callbacks/handle_event
+                      docid_queryparam: false
+                      include_metadata: true
+                    application_name: My_Integration_App
+                    entity_unique_id: d0c1d2d3d4d5d6d7d8d900000000000000000001
+                    event_subscription_owner_email: admin@example.com
+                  meta:
+                    pagination:
+                      count: 2
+                      links: []
+                      total: 2
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+        '400':
+          description: '* Incorrect filter format (each filter must contain `type` and `value` fields)
+
+            * Incorrect filter expression (must be a string)
+
+            * Incorrect `application` filter expression (must be `"type": "in"`)
+
+            * Incorrect `event` filter expression (must be `"type": "="` or `"type": "in"`)
+
+            * Incorrect `entity_id` or `callback_url` filter expression (must be `"type": "like"`)
+
+            * Incorrect `application` or `event` filter value (must be an array of strings)
+
+            * Incorrect `entity_id` or `callback_url` filter value (must be a string)
+
+            * Incorrect `date` filter value (must be an array)
+
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Incorrect filter format:
+                  errors:
+                  - code: 15006011
+                    message: Incorrect filter format, filter must have `type` and `value` fields.
+                Incorrect date filter value:
+                  errors:
+                  - code: 15006017
+                    message: The `date` filter value must be an array.
+                Incorrect filter expression:
+                  errors:
+                  - code: 15006012
+                    message: Incorrect filter format, filter `type` must be a string.
+                Incorrect event filter value:
+                  errors:
+                  - code: 0
+                    message: The `event` filter value should be array of strings.
+                Incorrect entity_id filter value:
+                  errors:
+                  - code: 15006020
+                    message: The `entity_id` filter value must be a string.
+                Incorrect event filter expression:
+                  errors:
+                  - code: 0
+                    message: The `event` filter expression should be equal to `=` or `in`
+                Incorrect application filter value:
+                  errors:
+                  - code: 15006023
+                    message: The `application` filter value should be an array of strings.
+                Incorrect entity_id filter expression:
+                  errors:
+                  - code: 15006019
+                    message: The `entity_id` filter expression must be equal to `like`.
+                Incorrect application filter expression:
+                  errors:
+                  - code: 15006021
+                    message: The `application` filter expression must be equal to `in`.
+      security:
+      - Bearer: []
+      tags:
+      - Event Subscriptions
+    post:
+      operationId: create-event-subscription-2
+      summary: Create event subscription
+      description: 'This endpoint allows users to subscribe an external service (`callback_url`) to a specific event related to a user, document, or document group. When the subscribed event occurs, your service receives a notification.
+
+
+        See the full list of available events in the Webhooks user guide.
+
+        Use HMAC verification for an additional layer of security.
+
+
+        > [!NOTE]
+
+        > For the payload your service receives for each event, see the response examples in Get callback info by ID.'
+      responses:
+        '201':
+          description: Event subscription created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                x-examples:
+                  Example 1:
+                    data:
+                      id: XXXXXXXXaa59418f996b81deb701697aa403fa72
+              example:
+                Example 1:
+                  data:
+                    id: XXXXXXXXaa59418f996b81deb701697aa403fa72
+        '400':
+          description: '* `event` format type is incorrect.
+
+            * `event` is empty.
+
+            * `event` does not exist.
+
+            * `entity_id` format type is incorrect.
+
+            * `entity_id` is empty.
+
+            * `entity_id` length is incorrect.
+
+            * `attributes` format type is incorrect.
+
+            * `attributes` is empty.
+
+            * `callback` is missing.
+
+            * `callback` format type is incorrect.
+
+            * `callback` is empty.
+
+            * `callback` format is invalid URL.
+
+            * `callback` host is not allowed.
+
+            * `callback` host unreachable.
+
+            * `use_tls_12` format type is incorrect.
+
+            * `integration_id` format type is incorrect.
+
+            * `integration_id` length is incorrect.
+
+            * `integration_id` is invalid.
+
+            * `docid_queryparam` format type is incorrect.
+
+            * `headers` format type is incorrect.
+
+            * `secret_key` format type is incorrect.
+
+            * `secret_key` is empty.
+
+            * `secret_key` length is incorrect.
+
+            * `delete_access_token` format type is incorrect.
+
+            * `include_metadata` format type is incorrect.
+
+            * Payload is invalid.
+
+            * `delay` not integer.
+
+            * `delay` out of range.
+
+            * `retry_count` not integer.
+
+            * `retry_count` out of range.
+
+            * Subscription limit reached.
+
+            * This combination of `entity_id`, `event`, and `callback_url` has already been used.
+
+            * API subscription not found.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 15007018
+                      message: The `attributes.callback` field must not be empty.
+              example:
+                Example 1:
+                  errors:
+                  - code: 15007018
+                    message: The `attributes.callback` field must not be empty.
+                Limit reached:
+                  errors:
+                  - code: 15006044
+                    message: Active subscriptions are limited to 20 subscriptions with this combination of entityId and eventName.
+                Event is empty:
+                  errors:
+                  - code: 15007010
+                    message: The `event` field must not be empty.
+                Callback is empty:
+                  errors:
+                  - code: 15007018
+                    message: The `attributes.callback` field must not be empty.
+                delay not integer:
+                  errors:
+                  - code: 15007034
+                    message: The `attributes.delay` field must be an integer.
+                Entity_id is empty:
+                  errors:
+                  - code: 15007013
+                    message: The `entity_id` field must not be empty.
+                delay out of range:
+                  errors:
+                  - code: 15007035
+                    message: The `attributes.delay` field must be between 0 and 100.
+                Attributes is empty:
+                  errors:
+                  - code: 15007016
+                    message: The `attributes` field must not be empty.
+                Callback is missing:
+                  errors:
+                  - code: 15007028
+                    message: The "callback" field is missing.
+                Secret_key is empty:
+                  errors:
+                  - code: 15007025
+                    message: The `attributes.secret_key` must not be empty.
+                Event does not exist:
+                  errors:
+                  - code: 15007011
+                    message: Provided event does not exist.
+                Payload is incorrect:
+                  code: 65536
+                  message: Invalid payload
+                retry_count not integer:
+                  errors:
+                  - code: 15007031
+                    message: The `attributes.retry_count` field must be an integer.
+                API subscription expired:
+                  errors:
+                  - code: 80001002
+                    message: Your API subscription could not be found.
+                retry_count out of range:
+                  errors:
+                  - code: 15007032
+                    message: The `attributes.retry_count` field must be between 1 and 10.
+                Callback host unreachable:
+                  errors:
+                  - code: 15007029
+                    message: Unknown callback host or callback host unreachable.
+                Integration_id is incorrect:
+                  errors:
+                  - code: 15007032
+                    message: Invalid integration id - {integration_id}
+                Callback host is not allowed:
+                  errors:
+                  - code: 15006001
+                    message: Host is not allowed.
+                Entity_id length is incorrect:
+                  errors:
+                  - code: 15007014
+                    message: The `entity_id` field must have 40 characters.
+                Callback format is invalid URL:
+                  errors:
+                  - code: 15007019
+                    message: The `attributes.callback` field must be url.
+                Event format type is incorrect:
+                  errors:
+                  - code: 15007009
+                    message: The `event` field must be string.
+                Secret_key length is incorrect:
+                  errors:
+                  - code: 15007026
+                    message: The `secret_key` value is too long. It should have 300 character or less.
+                Headers format type is incorrect:
+                  errors:
+                  - code: 15007023
+                    message: The `attributes.headers` field must be array.
+                Callback format type is incorrect:
+                  errors:
+                  - code: 15007017
+                    message: The `attributes.callback` field must be string.
+                Duplicate subscription combination:
+                  errors:
+                  - code: 15006045
+                    message: Active subscriptions must have different combinations of entityId, eventName, and callbackUrl.
+                Entity_id format type is incorrect:
+                  errors:
+                  - code: 15007012
+                    message: The `entity_id` field must be string.
+                Integration_id length is incorrect:
+                  errors:
+                  - code: 15007031
+                    message: The `integration_id` field must have 40 characters.
+                Attributes format type is incorrect:
+                  errors:
+                  - code: 15007015
+                    message: The `attributes` field must be array.
+                Secret_key format type is incorrect:
+                  errors:
+                  - code: 15007024
+                    message: The `attributes.secret_key` must be string.
+                Use_tls_12 format type is incorrect:
+                  errors:
+                  - code: 15007020
+                    message: The `attributes.use_tls_12` field must be bool.
+                Integration_id format type is incorrect:
+                  errors:
+                  - code: 15007021
+                    message: The `attributes.integration_id` field must be string.
+                Docid_queryparam format type is incorrect:
+                  errors:
+                  - code: 15007022
+                    message: The `attributes.docid_queryparam` field must be bool.
+                Include_metadata format type is incorrect:
+                  errors:
+                  - code: 15007030
+                    message: The `attributes.include_metadata` field must be bool.
+                Delete_access_token format type is incorrect:
+                  errors:
+                  - code: 15007027
+                    message: The `attributes.delete_access_token` field must be bool.
+        '403':
+          description: '
+
+            * The request is sent with a bearer token that does not belong to the user specified in the `entity_id` parameter.
+
+
+            * The request is sent with a bearer token of a user who is not the owner of the document specified in the `entity_id` parameter.
+
+
+            * API subscription is inactive.
+
+            * API subscription has expired.
+
+            * User reached the limit of event subscriptions.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 80001003
+                      message: Your API subscription is inactive.
+              example:
+                Example 1:
+                  errors:
+                  - code: 80001003
+                    message: Your API subscription is inactive.
+                Limit reached:
+                  errors:
+                  - code: 80001006
+                    message: You have reached the limit of event subscriptions.
+                Subscription expired:
+                  errors:
+                  - code: 80001005
+                    message: Your API subscription has expired.
+                Subscription inactive:
+                  errors:
+                  - code: 80001003
+                    message: Your API subscription is inactive.
+                Subscription not allowed for user (not an owner):
+                  errors:
+                  - code: 15006009
+                    message: Subscription to event is not allowed
+        '404':
+          description: '* `entity_id` not found.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - message: Not found entity with id = {entity_id}
+              example:
+                Example 1:
+                  errors:
+                  - message: Not found entity with id = {entity_id}
+                Entity_id not found:
+                  errors:
+                  - code: 15006005
+                    message: Not found entity with id = {entity_id}
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - event
+              - entity_id
+              properties:
+                event:
+                  type: string
+                  example: document.open
+                  description: Event name that triggers the subscription. Check [list of events](/docs/guides-webhooks#entity-events).
+                entity_id:
+                  type: string
+                  example: a1b2c3d4e5f67890123456789abcdef012345678
+                  description: Unique string ID of the entity (e.g., `document_id`, `user_id`, `document_group_id`).
+                attributes:
+                  type: object
+                  required:
+                  - callback
+                  properties:
+                    delay:
+                      type: integer
+                      default: 0
+                      maximum: 100
+                      minimum: 0
+                      description: Delay in seconds before the webhook is sent after the event triggers.
+                    headers:
+                      type: object
+                      properties:
+                        int_head:
+                          type: integer
+                          description: Example integer header.
+                        bool_head:
+                          type: boolean
+                          description: Example boolean header.
+                        float_head:
+                          type: number
+                          description: Example float header.
+                        string_head:
+                          type: string
+                          description: Example string header.
+                      description: Custom HTTP headers to be sent with the callback request (e.g., Authorization tokens).
+                    callback:
+                      type: string
+                      example: https://webhook.site/a0093533-766c-456e-b625-97592745216a
+                      description: URL that receives the event callback.
+                    secret_key:
+                      type: string
+                      example: c8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      maxLength: 300
+                      description: Secret key used to generate the HMAC signature for verifying request authenticity.
+                    use_tls_12:
+                      type: boolean
+                      description: Whether TLS 1.2 should be used for the callback request.
+                    retry_count:
+                      type: integer
+                      maximum: 10
+                      minimum: 1
+                      multipleOf: 10
+                      description: Maximum number of retries if the webhook fails with a 5xx error.
+                    integration_id:
+                      type: string
+                      description: Optional unique ID to identify the external system integration.
+                    docid_queryparam:
+                      type: boolean
+                      description: Whether the document ID is included as a query parameter in the callback URL.
+                    include_metadata:
+                      type: boolean
+                      description: Whether document metadata is included in the callback payload.
+                    delete_access_token:
+                      type: boolean
+                      default: true
+                      description: If `true`, the access token is removed from the webhook payload for security. Default is `true`.
+                  description: Configuration for the webhook callback.
+              x-examples:
+                Example 1:
+                  event: document.complete
+                  entity_id: document_id
+                  attributes:
+                    headers:
+                      int_head: 12
+                      bool_head: false
+                      float_head: 12.24
+                      string_head: sample_text
+                    callback: https://webhook.site/a0093533-766c-456e-b625-97592745216a
+                    use_tls_12: true
+                    integration_id: Unique ID Integration System
+                    docid_queryparam: true
+                  secret_key: c8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        required: true
+      tags:
+      - Event Subscriptions
+  /v2/event-subscriptions/{subscription_id}:
+    get:
+      operationId: get-v2-dashboard-event-subscriptions-subscription-id
+      summary: Get subscription info
+      description: This endpoint allows users to get detailed information about an event subscription by its ID.
+      parameters:
+      - in: path
+        name: subscription_id
+        required: true
+        description: 'ID of the subscription. Must match the pattern: [a-z0-9]{40}.'
+        schema:
+          type: string
+      - in: query
+        name: include_event_count
+        required: false
+        description: If set to `true`, `event_count` returns the number of `callback_response_log` entries.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correct request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Unique identifier of the event subscription.
+                      event:
+                        type: string
+                        description: Event name that triggers the subscription. Check [list of events](/docs/guides-webhooks#entity-events).
+                      action:
+                        type: string
+                        description: Action performed when the event occurs (for example, callback).
+                      active:
+                        type: boolean
+                        description: Indicates whether the subscription is currently active.
+                      created:
+                        type: integer
+                        description: Timestamp (Unix time) indicating when the subscription was created.
+                      version:
+                        type: integer
+                        description: Subscription schema version.
+                      entity_id:
+                        type: integer
+                        description: Internal numeric ID of the entity.
+                      entity_type:
+                        type: string
+                        description: Type of entity the subscription is linked to (`document`, `document_group`, `user`).
+                      event_count:
+                        type:
+                        - integer
+                        - 'null'
+                        description: Number of events sent (null if none or not tracked).
+                      request_method:
+                        type: string
+                        description: HTTP method used for the callback request.
+                      json_attributes:
+                        type: object
+                        properties:
+                          use_tls_12:
+                            type: boolean
+                            description: Whether TLS 1.2 should be used for the callback.
+                          callback_url:
+                            type: string
+                            description: URL that receives the event callback.
+                          docid_queryparam:
+                            type: boolean
+                            description: Whether the document ID is included as a query parameter.
+                          include_metadata:
+                            type: boolean
+                            description: Whether document metadata is included in the callback payload.
+                        description: Additional callback configuration details.
+                      application_name:
+                        type: string
+                        description: Name of the application that owns the subscription.
+                      entity_unique_id:
+                        type: string
+                        description: Unique string ID of the entity.
+                      event_subscription_owner_email:
+                        type: string
+                        description: Email address of the user who created the subscription.
+                    description: Subscription details object.
+              example:
+                Correct request:
+                  data:
+                    id: 19d209f7aa59418f996b81deb701697aa403fa72
+                    event: document.open
+                    action: callback
+                    active: true
+                    created: 1764244948
+                    version: 2
+                    entity_id: 552215426
+                    entity_type: document
+                    event_count: null
+                    request_method: post
+                    json_attributes:
+                      use_tls_12: true
+                      callback_url: https://webhook.site/a0093533-766c-456e-b625-97592745216a
+                      docid_queryparam: false
+                      include_metadata: true
+                    application_name: test_app
+                    entity_unique_id: f1c71db945974e2b847b0580d21c386561b415a0
+                    event_subscription_owner_email: greenanna070@gmail.com
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization error:
+                  code: 1537
+                  error: invalid_token
+        '403':
+          description: 'Anauthorized '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Subscription not allowed:
+                  errors:
+                  - code: 15006004
+                    message: Event subscription is not allowed.
+        '404':
+          description: Subscription not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 15006003
+                      message: Event subscription not found.
+              example:
+                Example 1:
+                  errors:
+                  - code: 15006003
+                    message: Event subscription not found.
+                Non-existing subscription_id:
+                  errors:
+                  - code: 15006003
+                    message: Event subscription not found.
+      security:
+      - Bearer: []
+      tags:
+      - Event Subscriptions
+    put:
+      operationId: put-v2-event-subscriptions-subscription-id
+      summary: Edit event subscription
+      description: This endpoint allows users to update an existing event subscription.
+      parameters:
+      - in: path
+        name: subscription_id
+        required: true
+        description: 'ID of the subscription. Must match the pattern: [a-z0-9]{40}.'
+        schema:
+          type: string
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Success, no content
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: '* Incorrect Bearer token
+
+            * `event` is not a string
+
+            * `event` is empty
+
+            * `event` doesn''t exist
+
+            * `entity_id` is not a string
+
+            * `entity_id` is missing
+
+            * `entity_id` is not 40 characters long
+
+            * `attributes` is not an array
+
+            * `attributes` is empty
+
+            * `attributes` error
+
+            * `callback` is not a string
+
+            * `callback` is empty
+
+            * `callback` is missing
+
+            * `callback` is not a valid email address
+
+            * `callback` URL is not allowed
+
+            * `callback` host unknown or unreachable
+
+            * `use_tls_12` is not a boolean
+
+            * `integration_id` is not a string
+
+            * `integration_id` is not 40 characters long
+
+            * Incorrect `integration_id`
+
+            * `docid_queryparam` is not a boolean
+
+            * `headers` is not an array
+
+            * `secret_key` is not a string
+
+            * `secret_key` is empty
+
+            * `secret_key` is longer than 300 characters
+
+            * `delete_access_token` is not a boolean
+
+            * `include_metadata` is not a boolean'
+          content:
+            application/json:
+              example:
+                Empty event:
+                  errors:
+                  - code: 15007010
+                    message: The `event` field must not be empty.
+                callback empty:
+                  errors:
+                  - code: 15007018
+                    message: The `attributes.callback` field must not be empty.
+                Attributes error:
+                  errors:
+                  - code: 65536
+                    message: Invalid payload
+                Empty attributes:
+                  errors:
+                  - code: 15007016
+                    message: The `attributes` field must not be empty.
+                Empty secret_key:
+                  errors:
+                  - code: 15007025
+                    message: The `attributes.secret_key` must not be empty.
+                callback missing:
+                  errors:
+                  - code: 15007028
+                    message: The "callback" field is missing.
+                event not string:
+                  errors:
+                  - code: 15007009
+                    message: The `event` field must be string.
+                include_metadata:
+                  errors:
+                  - code: 15007030
+                    message: The `attributes.include_metadata` field must be bool.
+                entity_id missing:
+                  errors:
+                  - code: 15007013
+                    message: The `entity_id` field must not be empty.
+                headers not array:
+                  errors:
+                  - code: 15007023
+                    message: The `attributes.headers` field must be array.
+                callback not string:
+                  errors:
+                  - code: 15007017
+                    message: The `attributes.callback` field must be string.
+                event doesn't exist:
+                  errors:
+                  - code: 15007011
+                    message: Provided event does not exist.
+                secret_key too long:
+                  errors:
+                  - code: 15007026
+                    message: The `secret_key` value is too long. It should have 300 character or less.
+                attributes not array:
+                  errors:
+                  - code: 15007015
+                    message: The `attributes` field must be array.
+                entity_id not string:
+                  errors:
+                  - code: 15007012
+                    message: The `entity_id` field must be string.
+                secret_key not string:
+                  errors:
+                  - code: 15007024
+                    message: The `attributes.secret_key` must be string.
+                Incorrect Bearer token:
+                  code: 1537
+                  error: invalid_token
+                entity_id length error:
+                  errors:
+                  - code: 15007014
+                    message: The `entity_id` field must have 40 characters.
+                use_tls_12 not boolean:
+                  errors:
+                  - code: 15007020
+                    message: The `attributes.use_tls_12` field must be bool.
+                Incorrect integration_id:
+                  errors:
+                  - code: 15007032
+                    message: Invalid integration id - 2d384c8a99ff4b6980a52c484b8ca0bdbf8cfc70
+                callback URL not allowed:
+                  errors:
+                  - code: 15006001
+                    message: Host is not allowed.
+                integration_id not string:
+                  errors:
+                  - code: 15007021
+                    message: The `attributes.integration_id` field must be string.
+                integration_id length error:
+                  errors:
+                  - code: 15007031
+                    message: The `integration_id` field must have 40 characters.
+                docid_queryparam not boolean:
+                  errors:
+                  - code: 15007022
+                    message: The `attributes.docid_queryparam` field must be bool.
+                callback not an email address:
+                  errors:
+                  - code: 15007019
+                    message: The `attributes.callback` field must be url.
+                delete_access_token not boolean:
+                  errors:
+                  - code: 15007027
+                    message: The `attributes.delete_access_token` field must be bool.
+                callback host unknown or unreachable:
+                  errors:
+                  - code: 15007029
+                    message: Unknown callback host or callback host unreachable.
+        '403':
+          description: '* The bearer token is valid but it belongs to another user.
+
+            * Subscription update is not allowed.
+
+            * API subscription is not found.
+
+            * API subscription is inactive.
+
+            * API subscription has expired.'
+          content:
+            application/json:
+              example:
+                Token of another user:
+                  errors:
+                  - code: 15006004
+                    message: Event subscription is not allowed.
+                Expired API subscription:
+                  errors:
+                  - code: 80001005
+                    message: Your API subscription has expired.
+                Inactive API subscription:
+                  errors:
+                  - code: 80001003
+                    message: Your API subscription is inactive.
+                API subscription not found:
+                  errors:
+                  - code: 80001002
+                    message: Your API subscription could not be found.
+                Subscription update not allowed:
+                  errors:
+                  - code: 15006010
+                    message: Updating of subscription to event is not allowed
+        '404':
+          description: '* The entity ID doesn''t exist.
+
+            * The subscription ID doesn''t exist.'
+          content:
+            application/json:
+              example:
+                Entity ID not found:
+                  errors:
+                  - code: 15006005
+                    message: Not found entity with id = 4d184c8a99ff4b6980a52c484b8ca0bdbf8cfc70
+                Subscription ID not found:
+                  errors:
+                  - code: 15006003
+                    message: Event subscription not found.
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - event
+              - entity_id
+              - attributes
+              properties:
+                event:
+                  type: string
+                  example: document.open
+                  description: Event that should trigger the subscription.
+                action:
+                  type: string
+                  example: callback
+                  description: Always only "callback"
+                entity_id:
+                  type: string
+                  example: 2e1fa467c4674e988a0542de8bf2f22cb0498410
+                  maxLength: 40
+                  minLength: 40
+                  description: ID of the entity that should trigger the subscription.
+                attributes:
+                  type: object
+                  required:
+                  - callback
+                  properties:
+                    headers:
+                      type: object
+                      properties:
+                        int_head:
+                          type: integer
+                        bool_head:
+                          type: boolean
+                        float_head:
+                          type: number
+                        string_head:
+                          type: string
+                      description: You can add any parameters to the "headers" array.
+                    callback:
+                      type: string
+                      example: https://webhook.site/a0093533-766c-456e-b625-97592745216a
+                      description: URL that should receive the callback.
+                    secret_key:
+                      type: string
+                      maxLength: 300
+                      description: Enables the HMAC security logic.
+                    use_tls_12:
+                      type: boolean
+                      description: 'If true, the 1.2 TLS version will be used. If false, the default TLS version will be used. '
+                    integration_id:
+                      type: string
+                      description: External system ID
+                    docid_queryparam:
+                      type: boolean
+                      description: If true, a JSON that is sent in a callback will contain document ID as a query string parameter and as a part of "callback_url" parameter.
+                    include_metadata:
+                      type: boolean
+                      description: Whether the payload of the webhook should include metadata.
+                    delete_access_token:
+                      type: boolean
+                      default: false
+                      description: Determines whether to keep access_token in the payload. If true, an access_token key id removed from the payload. If false, the access_token is kept in the payload attributes.
+        required: true
+      tags:
+      - Event Subscriptions
+    delete:
+      operationId: delete-v2-event-subscriptions-subscription-id
+      summary: Delete event subscription
+      description: This endpoint allows users to delete an event subscription.
+      parameters:
+      - in: path
+        name: subscription_id
+        required: true
+        description: 'ID of the subscription. Must match the pattern: [a-z0-9]{40}.'
+        schema:
+          type: string
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Success, no content
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Incorrect Bearer token
+          content:
+            application/json:
+              example:
+                Example 1:
+                  code: 1537
+                  error: invalid_token
+        '403':
+          description: '* The bearer token is valid but it belongs to another user.
+
+            * Email notifications are turned on for this subscription'
+          content:
+            application/json:
+              example:
+                Another user's token:
+                  errors:
+                  - code: 15006004
+                    message: Event subscription is not allowed.
+                Email notifications error:
+                  errors:
+                  - code: 15006040
+                    message: This webhook sends data to a callback URL that is used in your email notifications as a filter. The email address that receives notification is {notificationEmail}. First, remove the callback URL from the notification at API Dashboard, and then unsubscribe from the webhook.
+        '404':
+          description: '* The subscription ID doesn''t exist.
+
+            * The subscription ID value is incorrect (must match [a-z0-9]{40}).'
+          content:
+            application/json:
+              example:
+                Incorrect subscription ID:
+                  errors:
+                  - code: 15006003
+                    message: Event subscription not found.
+                Subscription ID doesn't exist:
+                  errors:
+                  - code: 15006003
+                    message: Event subscription not found.
+      security:
+      - Bearer: []
+      tags:
+      - Event Subscriptions
+  /v2/event-subscriptions/{subscription_id}/activate:
+    put:
+      operationId: put-v2-event-subscriptions-subscription-id-activate
+      summary: Activate event subscription
+      description: This endpoint allows users to activate an inactive event subscription.
+      parameters:
+      - in: path
+        name: subscription_id
+        required: true
+        description: 'ID of the subscription. Must match the pattern: [a-z0-9]{40}.'
+        schema:
+          type: string
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Success, no content
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Incorrect Bearer token
+          content:
+            application/json:
+              example:
+                Example 1:
+                  code: 1537
+                  error: invalid_token
+        '403':
+          description: The bearer token is valid but it belongs to another user.
+          content:
+            application/json:
+              example:
+                Example 1:
+                  errors:
+                  - code: 15006004
+                    message: Event subscription is not allowed.
+        '404':
+          description: '* The subscription ID doesn''t exist.
+
+            * The subscription ID value is incorrect (must match [a-z0-9]{40}).'
+          content:
+            application/json:
+              example:
+                Incorrect subscription ID:
+                  '404': 'Unable to find a route to match the URI: v2/dashboard/event-subscriptions/test'
+                Subscription ID doesn't exist:
+                  errors:
+                  - code: 15006003
+                    message: Event subscription not found.
+        '422':
+          description: This subscription ID is already active.
+          content:
+            application/json:
+              example:
+                Example 1:
+                  errors:
+                  - code: 15006008
+                    message: Event subscription is already active.
+      security:
+      - Bearer: []
+      tags:
+      - Event Subscriptions
+  /v2/event-subscriptions/{subscription_id}/deactivate:
+    put:
+      operationId: put-v2-event-subscriptions-subscription-id-deactivate
+      summary: Deactivate event subscription
+      description: This enpoint allows users to deactivate an active event subscription. Deactivated event subscriptions are not processing callbacks, that they are related to.
+      parameters:
+      - in: path
+        name: subscription_id
+        required: true
+        description: 'ID of the subscription. Must match the pattern: [a-z0-9]{40}.'
+        schema:
+          type: string
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Success, no content
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Incorrect Bearer token
+          content:
+            application/json:
+              example:
+                Example 1:
+                  code: 1537
+                  error: invalid_token
+        '403':
+          description: The bearer token is valid but it belongs to another user.
+          content:
+            application/json:
+              example:
+                Example 1:
+                  errors:
+                  - code: 15006004
+                    message: Event subscription is not allowed.
+        '404':
+          description: '* The subscription ID doesn''t exist.
+
+            * The subscription ID value is incorrect (must match [a-z0-9]{40}).'
+          content:
+            application/json:
+              example:
+                Incorrect subscription ID:
+                  '404': 'Unable to find a route to match the URI: v2/dashboard/event-subscriptions/test'
+                Subscription ID doesn't exist:
+                  errors:
+                  - code: 15006003
+                    message: Event subscription not found.
+        '422':
+          description: This subscription ID is already inactive.
+          content:
+            application/json:
+              example:
+                Example 1:
+                  errors:
+                  - code: 15006007
+                    message: Event subscription is already deactivated.
+      security:
+      - Bearer: []
+      tags:
+      - Event Subscriptions
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

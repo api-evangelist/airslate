@@ -1,0 +1,2761 @@
+openapi: 3.2.0
+info:
+  title: SignNow CRM API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: CRM
+paths:
+  /v2/crm/contacts/{contact_id}/groups:
+    get:
+      operationId: get-v2-crm-contacts-contact-id-groups
+      summary: Get contact groups list by contact
+      description: Allows users to retrieve the list of contact groups stored in the CRM.
+      parameters:
+      - in: path
+        name: contact_id
+        required: true
+        description: Contact ID.
+        schema:
+          type: string
+      - in: query
+        name: per_page
+        required: false
+        description: 'How many search items to view per page. Allowed values: positive integers from 1 to 100.'
+        schema:
+          type: string
+          default: '15'
+      - in: query
+        name: page
+        required: false
+        description: 'How many pages to fit the results in. Allowed values: any positive integer starting from 1.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Success:
+                  data:
+                  - id: 8fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: My group
+                    created_at: 1672242682
+                    updated_at: 1672242682
+                  meta:
+                    pagination:
+                      count: 10
+                      links:
+                        next: https://example.com/v2/crm/contacts/contact_id/groups?per_page=10&page=3
+                        previous: https://example.com/v2/crm/contacts/contact_id/groups?per_page=10&page=1
+                      total: 50
+                      per_page: 15
+                      total_pages: 5
+                      current_page: 2
+        '400':
+          description: '* Request with any of these cases: invalid token of user, expired token of user, empty header, authorization = null, authorization without value
+
+            * Request with incorrect `per_page` parameter type
+
+            * Request with `per_page` less than 0
+
+            * Request with `per_page` more than 100
+
+            * Request with incorrect `page` parameter type
+
+            * Request with `page` less than 0
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+                Incorrect `page` parameter type:
+                  code: 27400904
+                  message: Query parameter `page` must be a digit
+                Request with `page` less than 0:
+                  code: 27400905
+                  message: Query parameter `page` must be more than 0
+                Incorrect `per_page` parameter type:
+                  code: 27400901
+                  message: Query parameter `per_page` must be a digit
+                Request with `per_page` less than 0:
+                  code: 27400902
+                  message: Query parameter `per_page` must be more than 0
+                Request with `per_page` more than 100:
+                  code: 27400903
+                  message: Query parameter `per_page` must be less than or equal 100
+        '404':
+          description: Contact does not exist or does not belong to authorized user
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                'Contact does not exist ':
+                  code: 27404001
+                  message: Contact `contactUniqueId` not found
+      security:
+      - Bearer: []
+      tags:
+      - CRM
+  /v2/crm/groups:
+    post:
+      operationId: post-v2-crm-groups
+      summary: Create contact group
+      description: This endpoint allows users to create the contacts group from your CRM contacts.
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Created:
+                  data:
+                    id: 29XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        '400':
+          description: '* Request with any of these cases:
+
+
+            invalid token of user
+
+            expired token of user
+
+            empty header
+
+            authorization = null
+
+            authorization without value
+
+
+            * Request without group name or with empty group name
+
+            * Group name must be a string
+
+            * Group name contains invalid characters
+
+            * Group name length exceeded'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+                Group name length exceeded:
+                  code: 27405005
+                  message: Group name length must be not more than 40 characters
+                Group name must be a string:
+                  code: 27405003
+                  message: Group name must be a string
+                Group name contains invalid characters:
+                  code: 27405004
+                  message: Group name contains invalid characters
+                Request without group name or empty group name:
+                  code: 27405002
+                  message: Group name is required
+        '405':
+          description: Method Not Allowed
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Not allowed to use this HTTP method:
+                  message: 'The GET method is not supported for this route. Supported methods: DELETE.'
+        '422':
+          description: Group name already exists
+          content:
+            application/json:
+              example:
+                Group name already exists:
+                  code: 27405006
+                  message: Group with such a name already exists
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                name:
+                  type: string
+                  description: The new contact group name.
+              x-examples:
+                Example 1:
+                  name: My client`s group
+        required: true
+      tags:
+      - CRM
+    get:
+      operationId: get-v2-crm-groups
+      summary: Get the list of groups
+      description: Allows users to retrieve the list of groups.
+      parameters:
+      - in: query
+        name: 'filters: id'
+        required: false
+        description: 'Format: `filters=[{"id":{"type":"in","value": ["01XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: 'filters: name'
+        required: false
+        description: 'Format: `filters=[{"name":{"type":"like","value":"My group"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: per_page
+        required: false
+        description: 'How many search items to view per page. Allowed values: positive integers from 1 to 100.'
+        schema:
+          type: string
+      - in: query
+        name: page
+        required: false
+        description: 'How many pages to fit the results in. Allowed values: any positive integer starting from 1.'
+        schema:
+          type: string
+      - in: header
+        name: Accept
+        required: false
+        description: application/json
+        schema:
+          type: string
+          default: application/json
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              example:
+                Success:
+                  data:
+                  - id: 8fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: My group
+                    created_at: 1672242682
+                    updated_at: 1672242682
+                  meta:
+                    pagination:
+                      count: 10
+                      links:
+                        next: https://example.com/v2/crm/groups?per_page=10&page=3
+                        previous: https://example.com/v2/crm/groups?per_page=10&page=1
+                      total: 50
+                      per_page: 15
+                      total_pages: 5
+                      current_page: 2
+        '400':
+          description: '* Request with any of these cases: invalid token of user, expired token of user, empty header, authorization = null, authorization without value
+
+            * Request with incorrect `per_page` parameter type
+
+            * Request with `per_page` less than 0
+
+            * Request with `per_page` more than 100
+
+            * Request with incorrect `page` parameter type
+
+            * Request with `page` less than 0
+
+            * Request without `filter` parameters value or type
+
+            * Request with invalid type of `filter` parameter type
+
+            * Request with invalid expression of `email` filter parameter type
+
+            * Request with invalid type of `email` filter parameter value
+
+            * Request with invalid expression of `name` filter parameter type
+
+            * Request with invalid type of `name` filter parameter value
+
+            * Request with invalid filter format
+
+            * Request with invalid `sort` value
+
+            * Request with invalid `sort` order value
+
+            * Request with invalid `sort` format (expected array)
+
+            * Request with invalid `sort` format (more than one field for sorting)
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Invalid sort value:
+                  code: 27400906
+                  message: The `sort` key must be one of the following values:` created_at`, `full_name`, `company_name`, `email`, `last_interaction_at`
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+                Invalid filter format:
+                  code: 0
+                  message: Wrong filters format.
+                Incorrect `per_page` type:
+                  code: 27400901
+                  message: Query parameter `per_page` must be a digit
+                Invalid `sort` order value:
+                  code: 27400907
+                  message: 'The `sort` value must be one of the following values: `asc, desc`'
+                Incorrect `page` parameter type:
+                  code: 27400904
+                  message: Query parameter `page` must be a digit
+                Request with `page` less than 0:
+                  code: 27400905
+                  message: Query parameter `page` must be more than 0
+                Invalid data type of `type` filter:
+                  code: 27400052
+                  message: Invalid filter format, filter `type` should be string
+                Invalid type of email filter value:
+                  code: 27400054
+                  message: The `email` filter value should be of type string
+                Invalid type of `name` filter value:
+                  code: 27400056
+                  message: The `first_name` filter value should be of type string
+                Request with `per_page` less than 0:
+                  code: 27400902
+                  message: Query parameter `per_page` must be more than 0
+                Invalid sort format (expected array):
+                  code: 0
+                  message: 'Expected array, but got {{ type }}: {{ value }}'
+                Request with `per_page` more than 100:
+                  code: 27400903
+                  message: Query parameter `per_page` must be less than or equal 100
+                Invalid expression of email filter type:
+                  code: 27400053
+                  message: The `email` filter expression should be `=` or `like`
+                Invalid expression of `name` filter type:
+                  code: 27400055
+                  message: The `first_name` filter expression should be equal to `like`
+                Invalid `sort` format (more than one field):
+                  code: 27400908
+                  message: The `sort` must contain only one field for sorting
+                Request without `filter` parameters value or type:
+                  code: 27400051
+                  message: Invalid filter format, filter must have `type` and `value` fields
+        '404':
+          description: Contact does not exist or does not belong to authorized user
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Contact does not exist or does not belong to authorized user:
+                  code: 27404001
+                  message: Contact `contactUniqueId` not found
+      security:
+      - Bearer: []
+      tags:
+      - CRM
+  /v2/crm/groups/{group_id}:
+    get:
+      operationId: get-v2-crm-groups-group-id
+      summary: Get contact group
+      description: Allows users to retrieve properties of the contact group.
+      parameters:
+      - in: path
+        name: group_id
+        required: true
+        description: ID of the contact group.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Success:
+                  data:
+                  - id: 8fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: My group
+                    created_at: 1672242682
+                    updated_at: 1672242682
+                    contacts_count: 5
+        '400':
+          description: 'Request with any of cases:
+
+
+            invalid token of user
+
+            expired token of user
+
+            empty header
+
+            authorization = null
+
+            authorization without value'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+        '404':
+          description: '* Contacts group not found
+
+            * Contacts group does not belong to authorized user'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Contacts group not found:
+                  code: 27405001
+                  message: Group not found
+                Contacts group does not belong to authorized user:
+                  code: 27405001
+                  message: Group not found
+        '405':
+          description: Method Not Allowed
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Not allowed to use this HTTP method:
+                  message: 'The DELETE method is not supported for this route. Supported methods: GET.'
+      security:
+      - Bearer: []
+      tags:
+      - CRM
+    put:
+      operationId: put-v2-crm-groups-group-id
+      summary: Update contact group
+      description: Allows users to rename the contact group.
+      parameters:
+      - in: path
+        name: group_id
+        required: true
+        description: ID of the contact group.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Contacts group has been updated successfully
+        '400':
+          description: '* Request with any of these cases:
+
+
+            invalid token of user
+
+            expired token of user
+
+            empty header
+
+            authorization = null
+
+            authorization without value
+
+
+            * Request without group name or with empty group name
+
+            * Group name must be a string
+
+            * Group name contains invalid characters
+
+            * Group name length exceeded'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+                Group name length exceeded:
+                  code: 27405005
+                  message: Group name length must be not more than 40 characters
+                Group name must be a string:
+                  code: 27405003
+                  message: Group name must be a string
+                Group name contains invalid characters:
+                  code: 27405004
+                  message: Group name contains invalid characters
+                Request without group name or empty group name:
+                  code: 27405002
+                  message: Group name is required
+        '404':
+          description: Contacts group not found or does not belong to authorized user
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                'Contacts group not found ':
+                  code: 27405001
+                  message: Group not found
+        '405':
+          description: Method Not Allowed
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Not allowed to use this HTTP method:
+                  message: 'The GET method is not supported for this route. Supported methods: DELETE.'
+        '422':
+          description: Group name already exists
+          content:
+            application/json:
+              example:
+                Group name already exists:
+                  code: 27405006
+                  message: Group with such a name already exists
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                name:
+                  type: string
+                  description: The updated group name.
+        required: true
+      tags:
+      - CRM
+    delete:
+      operationId: delete-v2-crm-groups-group-id
+      summary: Remove contact group
+      description: Allows users to delete the contact group.
+      parameters:
+      - in: path
+        name: group_id
+        required: true
+        description: ID of the contact group.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: "\t\nContacts group has been deleted successfully"
+        '400':
+          description: 'Request with any of cases:
+
+
+            invalid token of user
+
+            expired token of user
+
+            empty header
+
+            authorization = null
+
+            authorization without value'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+        '404':
+          description: '* Contacts group not found
+
+            * Contacts group does not belong to authorized user'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Contacts group not found:
+                  code: 27405001
+                  message: Group not found
+                Contacts group does not belong to authorized user:
+                  code: 27405001
+                  message: Group not found
+        '405':
+          description: Method Not Allowed
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Not allowed to use this HTTP method:
+                  message: 'The DELETE method is not supported for this route. Supported methods: GET.'
+      security:
+      - Bearer: []
+      tags:
+      - CRM
+  /v2/crm/groups/{group_id}/contacts:
+    get:
+      operationId: get-v2-crm-groups-group-id-contacts
+      summary: Get contacts from group
+      description: Allows users to retrieve contacts from the group.
+      parameters:
+      - in: path
+        name: group_id
+        required: true
+        description: ID of the group
+        schema:
+          type: string
+      - in: query
+        name: sort
+        required: false
+        description: 'Format: `sort[last_interaction_at]="desc"`. Allowed values: `asc` for ascending order, `desc` for descending order.'
+        schema:
+          type: string
+      - in: query
+        name: filter:owners
+        required: false
+        description: 'Format: `filters=[{"owners":{"type":IN,"value":["e6XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"]}}]'
+        schema:
+          type: string
+      - in: query
+        name: filters:shared_with_me
+        required: false
+        description: 'Format: `filters=[{"shared_with_me":{"type":"=","value":"true"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: combined filter with `OR` for email `first_name` and `last_name` and `full_name`
+        required: false
+        description: 'Format: `filters=[{"_OR":[{"email":{"type":"like","value":"%value%"}},{"first_name":{"type":"like","value":"%value%"}},{"last_name":{"type":"like","value":"%value%"}},{"full_name":{"type":"like","value":"%value%"}}]}]`'
+        schema:
+          type: string
+      - in: query
+        name: combined filter with `OR`
+        required: false
+        description: 'Format: `filters=[{"_OR":[{"interaction":{"type":">","value":1652965774}},{"company":{"type":"=","value":"Best company"}}]}]`'
+        schema:
+          type: string
+      - in: query
+        name: combined filter
+        required: false
+        description: 'Format: `filters=[{"interaction":{"type":">","value":1652918152}, "company":{"type":"=","value":"Best company"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:interaction_before
+        required: false
+        description: 'Filter by interaction before. Format: `filters=[{"interaction":{"type":"<","value":1652918152}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:interaction_after
+        required: false
+        description: 'Filter by interaction after. Format: `filters=[{"interaction":{"type":">","value":1652918152}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:not_company
+        required: false
+        description: 'Filter out users without a company. Format: `filters=[{"company":{"type":"!=","value":"Best company"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:company
+        required: false
+        description: 'Filter by company. Format: `filters=[{"company":{"type":"=","value":"Best company"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:full_name
+        required: false
+        description: 'Filter by contact last name. Format: `filters=[{"full_name":{"type":"like","value":"value"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:last_name
+        required: false
+        description: 'Filter by contact last name. Format: `filters=[{"last_name":{"type":"like","value":"value"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filters:first_name
+        required: false
+        description: 'Filter by contact first name. Format: `filters=[{"first_name":{"type":"like","value":"value"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: 'filters:email '
+        required: false
+        description: 'Filter by email. Format: `filters=[{"email":{"type":"=","value":"crm@email.com"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: per_page
+        required: false
+        description: 'How many search items to view per page. Allowed values: positive integers from 1 to 100.'
+        schema:
+          type: string
+      - in: query
+        name: page
+        required: false
+        description: 'How many pages to fit the results in. Allowed values: any positive integer starting from 1.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Example 1:
+                  data:
+                  - id: 8fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    meta:
+                      created_at: 1649926419
+                      updated_at: 1649926419
+                      interacted_at: 1649926419
+                    email: crm@email.com
+                    phone:
+                      number: '1234567890'
+                      country_code: US
+                    address:
+                      city: New York
+                      state: New York
+                      street: 5 Avenue
+                      country: US
+                      zip_code: '0'
+                      apartment: Penthouse
+                    company:
+                      name: SignNow
+                      job_title: PHP Developer
+                    last_name: Doe
+                    first_name: John
+                    description: Best client
+                  meta:
+                    pagination:
+                      count: 10
+                      links:
+                        next: https://https://example.com/v2/crm/groups/group_id/contacts?per_page=10&page=3
+                        previous: https://https://example.com/v2/crm/groups/group_id/contacts?per_page=10&page=1
+                      total: 50
+                      per_page: 15
+                      total_pages: 5
+                      current_page: 2
+        '400':
+          description: '* Request with any of these cases: invalid token of user, expired token of user, empty header, authorization = null, authorization without value
+
+            * Request with incorrect `per_page` parameter type
+
+            * Request with `per_page` less than 0
+
+            * Request with `per_page` more than 100
+
+            * Request with incorrect `page` parameter type
+
+            * Request with `page` less than 0
+
+            * Request without `filter` parameters value or type
+
+            * Request with invalid type of `filter` parameter type
+
+            * Request with invalid expression of `email` filter parameter type
+
+            * Request with invalid type of `email` filter parameter value
+
+            * Request with invalid expression of `first_name` filter parameter type
+
+            * Request with invalid type of `first_name` filter parameter value
+
+            * Request with invalid expression of `last_name` filter parameter type
+
+            * Request with invalid type of `last_name` filter parameter value
+
+            * Request with invalid expression of `full_name` filter parameter type
+
+            * Request with invalid type of `full_name` filter parameter value
+
+            * Request with invalid expression of `company` filter parameter type
+
+            * Request with invalid type of `company` filter parameter value
+
+            * Request with invalid expression of `interaction` filter parameter type
+
+            * Request with invalid type of `interaction` filter parameter value
+
+            * Request with invalid filter format
+
+            * Request with invalid `sort` value
+
+            * Request with invalid `sort` order value
+
+            * Request with invalid `sort` format (expected array)
+
+            * Request with invalid `sort` format (more than one field for sorting)
+
+            * Request with invalid expression of `shared_with_me` filter parameter type
+
+            * Request with invalid type of `shared_with_me` filter parameter type
+
+            * Request with invalid type of `shared_with_me` filter parameter value
+
+            * Request with invalid expression of `owners` filter parameter type
+
+            * Request with invalid type of `owners` filter parameter type
+
+            * Request with invalid type of `owners` filter parameter value'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Invalid sort value:
+                  code: 27400906
+                  message: The `sort` key must be one of the following values:` created_at`, `full_name`, `company_name`, `email`, `last_interaction_at`
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+                Invalid filter format:
+                  code: 0
+                  message: Wrong filters format.
+                Invalid `sort` order value:
+                  code: 27400907
+                  message: 'The `sort` value must be one of the following values: `asc, desc`'
+                Incorrect `page` parameter type:
+                  code: 27400904
+                  message: Query parameter `page` must be a digit
+                Request with `page` less than 0:
+                  code: 27400905
+                  message: Query parameter `page` must be more than 0
+                Invalid type of email filter value:
+                  code: 27400054
+                  message: The `email` filter value should be of type string
+                Invalid type of owners filter type:
+                  code: 274001152
+                  message: The `owners` filter value should be of type string
+                Incorrect `per_page` parameter type:
+                  code: 27400901
+                  message: Query parameter `per_page` must be a digit
+                Invalid type of owners filter value:
+                  code: 27400153
+                  message: The `owners` contains invalid unique_id ("123")
+                Request with `per_page` less than 0:
+                  code: 27400902
+                  message: Query parameter `per_page` must be more than 0
+                Invalid sort format (expected array):
+                  code: 0
+                  message: 'Expected array, but got {{ type }}: {{ value }}'
+                Invalid type of company filter value:
+                  code: 27400062
+                  message: The `company` filter value should be of type string
+                Request with `per_page` more than 100:
+                  code: 27400903
+                  message: Query parameter `per_page` must be less than or equal 100
+                Invalid data type of the `type` filter:
+                  code: 27400052
+                  message: Invalid filter format, filter `type` should be string
+                Invalid expression of email filter type:
+                  code: 27400053
+                  message: The `email` filter expression should be `=` or `like`
+                Invalid type of `full_name` filter value:
+                  code: 27400060
+                  message: The `full_name` filter value should be of type string
+                Invalid type of `last_name` filter value:
+                  code: 27400058
+                  message: The `last_name` filter value should be of type string
+                Invalid type of interaction filter value:
+                  code: 27400064
+                  message: The `interaction` filter value should be of type integer and contain not more than 10 characters
+                Invalid expression of company filter type:
+                  code: 27400061
+                  message: The `company` filter expression should be one of `=`, `!=`, `like
+                Invalid type of `first_name` filter value:
+                  code: 27400056
+                  message: The `first_name` filter value should be of type string
+                Invalid expression of `owners` filter type:
+                  code: 27400151
+                  message: The `owners` filter expression should be `in`
+                Invalid type of shared_with_me filter type:
+                  code: 27400066
+                  message: The `shared_with_me` filter value should be of type string
+                Invalid `sort` format (more than one field):
+                  code: 27400908
+                  message: The `sort` must contain only one field for sorting
+                Invalid expression of full_name filter type:
+                  code: 27400059
+                  message: The `full_name` filter expression should be equal to `like`
+                Invalid type of shared_with_me filter value:
+                  code: 27400067
+                  message: The `shared_with_me` filter value should be `true` or `false`
+                Invalid expression of `last_name` filter type:
+                  code: 27400057
+                  message: The `last_name` filter expression should be equal to `like`
+                Invalid expression of interaction filter type:
+                  code: 27400063
+                  message: The `interaction` filter expression should be `<` or `>`
+                Invalid expression of `first_name` filter type:
+                  code: 27400055
+                  message: The `first_name` filter expression should be equal to `like`
+                Invalid expression of shared_with_me filter type:
+                  code: 27400065
+                  message: The `shared_with_me` filter expression should be `=`
+                Request without `filter` parameters value or type:
+                  code: 27400051
+                  message: Invalid filter format, filter must have `type` and `value` fields
+        '404':
+          description: Contact group not found or does not belong to authorized user
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Contact group not found or does not belong to authorized user:
+                  code: 27404001
+                  message: Contact `contactUniqueId` not found
+      security:
+      - Bearer: []
+      tags:
+      - CRM
+  /v2/crm/groups/{group_id}/contacts/{contact_id}:
+    put:
+      operationId: put-v2-crm-groups-group-id-contacts-contact-id
+      summary: Add contact to group
+      description: Allows users to add contact to the group.
+      parameters:
+      - in: path
+        name: contact_id
+        required: true
+        description: ID of the contact.
+        schema:
+          type: string
+      - in: path
+        name: group_id
+        required: true
+        description: ID of the contact group.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Contact successfully added to group
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: '* Request with any of these cases:
+
+
+            invalid token of user
+
+            expired token of user
+
+            empty header
+
+            authorization = null
+
+            authorization without value'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+        '404':
+          description: '* Contacts group not found or does not belong to authorized user
+
+            * Contact does not exist or does not belong to authorized user
+
+            * Contact does not exist or does not belong to authorized user 2'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                'Contact does not exist ':
+                  code: 27404001
+                  message: Contact `contactUniqueId` not found
+                Contact does not exist 2:
+                  code: 27404001
+                  message: Contact `contactUniqueId` not found
+                'Contacts group not found ':
+                  code: 27405001
+                  message: Group not found
+        '405':
+          description: Method Not Allowed
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Not allowed to use this HTTP method:
+                  message: 'The GET method is not supported for this route. Supported methods: DELETE.'
+      security:
+      - Bearer: []
+      tags:
+      - CRM
+    delete:
+      operationId: delete-v2-crm-groups-group-id-contacts-contact-id
+      summary: Remove contact from group
+      description: Allows users to delete the contact from the group.
+      parameters:
+      - in: path
+        name: contact_id
+        required: true
+        description: ID of the contact.
+        schema:
+          type: string
+      - in: path
+        name: group_id
+        required: true
+        description: ID of the contact group.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Contact successfully deleted from group
+        '400':
+          description: '* Request with any of these cases:
+
+
+            invalid token of user
+
+            expired token of user
+
+            empty header
+
+            authorization = null
+
+            authorization without value'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+        '404':
+          description: '* Contacts group not found or does not belong to authorized user
+
+            * Contact does not exist or does not belong to authorized user
+
+            * Contact does not exist or does not belong to authorized user or does not exist in group
+
+            * Contact does not exist in group'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                'Contact does not exist ':
+                  code: 27404001
+                  message: Contact `contactUniqueId` not found
+                Contact does not exist 2:
+                  code: 27404001
+                  message: Contact `contactUniqueId` not found
+                Contacts group not found:
+                  code: 27405001
+                  message: Group not found
+                Contact does not exist in group:
+                  code: 27405007
+                  message: Contact not found in current group
+        '405':
+          description: Method Not Allowed
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Not allowed to use this HTTP method:
+                  message: 'The GET method is not supported for this route. Supported methods: DELETE.'
+      security:
+      - Bearer: []
+      tags:
+      - CRM
+  /v2/crm/contacts:
+    post:
+      operationId: post-v2-crm-contacts
+      summary: Create CRM contact
+      description: Creates a new CRM contact object.
+      responses:
+        '201':
+          description: Contact has been created successfully
+          content:
+            application/json:
+              example:
+                Contact created successfully:
+                  id: c8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        '400':
+          description: '* Request with any of cases: invalid token, expired token, empty header, authorization = null, authorization without value
+
+            * Request with incorrect body parameters, see examples
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+                Invalid email address:
+                  code: 27400002
+                  message: Invalid email
+                Field `number` not a string:
+                  code: 27400003
+                  message: Field `number` must be a string
+                Field `number` length limits:
+                  code: 27400004
+                  message: Field `number` must be 10 or 15 characters
+                The `email` field is missing:
+                  code: 27400001
+                  message: The `email` field is required
+                Field `city` must be a string:
+                  code: 27400021
+                  message: Field `city` must be a string
+                Field `name` must be a string:
+                  code: 27400011
+                  message: Field `name` must be a string
+                Field `state` must be a string:
+                  code: 27400023
+                  message: Field `state` must be a string
+                The `city` field length limits:
+                  code: 27400022
+                  message: The `city` field length must not be more than 128 characters
+                The `name` field length limits:
+                  code: 27400012
+                  message: The `name` field length must not be more than 128 characters
+                Field `street` must be a string:
+                  code: 27400017
+                  message: Field `street` must be a string
+                The `state` field length limits:
+                  code: 27400024
+                  message: The `state` field length must not be more than 128 characters
+                Field `country` must be a string:
+                  code: 27400015
+                  message: Field `country` must be a string
+                The `street` field length limits:
+                  code: 27400018
+                  message: The `street` field length must not be more than 255 characters
+                Field `zip_code` must be a string:
+                  code: 27400025
+                  message: Field `zip_code` must be a string
+                The `country` field length limits:
+                  code: 27400016
+                  message: The `country` field length must not be more than 2 characters
+                Field `apartment` must be a string:
+                  code: 27400019
+                  message: Field `apartment` must be a string
+                Field `job_title` must be a string:
+                  code: 27400013
+                  message: Field `job_title` must be a string
+                Field `last_name` must be a string:
+                  code: 27400007
+                  message: Field `last_name` must be a string
+                The `zip_code` field length limits:
+                  code: 27400026
+                  message: The `zip_code` field length must not be more than 10 characters
+                Field `first_name` must be a string:
+                  code: 27400005
+                  message: Field `first_name` must be a string
+                The `apartment` field length limits:
+                  code: 27400020
+                  message: The `apartment` field length must not be more than 255 characters
+                The `job_title` field length limits:
+                  code: 27400014
+                  message: The `job_title` field length must not be more than 128 characters
+                The `last_name` field length limits:
+                  code: 27400008
+                  message: The `last_name` field length must not be more than 128 characters
+                Field `description` must be a string:
+                  code: 27400028
+                  message: Field `description` must be a string
+                The `first_name` field length limits:
+                  code: 27400006
+                  message: The `first_name` field length must not be more than 128 characters
+                Field `country_code` must be a string:
+                  code: 27400009
+                  message: Field `country_code` must be a string
+                The `description` field length limits:
+                  code: 27400029
+                  message: The `description` field length must not be more than 408 characters
+                The `city` contains invalid characters:
+                  code: 27400036
+                  message: The `city` field contains invalid characters
+                The `name` contains invalid characters:
+                  code: 27400033
+                  message: The `name` field contains invalid characters
+                The `state` contains invalid characters:
+                  code: 27400039
+                  message: The `state` field contains invalid characters
+                The `street` contains invalid characters:
+                  code: 27400037
+                  message: The `street` field contains invalid characters
+                The `country` contains invalid characters:
+                  code: 27400035
+                  message: The `country` field contains invalid characters
+                The `apartment` contains invalid characters:
+                  code: 27400038
+                  message: The `apartment` field contains invalid characters
+                The `job_title` contains invalid characters:
+                  code: 27400034
+                  message: The `job_title` field contains invalid characters
+                The `last_name` contains invalid characters:
+                  code: 27400031
+                  message: The `last_name` field contains invalid characters
+                The `first_name` contains invalid characters:
+                  code: 27400030
+                  message: The `first_name` field contains invalid characters
+                The `phone_country_code` field length limits:
+                  code: 27400010
+                  message: The `phone_country_code` field length must be 2 characters
+                The `country` field should be with `zip_code`:
+                  code: 27400027
+                  message: The `country` field should be provided when provide `zip_code`
+                The `description` contains invalid characters:
+                  code: 27400032
+                  message: The `description` field contains invalid characters
+                The `country_code` contains invalid characters:
+                  code: 27400040
+                  message: The `country_code` field contains invalid characters
+        '422':
+          description: '* User already has a contact with this email
+
+            * Zip code does not match the country
+
+            * Invalid country name provided
+
+            * Invalid state name provided. Only for United States
+
+            * Invalid phone country code provided'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Invalid country name provided:
+                  code: 27422003
+                  message: Invalid country
+                Invalid phone country code provided:
+                  code: 27422005
+                  message: Invalid country_code
+                Zip code does not match the country:
+                  code: 27422002
+                  message: Unsupported zip_code
+                Invalid state name. Only for United States:
+                  code: 27422004
+                  message: Invalid state
+                User already has a contact with this email:
+                  code: 27422001
+                  message: Contact already exists
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              properties:
+                email:
+                  type: string
+                  description: The new contact email address.
+                phone:
+                  type: object
+                  properties:
+                    number:
+                      type: string
+                      description: Contact phone number. Must be 10 or 16 characters.
+                    country_code:
+                      type: string
+                      description: Contact country code. Must be 2 characters.
+                  description: Object that holds details of the phone number.
+                address:
+                  type: object
+                  properties:
+                    city:
+                      type: string
+                      description: The city where the contact is located. Maximum 128 characters.
+                    state:
+                      type: string
+                      description: The state where the contact is located (only for United States). Maximum 128 characters.
+                    street:
+                      type: string
+                      description: The street where the contact is located. Maximum 255 characters.
+                    country:
+                      type: string
+                      description: The country where the contact is located. Required when `zip_code` parameters is specified.
+                    zip_code:
+                      type: string
+                      description: Zip code of the area where the contact is located. Maximum 10 characters.
+                    apartment:
+                      type: string
+                      description: The appartment office where the contact is located. Maximum 255 characters.
+                  description: Object that holds details about the contact address.
+                company:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: The name of the company. Maximum 128 characters.
+                    job_title:
+                      type: string
+                      description: Job title of the contact in this company. Maximum 128 characters.
+                  description: Object that holds details about the company that this contact represents.
+                last_name:
+                  type: string
+                  description: The new contact last name. Maximum 128 characters.
+                first_name:
+                  type: string
+                  description: The new contact first name. Maximum 128 characters.
+                description:
+                  type: string
+                  description: Contact description. Maximum 408 characters.
+              x-examples:
+                Example 1:
+                  email: example@mail.com
+                  phone:
+                    number: '3333333333'
+                    country_code: US
+                  address:
+                    city: New york
+                    state: New York
+                    street: 5 avenue, 17
+                    country: US
+                    zip_code: '11111'
+                    apartment: '26'
+                  company:
+                    name: Marvel company
+                    job_title: CEO
+                  last_name: contact last name
+                  first_name: contact name
+                  description: Any details about this person
+        required: true
+      tags:
+      - CRM
+    get:
+      operationId: get-v2-crm-contacts
+      summary: Get the list of CRM contacts
+      description: Retrieve the list of your CRM contacts.
+      parameters:
+      - in: query
+        name: sort
+        required: false
+        description: 'Default value: `sort[last_interaction_at] = ''desc''`. Allowed values: `asc` - ascending order.; `desc` - descending order.'
+        schema:
+          type: string
+      - in: query
+        name: 'filters: owners'
+        required: false
+        description: 'Format: `filters=[{"owners":{"type":"IN","value":["e6XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"]}}]'
+        schema:
+          type: string
+      - in: query
+        name: 'filters: shared with me'
+        required: false
+        description: 'Format: `filters=[{"shared_with_me":{"type":"=","value":"true"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: 'filters: combined filter with `OR` for `email`, `first_name`, `last_name`, and `full_name`'
+        required: false
+        description: 'Format: `filters=[{"_OR":[{"email":{"type":"like","value":"%value%"}},{"first_name":{"type":"like","value":"%value%"}},{"last_name":{"type":"like","value":"%value%"}},{"full_name":{"type":"like","value":"%value%"}}]}]`'
+        schema:
+          type: string
+      - in: query
+        name: 'filters: combined filter with `OR`'
+        required: false
+        description: 'Format: `filters=[{"_OR":[{"interaction":{"type":">","value":1652965774}},{"company":{"type":"=","value":"The best company"}}]}]`'
+        schema:
+          type: string
+      - in: query
+        name: 'filters: combined filter'
+        required: false
+        description: 'Format: `filters=[{"interaction":{"type":">","value":1652918152}, "company":{"type":"=","value":"Best company"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: 'filters: interaction before'
+        required: false
+        description: 'Format: `filters=[{"interaction":{"type":"<","value":1652918152}}]`'
+        schema:
+          type: string
+      - in: query
+        name: 'filters: interaction after'
+        required: false
+        description: 'Format: `filters=[{"interaction":{"type":">","value":1652918152}}]`'
+        schema:
+          type: string
+      - in: query
+        name: 'filters: not company'
+        required: false
+        description: 'Format: `filters=[{"company":{"type":"!=","value":"the best company"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: 'filters: company'
+        required: false
+        description: 'Format: `filters=[{"company":{"type":"=","value":"The best company"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: 'filters: full_name'
+        required: false
+        description: 'Format: `filters=[{"full_name":{"type":"like","value":"value"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: 'filters: last_name'
+        required: false
+        description: 'Format: `filters=[{"last_name":{"type":"like","value":"value"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: 'filters: first_name'
+        required: false
+        description: 'Format: `filters=[{"first_name":{"type":"like","value":"value"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: 'filters: email'
+        required: false
+        description: 'Format: `filters=[{"email":{"type":"=","value":"crm@email.com"}}]`'
+        schema:
+          type: string
+      - in: query
+        name: per_page
+        required: false
+        description: 'How many search items to view per page. Allowed values: positive integers from 1 to 100.'
+        schema:
+          type: integer
+      - in: query
+        name: page
+        required: false
+        description: 'How many pages to fit the results in. Allowed values: any positive integer starting from 1.'
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                Successfull response:
+                  data:
+                  - id: 8fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    meta:
+                      created_at: 1649926419
+                      updated_at: 1649926419
+                      interacted_at: 1649926419
+                    email: crm@example.com
+                    phone:
+                      number: '1234567890'
+                      country_code: US
+                    address:
+                      city: New York
+                      state: New York
+                      street: 5 Avenue
+                      country: US
+                      zip_code: '0'
+                      apartment: Penthouse
+                    company:
+                      name: Sample name
+                      job_title: PHP Developer
+                    last_name: Doe
+                    first_name: John
+                    description: Best client
+                  meta:
+                    pagination:
+                      count: 10
+                      links:
+                        next: https://example.com/v2/crm/contacts?per_page=10&page=3
+                        previous: https://example.com/v2/crm/contacts?per_page=10&page=1
+                      total: 50
+                      per_page: 15
+                      total_pages: 5
+                      current_page: 2
+        '400':
+          description: '* Request with any of cases: invalid token, expired token, empty header, authorization = null, authorization without value
+
+            * Request with incorrect per_page parameter type
+
+            * Request with incorrect per_page parameter value
+
+            * Request with incorrect per_page parameter value 2
+
+            * Request with incorrect page parameter type
+
+            * Request with incorrect page parameter value
+
+            * Request without filter parameters value or type
+
+            * Request with invalid type of filter parameter type
+
+            * Request with invalid expression of email filter parameter type
+
+            * Request with invalid type of email filter parameter value
+
+            * Request with invalid expression of first_name filter parameter type
+
+            * Request with invalid type of first_name filter parameter value
+
+            * Request with invalid expression of last_name filter parameter type
+
+            * Request with invalid type of last_name filter parameter value
+
+            * Request with invalid expression of full_name filter parameter type
+
+            * Request with invalid type of full_name filter parameter value
+
+            * Request with invalid expression of company filter parameter type
+
+            * Request with invalid type of company filter parameter value
+
+            * Request with invalid expression of interaction filter parameter type
+
+            * Request with invalid type of interaction filter parameter value
+
+            * Request with invalid filter format
+
+            * Request with invalid sort value
+
+            * Request with invalid sort direction value
+
+            * Request with invalid sort format
+
+            * Request with invalid sort format 2
+
+            * Request with invalid expression of shared_with_me filter parameter type
+
+            * Request with invalid type of shared_with_me filter parameter type
+
+            * Request with invalid type of shared_with_me filter parameter value
+
+            * Request with invalid expression of owners filter parameter type
+
+            * Request with invalid type of owners filter parameter type
+
+            * Request with invalid type of owners filter parameter value'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Invalid sort value:
+                  code: 27400906
+                  message: The `sort` key must be one of the following values:` created_at`, `full_name`, `company_name`, `email`, `last_interaction_at`
+                Invalid sort format:
+                  code: 0
+                  message: 'Expected array, but got {{ type }}: {{ value }}'
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+                Invalid filter format:
+                  code: 0
+                  message: Wrong filters format.
+                Invalid sort format 2:
+                  code: 27400908
+                  message: The `sort` must contain only one field for sorting
+                Invalid sort direction value:
+                  code: 27400907
+                  message: 'The `sort` value must be one of the following values: `asc, desc`'
+                Incorrect `page` parameter type:
+                  code: 27400904
+                  message: Query parameter `page` must be a digit
+                Incorrect `page` parameter value:
+                  code: 27400905
+                  message: Query parameter `page` must be more than 0
+                Invalid type of email filter value:
+                  code: 27400054
+                  message: The `email` filter value should be of type string
+                Invalid type of owners filter type:
+                  code: 274001152
+                  message: The `owners` filter value should be of type string
+                Incorrect `per_page` parameter type:
+                  code: 27400901
+                  message: Query parameter `per_page` must be a digit
+                'Invalid expression of email filter ':
+                  code: 27400053
+                  message: The `email` filter expression should be `=` or `like`
+                Invalid type of owners filter value:
+                  code: 27400153
+                  message: The `owners` contains invalid unique_id ("123")
+                Incorrect `per_page` parameter value:
+                  code: 27400902
+                  message: Query parameter `per_page` must be more than 0
+                Invalid type of company filter value:
+                  code: 27400062
+                  message: The `company` filter value should be of type string
+                Incorrect `per_page` parameter value 2:
+                  code: 27400903
+                  message: Query parameter `per_page` must be less than or equal 100
+                Invalid type of full_name filter value:
+                  code: 27400060
+                  message: The `full_name` filter value should be of type string
+                Invalid type of last_name filter value:
+                  code: 27400058
+                  message: The `last_name` filter value should be of type string
+                'Invalid data type of the `type` filter ':
+                  code: 27400052
+                  message: Invalid filter format, filter `type` should be string
+                Invalid type of first_name filter value:
+                  code: 27400056
+                  message: The `first_name` filter value should be of type string
+                'Invalid expression of first_name filter ':
+                  code: 27400055
+                  message: The `first_name` filter expression should be equal to `like`
+                Invalid expression of owners filter type:
+                  code: 27400151
+                  message: The `owners` filter expression should be `in`
+                Invalid type of interaction filter value:
+                  code: 27400064
+                  message: The `interaction` filter value should be of type integer and contain not more than 10 characters
+                Invalid expression of company filter type:
+                  code: 27400061
+                  message: The `company` filter expression should be one of `=`, `!=`, `like
+                Invalid type of shared_with_me filter type:
+                  code: 27400066
+                  message: The `shared_with_me` filter value should be of type string
+                Invalid expression of full_name filter type:
+                  code: 27400059
+                  message: The `full_name` filter expression should be equal to `like`
+                Invalid expression of last_name filter type:
+                  code: 27400057
+                  message: The `last_name` filter expression should be equal to `like`
+                Invalid type of shared_with_me filter value:
+                  code: 27400067
+                  message: The `shared_with_me` filter value should be `true` or `false`
+                Invalid expression of interaction filter type:
+                  code: 27400063
+                  message: The `interaction` filter expression should be `<` or `>`
+                Request without filter parameters value or type:
+                  code: 27400051
+                  message: Invalid filter format, filter must have `type` and `value` fields
+                Invalid expression of shared_with_me filter type:
+                  code: 27400065
+                  message: The `shared_with_me` filter expression should be `=`
+      security:
+      - Bearer: []
+      tags:
+      - CRM
+  /v2/crm/contacts/{contact_id}:
+    get:
+      operationId: get-v2-crm-contacts-contact-id
+      summary: Get CRM contact info
+      description: Retrieve details of a specific CRM Contact by ID.
+      parameters:
+      - in: path
+        name: contact_id
+        required: true
+        description: The ID of the CRM contact.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfull response
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Successfull response:
+                  data:
+                    id: 8fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    meta:
+                      created_at: 1649926419
+                      updated_at: 1649926419
+                      interacted_at: 1649926419
+                    email: crm@example.com
+                    phone:
+                      number: '1234567890'
+                      country_code: US
+                    address:
+                      city: New York
+                      state: New York
+                      street: 5 Avenue
+                      country: US
+                      zip_code: '0'
+                      apartment: Penthouse
+                    company:
+                      name: Sample Name
+                      job_title: PHP Developer
+                    last_name: Doe
+                    first_name: John
+                    description: Best client
+        '400':
+          description: 'Request with any of cases:
+
+
+            invalid token of user
+
+            expired token of user
+
+            empty header
+
+            authorization = null
+
+            authorization without value'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+        '404':
+          description: '* Request to contact that doesn`t belong to user or was deleted
+
+            * Request with wrong contact id in path parameter'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Incorrect contact id in path parameter:
+                  code: 404
+                  message: 'Unable to find a route to match the URI: v2/crm/contacts/6dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+                Contact doesn`t belong to user or was deleted:
+                  code: 27404001
+                  message: Contact 8fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX not found
+      security:
+      - Bearer: []
+      tags:
+      - CRM
+    put:
+      operationId: put-v2-crm-contacts-contact-id
+      summary: Update a CRM contact
+      description: Updates details in the CRM Contact.
+      parameters:
+      - in: path
+        name: contact_id
+        required: true
+        description: The ID of the CRM contact.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Contact has been updated successfully
+        '400':
+          description: '* Request with any of cases: invalid token, expired token, empty header, authorization = null, authorization without value
+
+            * Request with incorrect body parameters, see examples
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+                Field `number` limits:
+                  code: 27400004
+                  message: Field `number` must be 10 or 15 characters
+                Invalid email address:
+                  code: 27400002
+                  message: Invalid email
+                Field `number` not a string:
+                  code: 27400003
+                  message: Field `number` must be a string
+                The `email` field is missing:
+                  code: 27400001
+                  message: The `email` field is required
+                Field `city` must be a string:
+                  code: 27400021
+                  message: Field `city` must be a string
+                Field `name` must be a string:
+                  code: 27400011
+                  message: Field `name` must be a string
+                Field `state` must be a string:
+                  code: 27400023
+                  message: Field `state` must be a string
+                The `city` field length limits:
+                  code: 27400022
+                  message: The `city` field length must not be more than 128 characters
+                The `name` field length limits:
+                  code: 27400012
+                  message: The `name` field length must not be more than 128 characters
+                Field `street` must be a string:
+                  code: 27400017
+                  message: Field `street` must be a string
+                The `state` field length limits:
+                  code: 27400024
+                  message: The `state` field length must not be more than 128 characters
+                Field `country` must be a string:
+                  code: 27400015
+                  message: Field `country` must be a string
+                The `street` field length limits:
+                  code: 27400018
+                  message: The `street` field length must not be more than 255 characters
+                Field `zip_code` must be a string:
+                  code: 27400025
+                  message: Field `zip_code` must be a string
+                The `country` field length limits:
+                  code: 27400016
+                  message: The `country` field length must not be more than 2 characters
+                Field `apartment` must be a string:
+                  code: 27400019
+                  message: Field `apartment` must be a string
+                Field `job_title` must be a string:
+                  code: 27400013
+                  message: Field `job_title` must be a string
+                Field `last_name` must be a string:
+                  code: 27400007
+                  message: Field `last_name` must be a string
+                The `zip_code` field length limits:
+                  code: 27400026
+                  message: The `zip_code` field length must not be more than 10 characters
+                Field `first_name` must be a string:
+                  code: 27400005
+                  message: Field `first_name` must be a string
+                The `apartment` field length limits:
+                  code: 27400020
+                  message: The `apartment` field length must not be more than 255 characters
+                The `job_title` field length limits:
+                  code: 27400014
+                  message: The `job_title` field length must not be more than 128 characters
+                The `last_name` field length limits:
+                  code: 27400008
+                  message: The `last_name` field length must not be more than 128 characters
+                Field `description` must be a string:
+                  code: 27400028
+                  message: Field `description` must be a string
+                The `first_name` field length limits:
+                  code: 27400006
+                  message: The `first_name` field length must not be more than 128 characters
+                Field `country_code` must be a string:
+                  code: 27400009
+                  message: Field `country_code` must be a string
+                The `description` field length limits:
+                  code: 27400029
+                  message: The `description` field length must not be more than 408 characters
+                The `city` contains invalid characters:
+                  code: 27400036
+                  message: The `city` field contains invalid characters
+                The `name` contains invalid characters:
+                  code: 27400033
+                  message: The `name` field contains invalid characters
+                The `state` contains invalid characters:
+                  code: 27400039
+                  message: The `state` field contains invalid characters
+                The `street` contains invalid characters:
+                  code: 27400037
+                  message: The `street` field contains invalid characters
+                The `country` contains invalid characters:
+                  code: 27400035
+                  message: The `country` field contains invalid characters
+                The `apartment` contains invalid characters:
+                  code: 27400038
+                  message: The `apartment` field contains invalid characters
+                The `job_title` contains invalid characters:
+                  code: 27400034
+                  message: The `job_title` field contains invalid characters
+                The `last_name` contains invalid characters:
+                  code: 27400031
+                  message: The `last_name` field contains invalid characters
+                The `first_name` contains invalid characters:
+                  code: 27400030
+                  message: The `first_name` field contains invalid characters
+                The `phone_country_code` field length limits:
+                  code: 27400010
+                  message: The `phone_country_code` field length must be 2 characters
+                The `country` field should be with `zip_code`:
+                  code: 27400027
+                  message: The `country` field should be provided when provide `zip_code`
+                The `description` contains invalid characters:
+                  code: 27400032
+                  message: The `description` field contains invalid characters
+                The `country_code` contains invalid characters:
+                  code: 27400040
+                  message: The `country_code` field contains invalid characters
+        '404':
+          description: '* No contact found
+
+            * Attempt to edit shared contact'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                No contact found:
+                  code: 27404001
+                  message: Contact `46XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX` not found
+                Attempt to edit shared contact:
+                  code: 27400913
+                  message: You are not allowed to perform this action
+        '422':
+          description: '* User already has a contact with this email
+
+            * Zip code does not match the country
+
+            * Invalid country name provided
+
+            * Invalid state name provided. Only for United States
+
+            * Invalid phone country code provided'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Invalid country name provided:
+                  code: 27422003
+                  message: Invalid country
+                Invalid phone country code provided:
+                  code: 27422005
+                  message: Invalid country_code
+                Zip code does not match the country:
+                  code: 27422002
+                  message: Unsupported zip_code
+                Invalid state name. Only for United States:
+                  code: 27422004
+                  message: Invalid state
+                User already has a contact with this email:
+                  code: 27422001
+                  message: Contact already exists
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              properties:
+                email:
+                  type: string
+                  description: The new contact email address.
+                phone:
+                  type: object
+                  properties:
+                    number:
+                      type: string
+                      description: Contact phone number. Must be 10 or 16 characters.
+                    country_code:
+                      type: string
+                      description: Contact country code. Must be 2 characters.
+                  description: Object that holds details of the phone number.
+                address:
+                  type: object
+                  properties:
+                    city:
+                      type: string
+                      description: The city where the contact is located. Maximum 128 characters.
+                    state:
+                      type: string
+                      description: The state where the contact is located (only for United States). Maximum 128 characters.
+                    street:
+                      type: string
+                      description: The street where the contact is located. Maximum 255 characters.
+                    country:
+                      type: string
+                      description: The country where the contact is located. Required when `zip_code` parameters is specified.
+                    zip_code:
+                      type: string
+                      description: Zip code of the area where the contact is located. Maximum 10 characters.
+                    apartment:
+                      type: string
+                      description: The appartment office where the contact is located. Maximum 255 characters.
+                  description: Object that holds details about the contact address.
+                company:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: The name of the company. Maximum 128 characters.
+                    job_title:
+                      type: string
+                      description: Job title of the contact in this company. Maximum 128 characters.
+                  description: Object that holds details about the company that this contact represents.
+                last_name:
+                  type: string
+                  description: The new contact last name. Maximum 128 characters.
+                first_name:
+                  type: string
+                  description: The new contact first name. Maximum 128 characters.
+                description:
+                  type: string
+                  description: Contact description. Maximum 408 characters.
+              x-examples:
+                Example 1:
+                  email: example@mail.com
+                  phone:
+                    number: '3333333333'
+                    country_code: US
+                  address:
+                    city: New york
+                    state: New York
+                    street: 5 avenue, 17
+                    country: US
+                    zip_code: '11111'
+                    apartment: '26'
+                  company:
+                    name: Marvel company
+                    job_title: CEO
+                  last_name: contact last name
+                  first_name: contact name
+                  description: Any details about this person
+        required: true
+      tags:
+      - CRM
+    delete:
+      operationId: delete-v2-crm-contacts-contact-id
+      summary: Remove a CRM contact
+      description: Deletes a CRM Contact.
+      parameters:
+      - in: path
+        name: contact_id
+        required: true
+        description: The ID of the CRM contact.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Contact has been deleted successfully.
+        '400':
+          description: 'Request with any of cases:
+
+
+            invalid token of user
+
+            expired token of user
+
+            empty header
+
+            authorization = null
+
+            authorization without value'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+        '404':
+          description: '* No contact found or Contact does not belong to authorized user or Contact is already deleted
+
+            * Request with wrong contact id in path parameter'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                'No contact found ':
+                  code: 27404001
+                  message: Contact 8fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX not found
+      security:
+      - Bearer: []
+      tags:
+      - CRM
+  /v2/crm/contacts/import:
+    post:
+      operationId: post-v2-crm-contacts-import
+      summary: Import CRM contacts in bulk
+      description: 'This endpoint allows users to import contacts from a CSV file into the authenticated user account. Users can map CSV columns to contact fields and configure how duplicate contacts are handled.
+
+
+        **Notes:**
+
+        * The CSV file must contain a header row. Data rows start from line 2.
+
+        * Rows where the email value is missing or invalid are skipped and reported under `failed`.
+
+        * Rows with invalid non-email fields (phone, address, etc.) are still created with those fields set to `null` and reported as `created_partial`.
+
+        * CSV separator is auto-detected from the header row (supported: `,`, `;`, `\t`, `|`).
+
+        * Phone country codes are auto-detected from the phone number format (e.g., `+1` → `US`, `+44` → `GB`).
+
+        * If `duplicates` is not specified and duplicate contacts (by email) already exist, a `409 Conflict` is returned.
+
+
+        **Sample CSV**
+
+
+        ```csv
+
+        First Name,Last Name,Email,Phone,Company Name,Job Title,Country,Street Address,Apartment,City,State,ZIP Code,Description
+
+        John,Smith,john@example.com,5551234567,Sample Company,Manager,US,17 Station St,Suite 101,Brookline,Massachusetts,02445,This is a sample contact to demonstrate how the columns should be filled out. Don''t forget to remove this contact before importing your contacts.
+
+        ```
+
+
+        > Values in `mapping[...]` must exactly match the column headers in your CSV (case-sensitive, including spaces and punctuation). Set an optional `mapping[...]` to `null` to skip a field.'
+      responses:
+        '201':
+          description: Contacts imported successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      failed:
+                        type: object
+                        properties:
+                          rows:
+                            type: array
+                            items:
+                              type: integer
+                            description: Row numbers (starting at 2) of failed rows.
+                          count:
+                            type: integer
+                            description: Number of failed rows.
+                        description: Rows that could not be created due to a missing or incorrect email.
+                      created:
+                        type: integer
+                        description: Number of contacts fully created (excludes partially created).
+                      created_partial:
+                        type: object
+                        properties:
+                          rows:
+                            type: array
+                            items:
+                              type: integer
+                          count:
+                            type: integer
+                        description: Contacts created with some non-email fields set to `null` due to validation errors.
+              example:
+                Import succeeded:
+                  data:
+                    failed:
+                      rows:
+                      - 5
+                      - 12
+                      - 27
+                      count: 3
+                    created: 45
+                    created_partial:
+                      rows:
+                      - 8
+                      - 19
+                      count: 2
+        '400':
+          description: '* Missing or incorrect bearer token.
+
+            * Incorrect `mapping` type.
+
+            * The `mapping` is empty.
+
+            * The `file` is missing or larger than 5 MB.
+
+            * Incorrect `file` type.
+
+            * Incorrect file extension.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+              example:
+                Incorrect `file` type:
+                  errors:
+                  - code: 27405153
+                    message: The `file` type is invalid.
+                The `mapping` is empty:
+                  errors:
+                  - code: 27405149
+                    message: The `mapping` value can not be empty.
+                Incorrect `mapping` type:
+                  errors:
+                  - code: 27405148
+                    message: The `mapping` should be of type array.
+                Incorrect file extension:
+                  errors:
+                  - code: 27405155
+                    message: The allowed file extension is .csv.
+                Missing or incorrect bearer token:
+                  errors:
+                  - code: 1537
+                    message: invalid_token
+                The `file` is missing or larger than 5 MB:
+                  errors:
+                  - code: 27405152
+                    message: The `file` is required and maximum allowed file size is 5 MB.
+        '409':
+          description: Returned when the `duplicates` parameter is not set and contacts with matching emails already exist.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+              example:
+                Duplicate contacts found:
+                  errors:
+                  - code: 27405161
+                    message: Duplicate contacts found
+        '422':
+          description: '* Incorrect `mapping` value.
+
+            * Incorrect `duplicates` value.
+
+            * The `file` exceeds 5 MB.
+
+            * The `file` exceeds 3000 lines.
+
+            * The `file` is empty.
+
+            * The email column is missing in the file.
+
+            * Some mapping columns are missing in the file.
+
+            * Unable to import contacts.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+              example:
+                The `file` is empty:
+                  errors:
+                  - code: 27405157
+                    message: File can not be empty
+                The `file` exceeds 5 MB:
+                  errors:
+                  - code: 27405154
+                    message: The maximum allowed file size is 5 MB
+                Incorrect `mapping` value:
+                  errors:
+                  - code: 27405150
+                    message: The `mapping` value is invalid
+                Unable to import contacts:
+                  errors:
+                  - code: 27405160
+                    message: Unable to import contacts. Please, try again later
+                Incorrect `duplicates` value:
+                  errors:
+                  - code: 27405151
+                    message: Duplicates should be ["skip", "replace"]
+                The `file` exceeds 3000 lines:
+                  errors:
+                  - code: 27405156
+                    message: The maximum allowed file size is 3000 lines
+                The email column is missing in the file:
+                  errors:
+                  - code: 27405158
+                    message: Column with email is required
+                Some mapping columns are missing in the file:
+                  errors:
+                  - code: 27405159
+                    message: Columns from mapping are missed in file
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: 'CSV file to import. Maximum size: 5 MB. Maximum rows: 3000 (excluding header).'
+                duplicates:
+                  type: string
+                  enum:
+                  - skip
+                  - replace
+                  default: replace
+                  description: 'Duplicate handling strategy. Allowed values: `skip`, `replace`. If omitted, the request returns `409 Conflict` when contacts with matching emails already exist.'
+                mapping[email]:
+                  type: string
+                  description: 'Maps the contact email to a CSV column. The value is the column header name in your CSV. Required. Email values in the column must be valid and cannot end with `@no.reply`. Example value: `Email`.'
+                mapping[first_name]:
+                  type: string
+                  description: 'Maps the contact first name to a CSV column. The value is the column header name. Maximum 128 characters. Example value: `First Name`.'
+                mapping[last_name]:
+                  type: string
+                  description: 'Maps the contact last name to a CSV column. The value is the column header name. Maximum 128 characters. Example value: `Last Name`.'
+                mapping[description]:
+                  type: string
+                  description: 'Maps the contact description to a CSV column. The value is the column header name. Maximum 408 characters. Example value: `Description`.'
+                mapping[phone]:
+                  type: string
+                  description: 'Maps the contact phone number to a CSV column. The value is the column header name. Phone values must contain 10–15 digits; country code is auto-detected from the format. Example value: `Phone`.'
+                mapping[company][name]:
+                  type: string
+                  description: 'Maps the company name to a CSV column. The value is the column header name. Maximum 128 characters. Example value: `Company Name`.'
+                mapping[company][job_title]:
+                  type: string
+                  description: 'Maps the contact job title to a CSV column. The value is the column header name. Maximum 128 characters. Example value: `Job Title`.'
+                mapping[address][country]:
+                  type: string
+                  description: 'Maps the contact country to a CSV column. The value is the column header name. Country values must use ISO 2-character codes. Required when `mapping[address][zip_code]` is provided. Example value: `Country`.'
+                mapping[address][street]:
+                  type: string
+                  description: 'Maps the street address to a CSV column. The value is the column header name. Maximum 255 characters. Example value: `Street Address`.'
+                mapping[address][apartment]:
+                  type: string
+                  description: 'Maps the apartment / unit to a CSV column. The value is the column header name. Maximum 255 characters. Example value: `Apartment`.'
+                mapping[address][city]:
+                  type: string
+                  description: 'Maps the city to a CSV column. The value is the column header name. Maximum 128 characters. Example value: `City`.'
+                mapping[address][state]:
+                  type: string
+                  description: 'Maps the state to a CSV column. The value is the column header name. United States only. Maximum 128 characters. Example value: `State`.'
+                mapping[address][zip_code]:
+                  type: string
+                  description: 'Maps the zip code to a CSV column. The value is the column header name. Maximum 10 characters. Requires `mapping[address][country]` to be provided. Example value: `ZIP Code`.'
+              required:
+              - file
+              - mapping[email]
+      tags:
+      - CRM
+  /v2/crm/contacts/{contact_id}/users:
+    get:
+      operationId: get-v2-crm-contact-id-users
+      summary: Get users by contact
+      description: Retrieve all users connected by one CRM Contact.
+      parameters:
+      - in: path
+        name: contact_id
+        required: true
+        description: ID of the CRM contact.
+        schema:
+          type: string
+      - in: query
+        name: per_page
+        required: false
+        description: 'How many search items to view per page. Allowed values: positive integers from 1 to 100.'
+        schema:
+          type: string
+      - in: query
+        name: page
+        required: false
+        description: 'How many pages to fit the results in. Allowed values: any positive integer starting from 1.'
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: 'List of users with access to contacts '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                List of users with access to contacts:
+                  data:
+                  - id: feXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: crm_user1@emaildomain.com
+                    contact:
+                      last_name: Doe
+                      first_name: John
+                    permission:
+                      created_at: 1670934578
+                      permission: owner
+                      updated_at: 1670934578
+                  - id: f5XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: crm_user2@emaildomain.com
+                    contact:
+                      last_name: Dow
+                      first_name: Jane
+                    permission:
+                      created_at: 1670934578
+                      permission: owner
+                      updated_at: 1670934578
+                  meta:
+                    pagination:
+                      count: 2
+                      links: {}
+                      total: 2
+                      per_page: 2
+                      total_pages: 1
+                      current_page: 1
+        '400':
+          description: '* Request with any of cases: invalid token, expired token, empty header, authorization = null, authorization without value
+
+            * Request with incorrect per_page parameter type
+
+            * Request with incorrect per_page parameter value
+
+            * Request with incorrect per_page parameter value 2
+
+            * Request with incorrect page parameter type
+
+            * Request with incorrect page parameter value
+
+            * Request with incorrect include name'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+                Incorrect include name:
+                  code: 2740084
+                  message: Include must be `contacts`
+                Incorrect `page` parameter type:
+                  code: 27400904
+                  message: Query parameter `page` must be a digit
+                Incorrect `page` parameter value:
+                  code: 27400905
+                  message: Query parameter `page` must be more than 0
+                Incorrect `per_page` parameter type:
+                  code: 27400901
+                  message: Query parameter `per_page` must be a digit
+                Incorrect `per_page` parameter value:
+                  code: 27400902
+                  message: Query parameter `per_page` must be more than 0
+                Incorrect `per_page` parameter value 2:
+                  code: 27400903
+                  message: Query parameter `per_page` must be less than or equal 100
+      security:
+      - Bearer: []
+      tags:
+      - CRM
+    put:
+      operationId: put-v2-crm-contact-id-users
+      summary: Share contact with other users
+      description: Allows API users to share the CRM contacts.
+      parameters:
+      - in: path
+        name: contact_id
+        required: true
+        description: ID of the CRM contact.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: "\t\nContacts have been shared successfully."
+          content:
+            application/json:
+              example:
+                Contacts have been shared successfully.:
+                  data:
+                  - id: 12XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    item: 0
+                    email: share_to_1@emaildomain.com
+                    permission: view_only
+                  - id: 22XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    item: 1
+                    email: share_to_2@emaildomain.com
+                    permission: view_only
+        '400':
+          description: '* Request with any of cases: invalid token, expired token, empty header, authorization = null, authorization without value
+
+            * Request with invalid body parameters, see examples
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Invalid email:
+                  errors:
+                    code: 27400087
+                    item: 0
+                    message: Invalid email
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+                The `data` field is required:
+                  errors:
+                    code: 27400909
+                    item: 0
+                    message: The `data` field is required
+                The `email` field is required:
+                  errors:
+                    code: 27400086
+                    item: 0
+                    message: The `email` field is required
+                The `permission` field is required:
+                  errors:
+                    code: 27400089
+                    item: 0
+                    message: The `permission` field is required
+                Duplicated emails in the `data` field:
+                  errors:
+                    code: 27400912
+                    item: 0
+                    message: 'There are duplicated emails in the `data` field: {duplicated@emaildomain.com}'
+                The `permission` value should be "view_only":
+                  errors:
+                    code: 27400088
+                    item: 0
+                    message: The `permission` value should be "view_only"
+                The `data` field size must not be more than 100 items:
+                  errors:
+                    code: 27400911
+                    item: 0
+                    message: The `data` field size must not be more than 100 items
+        '422':
+          description: '* Unable to share contact to yourself
+
+            * Unable to share contact to itself'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Unable to share contact to itself:
+                  code: 27422016
+                  message: Unable to share contact to itself
+                Unable to share contact to yourself:
+                  code: 27422007
+                  message: Unable to share contact to yourself
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - data
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - email
+                    - permission
+                    properties:
+                      email:
+                        type: string
+                        description: Email address of the CRM contact that will be shared.
+                      permission:
+                        type: string
+                        description: Must be `view_only`.
+                  description: The object that holds contact items to be shared. Maximum 100 items.
+              x-examples:
+                Example 1:
+                  data:
+                  - email: share_to_1@mail.com
+                    permission: view_only
+                  - email: share_to_2@mail.com
+                    permission: view_only
+        required: true
+      tags:
+      - CRM
+  /v2/crm/contacts/{contact_id}/users/{user_id}:
+    delete:
+      operationId: delete-v2-crm-contacts-contact-id-users-user-id
+      summary: Revoke access to shared contact
+      description: Remove shared contact permissions for a specific user.
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        description: The user ID to revoke access from.
+        schema:
+          type: string
+      - in: path
+        name: contact_id
+        required: true
+        description: The shared CRM Contact ID.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: User contact permission has been removed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: '* Request with any of cases: invalid token, expired token, empty header, authorization = null, authorization without value
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+        '404':
+          description: '* Contact does not exist
+
+            * User from path does not exist'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Contact does not exist:
+                  code: 27404001
+                  message: Contact 22XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX not found
+                User from path does not exist:
+                  code: 27404001
+                  message: User `userUniqueId` not found
+        '422':
+          description: '* User from path does not have any permission to contact
+
+            * User request from and user in the path are the same'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Path user does not have any permission to contact:
+                  code: 27400092
+                  message: User have no permission to contact
+                User from request and user in the path are the same:
+                  code: 27400093
+                  message: Unable to revoke own contact
+      security:
+      - Bearer: []
+      tags:
+      - CRM
+  /v2/crm/users:
+    get:
+      operationId: get-v2-crm-users
+      summary: Get the list of CRM users
+      description: Get the list of CRM users with access to contacts and their permissions.
+      parameters:
+      - in: query
+        name: per_page
+        required: false
+        description: 'How many search items to view per page. Allowed values: positive integers from 1 to 100.'
+        schema:
+          type: integer
+      - in: query
+        name: page
+        required: false
+        description: 'How many pages to fit the results in. Allowed values: any positive integer starting from 1.'
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: 'List of users with access to contacts '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                'List of users with access to contacts ':
+                  data:
+                  - id: feXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: crm_user1@emaildomain.com
+                    contact:
+                      last_name: Now
+                      first_name: Sign
+                    permission:
+                      created_at: 1670934578
+                      permission: owner
+                      updated_at: 1670934578
+                  - id: f5XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: crm_user2@emaildomain.com
+                    contact:
+                      last_name: Doe
+                      first_name: Jane
+                    permission:
+                      created_at: 1670934578
+                      permission: owner
+                      updated_at: 1670934578
+                  meta:
+                    pagination:
+                      count: 2
+                      links: {}
+                      total: 2
+                      per_page: 2
+                      total_pages: 1
+                      current_page: 1
+        '400':
+          description: '* Request with any of cases: invalid token, expired token, empty header, authorization = null, authorization without value
+
+            * Request with incorrect per_page parameter type
+
+            * Request with incorrect per_page parameter value
+
+            * Request with incorrect per_page parameter value 2
+
+            * Request with incorrect page parameter type
+
+            * Request with incorrect page parameter value
+
+            * Request with incorrect include name'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Authorization issues:
+                  code: 1537
+                  message: invalid_token
+                Incorrect include name:
+                  code: 2740084
+                  message: Include must be `contact_names`
+                Incorrect `page` parameter type:
+                  code: 27400904
+                  message: Query parameter `page` must be a digit
+                Incorrect `page` parameter value:
+                  code: 27400905
+                  message: Query parameter `page` must be more than 0
+                Incorrect `per_page` parameter type:
+                  code: 27400901
+                  message: Query parameter `per_page` must be a digit
+                Incorrect `per_page` parameter value:
+                  code: 27400902
+                  message: Query parameter `per_page` must be more than 0
+                Incorrect `per_page` parameter value 2:
+                  code: 27400903
+                  message: Query parameter `per_page` must be less than or equal 100
+      security:
+      - Bearer: []
+      tags:
+      - CRM
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

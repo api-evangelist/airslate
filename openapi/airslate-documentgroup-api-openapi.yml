@@ -1,0 +1,3712 @@
+openapi: 3.2.0
+info:
+  title: SignNow Documentgroup API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Documentgroup
+paths:
+  /documentgroup/{document_group_id}/groupinvite/{invite_id}:
+    get:
+      operationId: get-document-group-invite
+      summary: Get doc group invite
+      description: 'This endpoint returns document group invite information, including the status of each field invite, step and action.
+
+
+        Here is the list of possible invite, action and step statuses:
+
+        - `created`: invite, action, or step has been created but is not waiting to be signed.
+
+        - `pending`: emails have been sent out for this invite action or step and are waiting to be viewed or signed.
+
+        - `fulfilled`: the invite, action, or step has been completed by signing, viewing or approving.
+
+        - `correction`: the step recipient is modifying the invite.
+
+        - `canceled`: the invite or step has been canceled by the recipient.
+
+
+        Possible invite actions are:
+
+        - `view`: The recipient can only review the document without making changes.
+
+        - `sign`: The recipient can sign or fill out the document.
+
+        - `approve`: The recipient can review the document to approve or decline it.'
+      parameters:
+      - in: path
+        name: document_group_id
+        required: true
+        description: ID of the document group.
+        schema:
+          type: string
+      - in: path
+        name: invite_id
+        required: true
+        description: ID of the document group invite.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invite:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: ID of the document group invite.
+                      steps:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: ID of the invite step.
+                            order:
+                              type: integer
+                              description: Position of the step in the signing order, starting at `1`.
+                            status:
+                              type: string
+                              description: Status of the step. One of `created`, `pending`, `fulfilled`, `correction`, or `canceled`.
+                            actions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  email:
+                                    type:
+                                    - string
+                                    - 'null'
+                                    description: Email address of the recipient. `null` when the recipient is invited by SMS (see `signer_phone_invite`).
+                                  action:
+                                    type: string
+                                    description: Action assigned to the recipient. One of `sign`, `approve`, or `view`.
+                                  status:
+                                    type: string
+                                    description: Status of the action. One of `created`, `pending`, `fulfilled`, `correction`, or `canceled`.
+                                  role_name:
+                                    type: string
+                                    description: Name of the recipient's role in the document.
+                                  document_id:
+                                    type: string
+                                    description: ID of the document within the document group this action applies to.
+                                  signer_phone_invite:
+                                    type:
+                                    - string
+                                    - 'null'
+                                    description: Phone number of the recipient invited by SMS, in E.164 format (`+` followed by up to 13 digits). `null` when the recipient is invited by email. Use this value as `phone_invite_to_update` when calling [Update doc group invite](/docs/doc-group-field-invite/operations/update-document-group-invite).
+                              description: Recipients and the actions assigned to them within this step.
+                        description: Ordered list of invite steps in the document group invite.
+                      status:
+                        type: string
+                        description: Status of the document group invite. One of `created`, `pending`, `fulfilled`, `correction`, or `canceled`.
+                    description: The document group invite.
+                x-examples:
+                  Success:
+                    invite:
+                      id: b1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      steps:
+                      - id: abXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        order: 1
+                        status: pending
+                        actions:
+                        - email: signer1@email.com
+                          action: sign
+                          status: pending
+                          role_name: Signer 1
+                          document_id: ddXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          signer_phone_invite: null
+                        - action: sign
+                          status: pending
+                          role_name: Signer 1
+                          document_id: ddXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          email_group:
+                            id: unique_id_of_the_group
+                            name: group name
+                          signer_phone_invite: null
+                        - email: signer2@email.com
+                          action: sign
+                          status: pending
+                          role_name: Signer 2
+                          document_id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          signer_phone_invite: null
+                        - email: null
+                          action: sign
+                          status: pending
+                          role_name: Signer 2 (SMS)
+                          document_id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          signer_phone_invite: '+14075985199'
+                      - id: deXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        order: 2
+                        status: created
+                        actions:
+                        - email: signer3@email.com
+                          action: sign
+                          status: created
+                          role_name: Signer 3
+                          document_id: ddXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          signer_phone_invite: null
+                        - email: signer4@email.com
+                          action: sign
+                          status: created
+                          role_name: Signer 4
+                          document_id: ddXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          signer_phone_invite: null
+                      - id: c1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        order: 3
+                        status: created
+                        actions:
+                        - email: signer5@email.com
+                          action: sign
+                          status: created
+                          role_name: Signer 5
+                          document_id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          signer_phone_invite: null
+                        - email: signer6@email.com
+                          action: sign
+                          status: created
+                          role_name: Signer 6
+                          document_id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          signer_phone_invite: null
+                      status: pending
+              example:
+                Success:
+                  invite:
+                    id: b1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    steps:
+                    - id: abXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      order: 1
+                      status: pending
+                      actions:
+                      - email: signer1@email.com
+                        action: sign
+                        status: pending
+                        role_name: Signer 1
+                        document_id: ddXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        signer_phone_invite: null
+                      - action: sign
+                        status: pending
+                        role_name: Signer 1
+                        document_id: ddXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        email_group:
+                          id: unique_id_of_the_group
+                          name: group name
+                        signer_phone_invite: null
+                      - email: signer2@email.com
+                        action: sign
+                        status: pending
+                        role_name: Signer 2
+                        document_id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        signer_phone_invite: null
+                      - email: null
+                        action: sign
+                        status: pending
+                        role_name: Signer 2 (SMS)
+                        document_id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        signer_phone_invite: '+14075985199'
+                    - id: deXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      order: 2
+                      status: created
+                      actions:
+                      - email: signer3@email.com
+                        action: sign
+                        status: created
+                        role_name: Signer 3
+                        document_id: ddXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        signer_phone_invite: null
+                      - email: signer4@email.com
+                        action: sign
+                        status: created
+                        role_name: Signer 4
+                        document_id: ddXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        signer_phone_invite: null
+                    - id: c1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      order: 3
+                      status: created
+                      actions:
+                      - email: signer5@email.com
+                        action: sign
+                        status: created
+                        role_name: Signer 5
+                        document_id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        signer_phone_invite: null
+                      - email: signer6@email.com
+                        action: sign
+                        status: created
+                        role_name: Signer 6
+                        document_id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        signer_phone_invite: null
+                    status: pending
+        '400':
+          description: '* Incorrect group invite id in the endpoint
+
+            * Incorrect group id in the endpoint'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 65582
+                      message: unable to find document group invite of f1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+              example:
+                Example 1:
+                  errors:
+                  - code: 65582
+                    message: unable to find document group invite of f1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Incorrect group id in the endpoint:
+                  errors:
+                  - code: 65582
+                    message: unable to find document group
+                Incorrect group invite id in the endpoint:
+                  errors:
+                  - code: 65582
+                    message: unable to find document group invite of f1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      security:
+      - Bearer: []
+      tags:
+      - Documentgroup
+  /documentgroup/{document_group_id}/groupinvite/{invite_id}/invitestep/{step_id}/emails:
+    get:
+      operationId: get-emails-invite-step
+      summary: Get emails of the invite step
+      description: Returns emails and other parameters of a particular invite step in the document group invite.
+      parameters:
+      - in: path
+        name: document_group_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      - in: path
+        name: invite_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      - in: path
+        name: step_id
+        required: true
+        description: ID of a step in the invite.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns signer's email addresses in the invite step and email settings for each of them.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invite:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      steps:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            order:
+                              type: integer
+                            status:
+                              type: string
+                            actions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  email:
+                                    type: string
+                                  action:
+                                    type: string
+                                  status:
+                                    type: string
+                                  role_name:
+                                    type: string
+                                  document_id:
+                                    type: string
+                      status:
+                        type: string
+              example:
+                application/json:
+                  emails:
+                  - email: signer1@email.com
+                    message: document_owner@email.com invited you to sign pdf
+                    subject: document_owner@email.com Needs Your Signature
+                    disabled: null
+                    reminder:
+                      remind_after: 3
+                      remind_before: 0
+                      remind_repeat: 5
+                    expiration_days: 30
+                  - email: signer2@email.com
+                    message: document_owner@email.com invited you to sign pdf
+                    subject: document_owner@email.com Needs Your Signature
+                    disabled: null
+                    reminder:
+                      remind_after: 2
+                      remind_before: 1
+                      remind_repeat: 3
+                    expiration_days: 30
+                  - email: signer3@email.com
+                    message: document_owner@email.com invited you to sign pdf
+                    subject: document_owner@email.com Needs Your Signature
+                    disabled: null
+                    reminder:
+                      remind_after: 0
+                      remind_before: 0
+                      remind_repeat: 0
+                    expiration_days: 30
+      security:
+      - Bearer: []
+      tags:
+      - Documentgroup
+  /documentgroup/{document_group_id}/groupinvite/{invite_id}/pendinginvites:
+    get:
+      operationId: get-pending-document-group-invites
+      summary: Get pending group invites
+      description: 'This endpoint allows users to retrieve all pending document group invite information.
+
+        If the caller is the document owner, the response includes both pending invites for that user and all fulfilled actions for the entire group invite.
+
+
+        Possible invite actions are:
+
+        - `sign`: The recipient can sign or fill out the document.
+
+        - `approve`: The recipient can review the document to approve or decline it.
+
+        - `view`: The recipient can only review the document without making changes.'
+      parameters:
+      - in: path
+        name: document_group_id
+        required: true
+        description: ID of the document group.
+        schema:
+          type: string
+      - in: path
+        name: invite_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invites:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        link:
+                          type: string
+                        action:
+                          type: string
+                        status:
+                          type: string
+                        document_name:
+                          type: string
+                        inviter_email:
+                          type: string
+                  document_group_name:
+                    type: string
+              example:
+                application/json:
+                  invites:
+                  - link: https://example.com/cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    action: sign
+                    status: fulfilled
+                    document_name: Sample Document
+                    inviter_email: signer1@email.com
+                  - link: https://example.com/ddXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    action: sign
+                    status: pending
+                    document_name: Contract 2
+                    inviter_email: signer2@email.com
+                  document_group_name: Contracts
+      security:
+      - Bearer: []
+      tags:
+      - Documentgroup
+  /documentgroup/{document_group_id}/groupinvite:
+    post:
+      operationId: invite-to-sign-document-group
+      summary: Invite to sign doc group
+      description: 'This endpoint allows users to create an invite for signing a document group. You can configure a multistep workflow, where different recipients act on the document group at different stages.
+
+
+        Recipients can receive the invite by email or by SMS: identify a recipient by `email` for email delivery or by `phone_invite` for SMS delivery. You can combine email and SMS recipients in a single request. For more information, see the SMS invite guide.
+
+
+        Each invite step includes:
+
+
+        - `order`: the sequence number of the step.
+
+        - `invite_actions`: an array of objects specifying who is invited and the action they must perform:
+
+
+        - **`sign`**: The recipient can sign or fill out the document.
+
+        - **`approve`**: The recipient can review the document to approve or decline it.
+
+        - **`view`**: The recipient can only review the document without making changes.
+
+
+        - `invite_emails`: an array for customizing the emails sent to recipients at that step.
+
+        - `invite_sms`: an array for customizing the SMS invites sent to recipients at that step: custom SMS text (`sms_message`), expiration, and reminder settings.
+
+
+        Once all invite actions in a step are completed, the system sends the emails or SMS messages for the next step. When all steps are complete, completion emails are triggered.
+
+
+        To invite a **signing group**, use the `email_groups` field. A signing group includes multiple email addresses, and the step is marked complete as soon as any member of the group signs. You can either use an existing group or define a new one by providing a 40-character ID, a group name, and the list of recipient emails.
+
+
+        To create a signing group separately, see Create contact group.
+
+
+        Learn more about an Invite to sign a document group.
+
+
+        **Use additional attributes to customize signing experience**
+
+
+        Parameter | Description | Example
+
+        ---------|----------|---------
+
+        `reassign` | A recipient can forward the invite by clicking **More Actions** > **Forward Invite** and entering an email address. |
+
+        `force_new_signature` | A recipient must create a new signature for each signature field. |
+
+        `prefill_signature_name` | A string with a signature name that appears when a signer clicks a signature field. The signer can edit the signature.|
+
+        `required_preset_signature_name` | A string with a signature name that appears when a signer clicks a signature field. The signer cannot edit the signature. |
+
+        `decline_by_signature` | When a signer clicks a signature field, they see two options: sign the fields and decline the document group. |
+
+        `authentication_type` | Requires a recipient to enter a password or a code before viewing the document group. For more information, see Two-factor authentication. |'
+      parameters:
+      - in: path
+        name: document_group_id
+        required: true
+        description: The ID of the document group
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Document group invite created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID of the created document group invite.
+                  pending_invite_link:
+                    type:
+                    - string
+                    - 'null'
+                    description: Link for signers with pending invites.
+                x-examples:
+                  example-1:
+                    id: 5e7d9934e1f544d187ba2fde985594342933d9d2
+                    pending_invite_link: null
+              example:
+                example-1:
+                  id: 5e7d9934e1f544d187ba2fde985594342933d9d2
+                  pending_invite_link: null
+                application/json:
+                  id: 5e7d9934e1f544d187ba2fde985594342933d9d2
+                  pending_invite_link: null
+        '400':
+          description: '* `invite_actions` consists of more than one action with the same `email_group` and the same `document_id`.
+
+            * `role` not found.
+
+            * `group_id` not found.
+
+            * Invite already exists.
+
+
+            **Validation errors**:
+
+
+            * `language` is not a string.
+
+            * Incorrect `language`.
+
+            * One recipient must have the same `language`.
+
+            * `redirect_uri` is not a string.
+
+            * Empty `redirect_uri`.
+
+            * `redirect_uri` is not a correct URL.
+
+            * `redirect_uri` is longer than 2048 characters.
+
+            * One recipient must have the same `redirect_uri`.
+
+            * `decline_redirect_uri` is not a string.
+
+            * Empty `decline_redirect_uri`.
+
+            * `decline_redirect_uri` is not a correct URL.
+
+            * `decline_redirect_uri` is longer than 2048 characters.
+
+            * `decline_redirect_uri` cannot be used with the `view`.
+
+            * One recipient must have the same `decline_redirect_uri`.
+
+            * `close_redirect_uri` is not a string.
+
+            * Empty `close_redirect_uri`.
+
+            * `close_redirect_uri` is not a correct URL address
+
+            * `close_redirect_uri` is longer than 2048 characters.
+
+            *  One recipient must have the same `close_redirect_uri`.
+
+            * `redirect_target` is not a string.
+
+            * Incorrect `redirect_target`. Allowed values: `self`, `blank`.
+
+            * One of redirect URLs is required if `redirect_target` is added.
+
+            * One recipient must have the same `redirect_target`.
+
+            * `invite_emails` contains both `email` and `email_group` (must contain only one of these).
+
+            * `allow_reassign` is not allowed for an email group.
+
+            * Incorrect format of `email_groups`.
+
+            * Email group `id` or email group `name` is missing.
+
+            * Email group `id` is not a string.
+
+            * Email group `id` is not a correct unique id.
+
+            * Email group `name` is not a string.
+
+            * Email group `name` contains forbidden characters (4-byte characters, such as emojis).
+
+            * Emails in `email_groups` are missing.
+
+            * Emails in `email_groups` is not an array of arrays.
+
+            * Emails in `email_groups` contains more than 15 emails.
+
+            * Emails in an email group must be unique.
+
+            * Email in `email_groups.emails` is not a string.
+
+            * Email in `email_groups.emails` is not a correct email address.
+
+            * `signature.type` is missing.
+
+            * Incorrect `signature.type`. Allowed values: `eideasy`,`eideasy-pdf`, `nom151`.
+
+            * Missing or different QES settings for one or more signers.
+
+            * The `prefill_signature_name` format is wrong.
+
+            * The `prefill_signature_name` is empty.
+
+            * The`prefill_signature_name` contains unsupported characters.
+
+            * The `prefill_signature_name` is too long.
+
+
+            **SMS invite (`phone_invite`) errors**:
+
+
+            * `phone_invite` type incorrect.
+
+            * `phone_invite` empty.
+
+            * `phone_invite` too long.
+
+            * `phone_invite` format incorrect.
+
+            * `phone_invite` in `invite_sms` type is incorrect.
+
+            * `phone_invite` in `invite_sms` is empty.
+
+            * `phone_invite` in `invite_sms` is too long.
+
+            * `phone_invite` in `invite_sms` format is incorrect.
+
+            * `expiration_days` in `invite_sms` type incorrect.
+
+            * `expiration_days` in `invite_sms` range incorrect.
+
+            * `remind_after` range incorrect.
+
+            * `remind_before` range incorrect.
+
+            * `remind_repeat` range incorrect.
+
+            * `phone_invite` with CFR org setting enabled.
+
+            * `phone_invite` with consent org setting enabled.
+
+            * `phone_invite` with `require_login` setting enabled.
+
+            * Incorrect phone number.
+
+            * `allow_reassign` not allowed for `phone_invite`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+              example:
+                role not found:
+                  errors:
+                  - code: 65582
+                    message: Role Signer 1 on document edXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX was not specified in any invite_actions. All roles must be used in all document groups
+                Email not string:
+                  errors:
+                  - code: 65582
+                    message: Field `email` in `email_groups.emails` should be of type string.
+                Empty redirect_uri:
+                  errors:
+                  - code: 65536
+                    message: Field `redirect_uri` must not be an empty string.
+                Incorrect language:
+                  errors:
+                  - code: 65536
+                    message: 'The `language` field is invalid, allowed values: "en", "es", "fr".'
+                group_id not found:
+                  errors:
+                  - code: 65582
+                    message: unable to find document group
+                phone_invite empty:
+                  errors:
+                  - code: 65536
+                    message: The `phone_invite` must not be empty string.
+                CFR org restriction:
+                  errors:
+                  - code: 65582
+                    message: The phone_invite cannot be used with the CFR setting enabled.
+                consent restriction:
+                  errors:
+                  - code: 65582
+                    message: The phone_invite cannot be used with the consent setting enabled.
+                language not string:
+                  errors:
+                  - code: 65536
+                    message: The `language` field must be a string.
+                Missing redirect URL:
+                  errors:
+                  - code: 65536
+                    message: The one of `redirect_uri` fields is required when `redirect_target` is added.
+                Invite already exists:
+                  errors:
+                  - code: 65582
+                    message: An group invite already exists for this document group.
+                phone_invite too long:
+                  errors:
+                  - code: 65536
+                    message: The `phone_invite` value is too long. It should have 14 characters.
+                redirect_uri too long:
+                  errors:
+                  - code: 65536
+                    message: The `redirect_uri` field must contain no more than 2048 characters.
+                Duplicate viewer email:
+                  errors:
+                  - code: 65582
+                    message: Two viewer actions in one order should not have one user email for document
+                Incorrect phone number:
+                  errors:
+                  - code: 104833
+                    message: The phone_invite value holds a non-existent phone number.
+                Missing email group id:
+                  errors:
+                  - code: 65582
+                    message: Field `id` in `email_groups` should not be blank.
+                Missing signature.type:
+                  code: 66390
+                  message: Signature type could not be blank
+                redirect_uri not a URL:
+                  errors:
+                  - code: 65536
+                    message: Field `redirect_uri` must be a valid URL.
+                Unmatching redirect_uri:
+                  errors:
+                  - code: 65536
+                    message: The `redirect_uri` must be equal for the same signer.
+                redirect_uri not string:
+                  errors:
+                  - code: 65536
+                    message: Field `redirect_uri` must be of type string.
+                Empty close_redirect_uri:
+                  errors:
+                  - code: 65536
+                    message: The `close_redirect_uri` field must not be empty.
+                Incorrect signature.type:
+                  code: 66390
+                  message: 'The signature_type must be one of the following types: eideasy, eideasy-pdf, nom151'
+                Incorrect email_groups.id:
+                  errors:
+                  - code: 65582
+                    message: Field `id` in `email_groups` should be a valid unique id.
+                Incorrect redirect_target:
+                  errors:
+                  - code: 65536
+                    message: 'The `redirect_target` field is invalid, allowed values: self, blank.'
+                Missing email_groups.name:
+                  errors:
+                  - code: 65582
+                    message: Field `name` in `email_groups` should not be blank.
+                Missing emails in a group:
+                  errors:
+                  - code: 65582
+                    message: Field `emails` in `email_groups` should not be blank.
+                require_login restriction:
+                  errors:
+                  - code: 65582
+                    message: The phone_invite cannot be used with the require_login_for_signing setting enabled.
+                Empty decline_redirect_uri:
+                  errors:
+                  - code: 65536
+                    message: The `decline_redirect_uri` field must not be empty.
+                Too many emails in a group:
+                  errors:
+                  - code: 65582
+                    message: Email group cannot contain more than 15 emails.
+                Unmatching redirect_target:
+                  errors:
+                  - code: 65536
+                    message: The `redirect_target` fields must be the same for the one signer.
+                email not an email address:
+                  errors:
+                  - code: 65582
+                    message: Field `email` in `email_groups.emails` should be a valid email address.
+                email_groups.id not string:
+                  errors:
+                  - code: 65582
+                    message: Field `id` in `email_groups` should be of type string.
+                redirect_target not string:
+                  errors:
+                  - code: 65536
+                    message: The `redirect_target` field must be a string.
+                Duplicate emails in a group:
+                  errors:
+                  - code: 65582
+                    message: Email in email group should be unique.
+                close_redirect_uri too long:
+                  errors:
+                  - code: 65536
+                    message: The `close_redirect_uri` field must contain no more than 2048 characters.
+                emails not array of arrays.:
+                  errors:
+                  - code: 65582
+                    message: Field `emails` in `email_groups` must be an array of arrays.
+                phone_invite type incorrect:
+                  errors:
+                  - code: 65536
+                    message: The `phone_invite` value should be of type string.
+                close_redirect_uri not a URL:
+                  errors:
+                  - code: 65536
+                    message: The `close_redirect_uri` field contains a URL in an invalid format.
+                email_groups.name not string:
+                  errors:
+                  - code: 65582
+                    message: Field `name` in `email_groups` should be of type string.
+                remind_after range incorrect:
+                  errors:
+                  - code: 65536
+                    message: The remind_after attribute cannot be less than 0
+                Unmatching close_redirect_uri:
+                  errors:
+                  - code: 65536
+                    message: The `close_redirect_uri` fields must be the same for the one signer.
+                close_redirect_uri not string:
+                  errors:
+                  - code: 65536
+                    message: The `close_redirect_uri` field must be a string.
+                decline_redirect_uri too long:
+                  errors:
+                  - code: 65536
+                    message: The `decline_redirect_uri` field must contain no more than 2048 characters.
+                phone_invite format incorrect:
+                  errors:
+                  - code: 65536
+                    message: The `phone_invite` value is incorrect.
+                remind_before range incorrect:
+                  errors:
+                  - code: 65536
+                    message: The remind_before attribute cannot be less than 0
+                remind_repeat range incorrect:
+                  errors:
+                  - code: 65536
+                    message: The remind_repeat attribute cannot be less than 0
+                decline_redirect_uri not a URL:
+                  errors:
+                  - code: 65536
+                    message: The `decline_redirect_uri` field contains a URL in an invalid format.
+                Both email and email_group used:
+                  errors:
+                  - code: 65582
+                    message: The `email` or `email_group.name` in `invite_emails` is required. But you cannot use 2 parameters at one time.
+                Unmatching decline_redirect_uri:
+                  errors:
+                  - code: 65536
+                    message: The `decline_redirect_uri` fields must be the same for the one signer.
+                decline_redirect_uri for viewer:
+                  errors:
+                  - code: 65536
+                    message: The `decline_redirect_uri` field can be used with `sign` action only.
+                decline_redirect_uri not string:
+                  errors:
+                  - code: 65536
+                    message: The `decline_redirect_uri` field must be a string.
+                prefill_signature_name is empty:
+                  errors:
+                  - code: 19021121
+                    message: The `prefill_signature_name` field cannot be empty.
+                prefill_signature_name too long:
+                  errors:
+                  - code: 19021120
+                    message: The `prefill_signature_name` field cannot exceed 255 characters.
+                One user has different languages:
+                  errors:
+                  - code: 65536
+                    message: The `language` fields must be the same for the one user.
+                email_groups not array of arrays:
+                  errors:
+                  - code: 65582
+                    message: email_groups must be an array of arrays.
+                phone_invite in invite_sms empty:
+                  errors:
+                  - code: 65536
+                    message: The `phone_invite` in invite_sms must not be empty string.
+                4-byte chars in email_groups.name:
+                  errors:
+                  - code: 65582
+                    message: Invalid characters provided for `name` in `email_groups`.
+                Missing or different QES settings:
+                  code: 65582
+                  message: Invalid advanced sign provider for sender organization
+                phone_invite in invite_sms too long:
+                  errors:
+                  - code: 65536
+                    message: The `phone_invite` value in invite_sms is too long. It should have 14 characters.
+                prefill_signature_name not a string:
+                  errors:
+                  - code: 19021118
+                    message: The `prefill_signature_name` field must be a string.
+                allow_reassign used with email group:
+                  errors:
+                  - code: 65582
+                    message: Could not set the allow_reassign parameter for a signing group.
+                phone_invite in invite_sms incorrect:
+                  errors:
+                  - code: 65536
+                    message: The `phone_invite` value in invite_sms is incorrect.
+                reassign not allowed for phone_invite:
+                  errors:
+                  - code: 65582
+                    message: The `allow_reassign` in invite_actions could not be presented for phone_invite
+                phone_invite type in invite_sms incorrect:
+                  errors:
+                  - code: 65536
+                    message: The `phone_invite` value in invite_sms should be of type string.
+                expiration_days in invite_sms type incorrect:
+                  errors:
+                  - code: 65536
+                    message: The `expiration_days` in invite_sms must be integer
+                expiration_days in invite_sms range incorrect:
+                  errors:
+                  - code: 65582
+                    message: The `expiration_days` in invite_sms should be between 3 and 180.
+                prefill_signature_name contains 4-byte characters:
+                  errors:
+                  - code: 19021119
+                    message: UTF 4-byte characters are not supported in the `prefill_signature_name` field.
+        '401':
+          description: Incorrect or missing bearer token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  error:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 1537
+                    error: invalid_token
+              example:
+                Example 1:
+                  code: 1537
+                  error: invalid_token
+                Unauthorized:
+                  code: 1537
+                  error: invalid_token
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - invite_steps
+              properties:
+                cc:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of cc email addresses.
+                order_type:
+                  enum:
+                  - at_the_same_time
+                  - recipient_order
+                  - advanced_order
+                  - null
+                  type:
+                  - string
+                  - 'null'
+                  description: Recipient routing rule applied to all recipients in the invite. `at_the_same_time` - all at once; `recipient_order` - sequential by `order` parameter; `advanced_order` - advanced rules.
+                email_groups:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - id
+                    - name
+                    - emails
+                    properties:
+                      id:
+                        type: string
+                        description: Signing group ID. If you created your own ID, make sure that it's 40 characters long.
+                        x-stoplight:
+                          id: ftm8fhfa4sx96
+                      name:
+                        type: string
+                        description: Signing group name
+                        x-stoplight:
+                          id: 6u0opiomemub1
+                      emails:
+                        type: array
+                        items:
+                          type: object
+                          required:
+                          - email
+                          properties:
+                            email:
+                              type: string
+                              description: Email address in the signing group. Must be unique within a group.
+                              x-stoplight:
+                                id: nmhbd010yzp4l
+                          x-stoplight:
+                            id: ge2dl9pzwvwfm
+                        description: List all the email addresses that should receive an invite within a group, no matter if you are using an existing email group or a new one.
+                        x-stoplight:
+                          id: ngdzqehm8e1ki
+                    x-stoplight:
+                      id: dh0e12s3p4bwd
+                  description: Defines a signing group. Required if at least one step contains a signing group (`email_group`). You can use both an existing email group or create your own.
+                  x-stoplight:
+                    id: 6bsyxhwpmmomu
+                invite_steps:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - order
+                    - invite_actions
+                    properties:
+                      order:
+                        type: integer
+                        description: 'Integer, order of signing step: 1 - the recipient(s)  sign the document group first, then the document group is sent to 2,3 etc. Several recipients can hold the same order of signing.'
+                      invite_sms:
+                        type: array
+                        items:
+                          type: object
+                          required:
+                          - phone_invite
+                          properties:
+                            reminder:
+                              type: object
+                              properties:
+                                remind_after:
+                                  type: number
+                                  maximum: 179
+                                  minimum: 1
+                                  description: Number of days after sending the invite when the recipient receives a reminder SMS. Must be less than `expiration_days`.
+                                remind_before:
+                                  type: number
+                                  maximum: 179
+                                  minimum: 1
+                                  description: Number of days before the invite expires when the recipient receives a reminder SMS. Must be less than `expiration_days`.
+                                remind_repeat:
+                                  type: number
+                                  maximum: 7
+                                  minimum: 1
+                                  description: Number of days between each reminder sent to the recipient.
+                              description: Settings for sending automatic reminders.
+                            sms_message:
+                              type: string
+                              example: Hi, here is a document for signature from {sender_email}
+                              maxLength: 140
+                              description: 'Custom text of the SMS invite, max `140` characters. Supports the `{sender_email}` placeholder that is automatically replaced with the sender''s email address. The link to the document group and an opt-out notice are automatically added at the end of the SMS. Without this parameter, the recipient receives the default message: "{sender email} has sent you a document. Follow the link to view the document". Custom SMS messages require an API free trial, an active API subscription, or a Site License.'
+                            phone_invite:
+                              type: string
+                              example: '+14075985199'
+                              description: Recipient's phone number for the SMS invite. Must match the `phone_invite` value of this recipient in `invite_actions`.
+                            expiration_days:
+                              type: number
+                              default: 30
+                              maximum: 180
+                              minimum: 3
+                              description: Number of days before the invite expires.
+                        description: Objects that define a custom SMS message, expiration, and reminder settings for each SMS recipient within a step. SMS recipients are identified by `phone_invite` instead of `email` in `invite_actions`.
+                      invite_emails:
+                        type: array
+                        items:
+                          type: object
+                          required:
+                          - email
+                          properties:
+                            email:
+                              type: string
+                              format: email
+                              description: Recipient's email address
+                            message:
+                              type: string
+                              description: Custom email message for the recipient. Requires a paid API plan, an API free trial, or a Site License.
+                            subject:
+                              type: string
+                              description: Custom email subject for the recipient. Requires a paid API plan, an API free trial, or a Site License.
+                            reminder:
+                              type: object
+                              properties:
+                                remind_after:
+                                  type: number
+                                  maximum: 179
+                                  minimum: 1
+                                  description: x days after the invite, a recipient gets a reminder email. Must be less than `expiration_days`
+                                remind_before:
+                                  type: number
+                                  maximum: 179
+                                  minimum: 1
+                                  description: x days before expiration, a recipient gets a reminder email. Must be less than `expiration_days`
+                                remind_repeat:
+                                  type: number
+                                  maximum: 7
+                                  minimum: 1
+                                  description: A recipient gets a reminder email each x days after the invite is sent
+                              description: Settings for sending automatic reminder emails.
+                            email_group:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                  description: The name of the contact group.
+                                  x-stoplight:
+                                    id: cpunlkhtfa0sv
+                              description: A contact group of recipients, for example, [CRM Contact group](/docs/contact-groups/operations/post-v2-crm-groups).
+                              x-stoplight:
+                                id: 8j65i1jlx4gka
+                            expiration_days:
+                              type: number
+                              default: 30
+                              maximum: 180
+                              minimum: 3
+                              description: In x days, the invite expires
+                        description: Objects that define custom email subject, email message, expiration and reminder settings for each recipient within a step.
+                      invite_actions:
+                        type: array
+                        items:
+                          type: object
+                          required:
+                          - role_name
+                          - action
+                          - document_id
+                          properties:
+                            email:
+                              type: string
+                              format: email
+                              description: Recipient's email address. The invite is delivered by email. Identify each recipient by `email`, `phone_invite`, or `email_group` — only one of these parameters at a time.
+                            action:
+                              type: string
+                              description: 'Allowed action with a document. Possible values: `view`, `sign`, `approve`. The `approve` action must be assigned to all documents in the document group. The `view` action can be assigned to any subset of documents in the group.'
+                            language:
+                              type: string
+                              description: 'Sets the language of the signing session and notification emails for the signer. Possible values: `en` for English, `es` for Spanish, and `fr` for French. If not set, the language is determined by the language of your signNow account. If emails are branded, you can set up [your own](/docs/guides-branding#language-branding) email texts in different languages.'
+                              x-stoplight:
+                                id: b743u1ldxugp1
+                            role_name:
+                              type: string
+                              description: Recipient's role name in the document (can be used to identify fields in the document assigned to this particular recipient). The `role` parameter is also supported as an equivalent of `role_name`.
+                            signature:
+                              type: object
+                              properties:
+                                type:
+                                  type: string
+                                  description: 'Type of QES signature. Possible values: `eideasy`,` eideasy-pdf`, and `nom151`. All signers in the invite must have the same signature type.'
+                                  x-stoplight:
+                                    id: 4l7pk80x2ug82
+                              description: This object is used to request QES signatures from signers. To use it, a user must be a member of an organization (workspace) with QES settings enabled. If QES is used, it must be used for all signers in the invite.<br>For more information, see [QES user guide](/docs/qualified-electronic-signature).
+                              x-stoplight:
+                                id: 7eghm82e9pwme
+                            document_id:
+                              type: string
+                              description: ID of the document on which actions are required from this recipient.
+                            email_group:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                  description: The name of the contact group.
+                                  x-stoplight:
+                                    id: woou5tg76ubps
+                              description: A contact group of recipients, for example, [CRM Contact group](/docs/contact-groups/operations/post-v2-crm-groups).
+                              x-stoplight:
+                                id: pfen0o1om14d5
+                            phone_invite:
+                              type: string
+                              example: '+14075985199'
+                              description: Recipient's phone number. The invite is delivered by SMS instead of email. Use instead of `email`. To customize the SMS text, expiration, or reminders, add an object with the same phone number to the `invite_sms` array of this step.
+                            redirect_uri:
+                              type: string
+                              example: https://www.signnow.com/
+                              description: 'The link that opens after the recipient completes the document.
+
+
+                                '
+                              x-stoplight:
+                                id: z01y5i3duhee2
+                            allow_reassign:
+                              type: string
+                              description: 'Whether or not to allow recipients reassign this invite to another email address. Possible values: "0" - not allowed, "1" - allowed.'
+                            authentication:
+                              type: object
+                              properties:
+                                type:
+                                  type: string
+                                  description: 'Type of signer''s identity verification. Possible values: `"password"` or `"phone"`.'
+                                phone:
+                                  type: string
+                                  description: 'Required in case of `"type"`: `"phone"`. User''s phone number.'
+                                value:
+                                  type: string
+                                  description: 'Required in case of `"type"`: `"password"`. The password for user authentication.'
+                                method:
+                                  type: string
+                                  description: 'Required in case of `"type"`: `"phone"`. Possible values: `"phone_call`", `"sms"`.'
+                                message:
+                                  type: string
+                                  description: 'In case of `"method"`: `"sms"` - custom SMS message, max 140 characters. Customizing the 2FA SMS message requires an API free trial, an active API subscription, or a Site License.'
+                              description: Object that contains the type of signer's identity verification, phone number or password.
+                            payment_request:
+                              type: object
+                              properties:
+                                type:
+                                  type: string
+                                  description: In this case, must be "fixed".
+                                  x-stoplight:
+                                    id: 8eozczxgftexj
+                                amount:
+                                  type: string
+                                  description: The payment amount requested.
+                                  x-stoplight:
+                                    id: pgiupb58ob7i4
+                                currency:
+                                  type: string
+                                  description: The payment currency requested.
+                                  x-stoplight:
+                                    id: 1w4yo844v8oqv
+                                merchant_id:
+                                  type: string
+                                  description: The ID of the merchant account added to your organization (workspace).
+                                  x-stoplight:
+                                    id: 74htcsy6un1ra
+                              description: Object that contains details about the payment request.
+                              x-stoplight:
+                                id: iekmitepg8epa
+                            redirect_target:
+                              type: string
+                              default: blank
+                              description: 'Determines whether to open the redirect link in the new tab in the browser, or in the same tab after the signing session. Possible values: `blank` - opens the link in the new tab, `self` - opens the link in the same tab.'
+                              x-stoplight:
+                                id: 7vhkx05u09xgd
+                            close_redirect_uri:
+                              type: string
+                              description: The link that opens when a signer clicks **Save Progress and Finish Later** during a signing session or **Close** in view mode. Available for `sign ` action.
+                              x-stoplight:
+                                id: hoyx0baz5erbv
+                            decline_by_signature:
+                              type: string
+                              description: Whether or not to allow recipients decline to sign the invite.
+                            decline_redirect_uri:
+                              type: string
+                              description: The URL that opens after the recipient declines the document. Available for `sign` action.
+                              x-stoplight:
+                                id: 179b6xp2pyvyl
+                            prefill_signature_name:
+                              type: string
+                              example: Jane Doe
+                              maxLength: 255
+                              description: The text displayed in the Signature field. The signer can edit this value.
+                            is_close_redirect_canceled:
+                              type: boolean
+                              default: false
+                              description: Specifies whether the save progress redirect setting is canceled for the organization (workspace).`true` – the redirect is canceled;`false` – the redirect remains active.
+                              x-stoplight:
+                                id: vmbf2a9u6y1uz
+                            is_finish_redirect_canceled:
+                              type: boolean
+                              default: false
+                              description: Specifies whether the completion redirect setting is canceled for the organization (workspace).`true` – the redirect is canceled;`false` – the redirect remains active.
+                              x-stoplight:
+                                id: vmbf2a9u6y1uz
+                            is_decline_redirect_canceled:
+                              type: boolean
+                              default: false
+                              description: Specifies whether the decline redirect setting is canceled for the organization (workspace).`true` – the redirect is canceled;`false` – the redirect remains active.
+                              x-stoplight:
+                                id: vmbf2a9u6y1uz
+                            required_preset_signature_name:
+                              type: string
+                              example: Jane Doe
+                              description: The text displayed in the Signature field. The signer cannot edit this value. Cannot be used simultaneously with `prefill_signature_name` or `force_new_signature` for the same role.
+                        description: Objects that define recipients (email addresses, phone numbers for SMS delivery, or signing groups) and invite actions, roles and documents assigned to each recipient within a step.
+                  description: Steps of the document group invite. Every step contains the `order` number, `invite_emails`, `invite_sms`, and `invite_actions` within this step.
+                sign_as_merged:
+                  type: boolean
+                  default: true
+                  description: If true, allows API user to send an invite which opens as merged document group in a single document.
+                client_timestamp:
+                  type: integer
+                  description: The timestamp of the document group invite.
+                general_reminder:
+                  type:
+                  - object
+                  - 'null'
+                  properties:
+                    remind_after:
+                      type: integer
+                      description: Days after invite is sent before a reminder is delivered. Must be less than `general_expiration_days`.
+                    remind_before:
+                      type: integer
+                      description: Days before expiration when a reminder is delivered. Must be less than `general_expiration_days`.
+                    remind_repeat:
+                      type: integer
+                      description: Days between repeated reminders.
+                  description: Default `reminder` applied to all recipients in the invite.
+                completion_emails:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                        format: email
+                        description: Email address of the completion email recipient.
+                      message:
+                        type: string
+                        description: Custom message for the completion email. Requires a paid API plan, an API free trial, or a Site License.
+                      subject:
+                        type: string
+                        description: Custom subject for the completion email. Requires a paid API plan, an API free trial, or a Site License.
+                      disable_document_attachment:
+                        type: integer
+                        description: 'Whether to disable sending document attachments with the completion email. Possible values: 0 - enable document attachment, 1 - disable document attachment.'
+                  description: Object that contains email addresses and custom settings for sending emails about completing the invite.
+                general_expiration_days:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 30
+                  maximum: 180
+                  minimum: 1
+                  description: 'Default `expiration_days` applied to all recipients in the invite. Min: `1`, Max: `180`. Default: `30`.'
+                general_expiration_time:
+                  type:
+                  - integer
+                  - 'null'
+                  description: Default expiration timestamp (Unix time, seconds) applied to all recipients in the invite.
+        required: true
+      tags:
+      - Documentgroup
+  /documentgroup/{document_group_id}/groupinvite/{invite_id}/cancelinvite:
+    post:
+      operationId: cancel-document-group-invite
+      summary: Cancel doc group invite
+      description: Cancels a group invite. All documents will be unshared with invitees. Any signatures that occurred before canceling will remain on the documents.
+      parameters:
+      - in: path
+        name: document_group_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      - in: path
+        name: invite_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  status: success
+      security:
+      - Bearer: []
+      tags:
+      - Documentgroup
+  /documentgroup/{document_group_id}/groupinvite/{invite_id}/invitestep/{step_id}/update:
+    post:
+      operationId: update-document-group-invite
+      summary: Update doc group invite
+      description: 'This endpoint either replaces the recipient at a particular invite step or updates the invite attributes (reminder, expiration, language) for a recipient at that step.
+
+
+        Recipients can be identified and replaced by email or by SMS. Identify the current recipient by `user_to_update` (email) or `phone_invite_to_update` (phone number). Set the new recipient with `replace_with_this_user` (email) or `replace_with_this_phone_invite` (phone number). This supports all four conversions: email to email, email to phone, phone to email, and phone to phone. For SMS invites, see the SMS invite guide.
+
+
+        To get the current SMS recipient''s phone number for `phone_invite_to_update`, call Get doc group invite and read `actions[].signer_phone_invite`.
+
+
+        **Notes**
+
+
+        * Send both an identifier and a replacement. Use one identifier (`user_to_update` for email or `phone_invite_to_update` for phone) and one replacement (`replace_with_this_user` for email or `replace_with_this_phone_invite` for phone). To keep the same recipient and only change attributes, repeat the current value in the replacement field.
+
+        * For an SMS recipient, omitting `replace_with_this_phone_invite` still returns `200`, but the invite stops being delivered, so always send it.
+
+        * When replacing with an email recipient, `invite_email.email` must equal `replace_with_this_user`. When replacing with an SMS recipient, `invite_sms.phone_invite` must equal `replace_with_this_phone_invite`.
+
+        * `update_invite_action_attributes` is optional. If omitted, every document the recipient has in the step is updated; if provided, only the listed `document_id`s are updated.
+
+        * `expiration_days` accepts `1` to `180`. `0` means use the organization''s default invite-expiration setting (falls back to `30` days).
+
+        * A phone recipient is rejected when the `CFR` or `require_login_for_signing` setting is enabled. SMS delivery may still be suppressed after a `200` if the recipient has opted out of or declined SMS consent.
+
+        * `allow_reassign` cannot be combined with `replace_with_this_phone_invite`.
+
+        * With `is_short_link_invite: true` the service generates the recipient, so neither `replace_with_this_user` nor `replace_with_this_phone_invite` may be sent.'
+      parameters:
+      - in: path
+        name: document_group_id
+        required: true
+        description: ID of the document group.
+        schema:
+          type: string
+      - in: path
+        name: invite_id
+        required: true
+        description: ID of the document group invite.
+        schema:
+          type: string
+      - in: path
+        name: step_id
+        required: true
+        description: ID of the invite step to update.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The invite step was updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Result of the operation.
+                x-examples:
+                  Example 1:
+                    status: success
+              example:
+                Example 1:
+                  status: success
+                application/json:
+                  status: success
+        '400':
+          description: 'Bad request. Possible errors:
+
+
+            * Neither `user_to_update` nor `phone_invite_to_update` provided.
+
+            * Both `user_to_update` and `phone_invite_to_update` provided (only one identifier allowed).
+
+            * Both `replace_with_this_user` and `replace_with_this_phone_invite` provided (only one replacement allowed).
+
+            * Incorrect user to update.
+
+            * The recipient in `user_to_update` or `phone_invite_to_update` is not on this step.
+
+            * Incorrect document ID in `update_invite_action_attributes`.
+
+            * Incorrect replace user email.
+
+            * Incorrect group invite ID in endpoint.
+
+            * Cannot update the invite with an email group.
+
+            * Invalid `phone_invite_to_update` or `replace_with_this_phone_invite` format.
+
+            * Phone number is valid but could not be found.
+
+            * `invite_email.email` does not match `replace_with_this_user`.
+
+            * `invite_sms.phone_invite` does not match `replace_with_this_phone_invite`.
+
+            * `allow_reassign` used together with `replace_with_this_phone_invite`.
+
+            * A short-link invite (`is_short_link_invite`) contains `replace_with_this_user` or `replace_with_this_phone_invite`.
+
+            * Phone recipient rejected because the `CFR` setting is enabled.
+
+            * Phone recipient rejected because the `require_login_for_signing` setting is enabled.
+
+            * SSO (SN Login) authentication is incompatible with SMS delivery.
+
+            * Daily invite limit exceeded.
+
+            * The organization does not allow senders to change the invite expiration.
+
+            * The organization does not allow senders to change invite reminders.
+
+            * The SMS message was blocked by a message filter.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 65582
+                      message: Invite step does not belong to document group invite
+              example:
+                Example 1:
+                  errors:
+                  - code: 65582
+                    message: Invite step does not belong to document group invite
+                CFR setting enabled:
+                  errors:
+                  - code: 65582
+                    message: The `replace_with_this_phone_invite` cannot be used with the `CFR` setting enabled.
+                Phone number not found:
+                  errors:
+                  - code: 104833
+                    message: The phone_invite value holds a non-existent phone number.
+                SMS invite not allowed:
+                  errors:
+                  - code: 104956
+                    message: Sending sms invite is not allowed.
+                Incorrect user to update:
+                  errors:
+                  - code: 65582
+                    message: Invite step does not belong to document group invite
+                Recipient not on this step:
+                  errors:
+                  - code: 65582
+                    message: Cannot update signer signer1@email.com because user is not part of invite step
+                Short link invite conflict:
+                  errors:
+                  - code: 65536
+                    message: Short link invite cannot contain replace_with_this_user or replace_with_this_phone_invite fields.
+                Daily invite limit exceeded:
+                  errors:
+                  - code: 65639
+                    message: Daily invite limit exceeded
+                Invalid phone number format:
+                  errors:
+                  - code: 65582
+                    message: The `phone_invite_to_update` value is invalid. It must start with `+` and contain up to 13 digits (total max 14 characters).
+                Neither identifier provided:
+                  errors:
+                  - code: 65536
+                    message: Either `user_to_update` or `phone_invite_to_update` field must be provided.
+                Incorrect replace user email:
+                  errors:
+                  - code: 65544
+                    message: replace_with_this_user is invalid email.
+                Require login setting enabled:
+                  errors:
+                  - code: 65582
+                    message: The `replace_with_this_phone_invite` cannot be used with the `require_login_for_signing` setting enabled.
+                SSO login incompatible with SMS:
+                  errors:
+                  - code: 19099002
+                    message: Authentication type sso_login is incompatible with SMS delivery type.
+                Email does not match replacement:
+                  errors:
+                  - code: 65582
+                    message: Email in the invite_email object must match the email of the user being updated.
+                Phone does not match replacement:
+                  errors:
+                  - code: 65582
+                    message: '`phone_invite` in the `invite_sms` object must match the `phone_invite` of the user being updated.'
+                Incorrect group invite id in endpoint:
+                  errors:
+                  - code: 65582
+                    message: unable to find document group invite of f1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Only one recipient identifier allowed:
+                  errors:
+                  - code: 65536
+                    message: 'Only one field can be provided: either `user_to_update` or `phone_invite_to_update`.'
+                Reassign not allowed for phone invite:
+                  errors:
+                  - code: 65536
+                    message: The `allow_reassign` in `update_invite_action_attributes` could not be presented for `replace_with_this_phone_invite`.
+                Only one replacement recipient allowed:
+                  errors:
+                  - code: 65536
+                    message: 'Only one field can be provided: either `replace_with_this_user` or `replace_with_this_phone_invite`.'
+                Cannot update the invite with an email group:
+                  errors:
+                  - code: 65582
+                    message: Field invite with email group is present
+                Editing reminders not allowed by organization:
+                  errors:
+                  - code: 65582
+                    message: Modifying invite reminders is not allowed by organization settings.
+                Editing expiration not allowed by organization:
+                  errors:
+                  - code: 65582
+                    message: Modifying invite expiration is not allowed by organization settings.
+                Incorrect document id in update invite action attributes:
+                  errors:
+                  - code: 65582
+                    message: Could not find existing action with document id c4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX in update_invite_action_attributes payload
+        '401':
+          description: Incorrect or missing bearer token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  error:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 1537
+                    error: invalid_token
+              example:
+                Example 1:
+                  code: 1537
+                  error: invalid_token
+                Unauthorized:
+                  code: 1537
+                  error: invalid_token
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invite_sms:
+                  type: object
+                  required:
+                  - phone_invite
+                  properties:
+                    reminder:
+                      type: object
+                      properties:
+                        remind_after:
+                          type: integer
+                          maximum: 179
+                          minimum: 1
+                          description: Number of days after sending the invite when the recipient receives a reminder SMS. Must be less than `expiration_days`.
+                        remind_before:
+                          type: integer
+                          maximum: 179
+                          minimum: 1
+                          description: Number of days before the invite expires when the recipient receives a reminder SMS. Must be less than `expiration_days`.
+                        remind_repeat:
+                          type: integer
+                          maximum: 7
+                          minimum: 1
+                          description: Number of days between each reminder sent to the recipient.
+                      description: Settings for sending automatic reminders. A reminder applies to the recipient's first invite in the step, not to each document.
+                    phone_invite:
+                      type: string
+                      example: '+14085550123'
+                      description: Phone number of the new SMS recipient in E.164 format (`+` followed by up to 13 digits, max 14 characters). Must match `replace_with_this_phone_invite`.
+                    expiration_days:
+                      type: integer
+                      maximum: 180
+                      minimum: 1
+                      description: Number of days before the invite expires. Accepts `1` to `180`. `0` uses the organization's default invite-expiration setting (falls back to `30`).
+                  description: Settings for the new SMS recipient. Include when the updated recipient receives the invite by SMS. The `phone_invite` value must match `replace_with_this_phone_invite`.
+                invite_email:
+                  type: object
+                  required:
+                  - email
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                      example: updated.signer@email.com
+                      description: Email address of the new recipient. Must match `replace_with_this_user`.
+                    reminder:
+                      type: object
+                      properties:
+                        remind_after:
+                          type: integer
+                          maximum: 179
+                          minimum: 1
+                          description: Number of days after sending the invite when the recipient receives a reminder. Must be less than `expiration_days`.
+                        remind_before:
+                          type: integer
+                          maximum: 179
+                          minimum: 1
+                          description: Number of days before the invite expires when the recipient receives a reminder. Must be less than `expiration_days`.
+                        remind_repeat:
+                          type: integer
+                          maximum: 7
+                          minimum: 1
+                          description: Number of days between each reminder sent to the recipient.
+                      description: Settings for sending automatic reminders. A reminder applies to the recipient's first invite in the step, not to each document.
+                    expiration_days:
+                      type: integer
+                      maximum: 180
+                      minimum: 1
+                      description: Number of days before the invite expires. Accepts `1` to `180`. `0` uses the organization's default invite-expiration setting (falls back to `30`).
+                  description: Settings for the new email recipient. Include when the updated recipient receives the invite by email. The `email` value must match `replace_with_this_user`.
+                user_to_update:
+                  type: string
+                  example: initial.signer@email.com
+                  description: Current email recipient to update or replace, identified by email address. Provide either `user_to_update` or `phone_invite_to_update`, not both.
+                client_timestamp:
+                  type: integer
+                  example: 1531154773
+                  description: Unix timestamp of the request.
+                is_short_link_invite:
+                  type: boolean
+                  example: false
+                  description: Set to `true` for a short-link invite. Short-link invites cannot contain `replace_with_this_user` or `replace_with_this_phone_invite`, reminders, or SN Login authentication.
+                phone_invite_to_update:
+                  type: string
+                  example: '+14075985199'
+                  description: 'Current SMS recipient to update or replace, identified by phone number in E.164 format (`+` followed by up to 13 digits, max 14 characters). Source it from [Get doc group invite](/docs/doc-group-field-invite/operations/get-document-group-invite) and read `actions[].signer_phone_invite`. Provide either `user_to_update` or `phone_invite_to_update`. Note: The internal `sms_signer_+<phone>@no.reply` address is not a supported input.'
+                replace_with_this_user:
+                  type: string
+                  example: updated.signer@email.com
+                  description: Email address of the new recipient that replaces the current one. Provide either `replace_with_this_user` or `replace_with_this_phone_invite`, not both. When provided, `invite_email.email` must equal this value.
+                replace_with_this_phone_invite:
+                  type: string
+                  example: '+14085550123'
+                  description: Phone number (E.164) of the new SMS recipient that replaces the current one. Provide either `replace_with_this_user` or `replace_with_this_phone_invite`. When provided, `invite_sms.phone_invite` must equal this value. Cannot be combined with `allow_reassign`, or with the `CFR` or `require_login_for_signing` settings.
+                update_invite_action_attributes:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - document_id
+                    properties:
+                      language:
+                        type: string
+                        example: en
+                        description: 'Language of the invite email or SMS. Allowed values: `en`, `es`, `fr`. Must be the same for one recipient.'
+                      contact_id:
+                        type: string
+                        example: abc123def456abc123def456abc123def456abcd
+                        description: 40-character ID of the CRM contact to associate with this recipient.
+                      document_id:
+                        type: string
+                        example: abc123def456abc123def456abc123def456abcd
+                        description: ID of the document within the document group to update for this recipient.
+                      allow_reassign:
+                        type: integer
+                        example: 0
+                        description: Allow the recipient to reassign the invite (`1`) or not (`0`). Cannot be used together with `replace_with_this_phone_invite`.
+                      decline_by_signature:
+                        type: string
+                        example: '0'
+                        description: When a signer clicks a signature field, they can sign or decline the document group. Enabled (`1`) or disabled (`0`).
+                  description: Optional per-document settings for the recipient being updated. If omitted, all documents the recipient has in the step are updated; if provided, only the listed `document_id`s are updated.
+        required: true
+      tags:
+      - Documentgroup
+  /documentgroup/{document_group_id}/groupinvite/{invite_id}/resendinvites:
+    post:
+      operationId: resend-document-group-invite
+      summary: Resend doc group invite
+      description: Resends invite emails to those with pending invites for the group invite. Resend can also be used to resend invites to a single user if the user's email is specified in the POST JSON body.
+      parameters:
+      - in: path
+        name: document_group_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      - in: path
+        name: invite_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  status: success
+        '400':
+          description: '* Incorrect email
+
+            * Incorrect group invite id in endpoint
+
+            * Incorrect group id in endpoint
+
+            * Cannot update the invite with an email group'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Incorrect email:
+                  errors:
+                  - code: 65544
+                    message: Invalid email.
+                Incorrect group id in endpoint:
+                  errors:
+                  - code: 65582
+                    message: unable to find document group
+                Incorrect group invite id in endpoint:
+                  errors:
+                  - code: 65582
+                    message: unable to find document group invite of f1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Cannot update the invite with an email group:
+                  errors:
+                  - code: 65582
+                    message: Field invite with email group is present
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+        required: true
+      tags:
+      - Documentgroup
+  /documentgroup:
+    post:
+      operationId: create-document-group
+      summary: Create document group
+      description: 'Creates a document group from a list of document ids
+
+
+        All documents:
+
+        * Must be owned by the person creating the document group.
+
+        * Cannot be templates.
+
+        * Cannot already be a part of another document group (delete document group first to add them).
+
+        * Cannot have active or fulfilled invites.
+
+
+        For more information, check out our video tutorial.
+
+
+        **Video tutorial**
+
+
+        Note: The design shown in the video is outdated, but the flow is still accurate. You can go ahead and follow the steps as demonstrated.
+
+
+        Video tutorial'
+      responses:
+        '200':
+          description: Document group successfully created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                x-examples:
+                  Example 1:
+                    id: 68XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+              example:
+                Example 1:
+                  id: 68XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                application/json:
+                  id: 68XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        '400':
+          description: "\t\nRequest with incorrect authorization:\n\n* incorrect token\n* expired token\n* empty authorization header\n* authorization = null\n* authorization header without value\n\nOther errors:\n* Incorrect payload\n* Incorrect `document_ids` property\n* `document_ids` array not containing documents\n* Document not found\n* Document not found or belongs to another user\n* Document is a template\n* Document already part of another document group\n* Missing `group_name` property\n* Document has active or fulfilled invites"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 1537
+                    message: invalid_token
+              example:
+                Example 1:
+                  code: 1537
+                  message: invalid_token
+                Incorrect token:
+                  code: 1537
+                  message: invalid_token
+                Incorrect payload:
+                  errors:
+                  - code: 65536
+                    message: Invalid payload
+                Document not found:
+                  errors:
+                  - code: 65582
+                    message: Document "{document_id}" could not be found, make sure the id is correct and the user owns the document
+                document_ids empty:
+                  errors:
+                  - code: 65582
+                    message: No documents provided
+                Document has invites:
+                  errors:
+                  - code: 65582
+                    message: Document {document_id} already has active or fulfilled invites.
+                Document is template:
+                  errors:
+                  - code: 65582
+                    message: Document {template_id} is a template
+                Incorrect document_ids:
+                  errors:
+                  - code: 65582
+                    message: document_ids property is missing, empty, or not an array
+                Missing group_name property:
+                  errors:
+                  - code: 65582
+                    message: group_name property is empty
+                Document is part of another document group:
+                  errors:
+                  - code: 65582
+                    message: Document {document_id} is already part of a document group
+                Document not found or belongs to another user:
+                  errors:
+                  - code: 65582
+                    message: Document "{document_id}" could not be found, make sure the id is correct and the user owns the document
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - document_ids
+              - group_name
+              properties:
+                group_name:
+                  type: string
+                document_ids:
+                  type: array
+                  items:
+                    type: string
+        required: true
+      tags:
+      - Documentgroup
+  /documentgroup/{document_group_id}:
+    delete:
+      operationId: delete-documentgroup
+      summary: Delete document group
+      description: Deletes a document group. Documents within the group are not deleted. Document groups cannot be deleted while they have a group invite
+      parameters:
+      - in: path
+        name: document_group_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  status: success
+      security:
+      - Bearer: []
+      tags:
+      - Documentgroup
+    get:
+      operationId: get-documentgroup
+      summary: Get document group
+      description: 'This endpoint allows API users to retrieve details about a specific document group, including its documents, assigned roles, and any FreeForm or field invites.
+
+
+        The `invite_id` property indicates the group invite if it exists, or is null if no invite has been created.'
+      parameters:
+      - in: path
+        name: document_group_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: '* Success
+
+            * Success with email_group block'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Unique identifier of the document group.
+                  state:
+                    enum:
+                    - created
+                    - pending
+                    - canceled
+                    - completed
+                    - declined
+                    - correction
+                    type: string
+                    description: 'Current state of the document group. Possible values: `created` — the document group has been created; `pending` — an invite has been sent and is awaiting signing; `canceled` — the document group invite was canceled; `completed` — all signing steps are completed; `declined` — one of the signers declined to sign; `correction` — the document group is in correction mode.'
+                  documents:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        roles:
+                          type: array
+                          items:
+                            type: string
+                        settings:
+                          type: array
+                          items:
+                            type: object
+                            properties: {}
+                        thumbnail:
+                          type: object
+                          properties:
+                            large:
+                              type: string
+                            small:
+                              type: string
+                            medium:
+                              type: string
+                        document_name:
+                          type: string
+                        field_invites:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              short_link_url:
+                                type:
+                                - string
+                                - 'null'
+                              signature_type:
+                                type:
+                                - string
+                                - 'null'
+                              payment_request:
+                                type:
+                                - string
+                                - 'null'
+                        allowed_to_remove:
+                          type: boolean
+                        origin_document_id:
+                          type:
+                          - string
+                          - 'null'
+                        has_unassigned_field:
+                          type: boolean
+                        has_credit_card_number:
+                          type: boolean
+                    description: List of documents in the document group.
+                  folder_id:
+                    type:
+                    - string
+                    - 'null'
+                    description: Unique identifier of the folder that contains the document group, or `null` if the group is not in a folder.
+                  invite_id:
+                    type: string
+                    description: Unique identifier of the active group invite, or `null` if no invite has been created.
+                  group_name:
+                    type: string
+                    description: Display name of the document group.
+                  share_info:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                      is_personally_shared_to_others:
+                        type: boolean
+                    description: Sharing information for the document group, including the requesting user's role.
+                  mail_provider:
+                    type: 'null'
+                    description: Mail provider used for sending invite emails. `null` if the default provider is used.
+                  freeform_invite:
+                    type: object
+                    properties:
+                      id:
+                        type:
+                        - string
+                        - 'null'
+                    description: Information about the FreeForm invite associated with this document group. The `id` is `null` if no FreeForm invite has been created.
+                  scheduled_invite:
+                    type: 'null'
+                    description: Information about a scheduled invite for the document group, or `null` if no invite is scheduled.
+                  email_action_on_complete:
+                    type: 'null'
+                    description: Specifies how documents are emailed when the document group invite is completed. `null` if no action is configured.
+                  document_group_attributes:
+                    type: object
+                    properties:
+                      from_name:
+                        type: string
+                      from_email:
+                        type: string
+                    description: Custom attributes for the document group, such as the sender email and sender name used for invites.
+                  originator_organization_settings:
+                    type: array
+                    items:
+                      type: object
+                      properties: {}
+                    description: Organization-level settings inherited from the document group owner's organization.
+                x-examples:
+                  Example 1:
+                    id: bcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    state: completed
+                    documents:
+                    - id: 19XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      roles:
+                      - Signer 1
+                      thumbnail:
+                        large: https://example.com/document/19XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                        small: https://example.com/document/19XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                        medium: https://example.com/document/19XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                      document_name: Sample document
+                      origin_document_id: 73XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      has_unassigned_field: false
+                      has_credit_card_number: false
+                    - id: 6fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      roles:
+                      - Employer Representative
+                      thumbnail:
+                        large: https://example.com/document/6fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                        small: https://example.com/document/6fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                        medium: https://example.com/document/6fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                      document_name: Sample document 1
+                      field_invites: []
+                      origin_document_id: 76XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      has_unassigned_field: false
+                      has_credit_card_number: false
+                    invite_id: 47XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    group_name: Sample document group
+                    project_id: null
+                    share_info:
+                      role: owner
+                      is_personally_shared_to_others: false
+                    mail_provider: null
+                    scheduled_invite: null
+                    email_action_on_complete: null
+                    document_group_attributes:
+                      from_name: Jane Doe
+                      from_email: sender@email.com
+                    originator_organization_settings: []
+              example:
+                Success:
+                  id: d6XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  state: pending
+                  documents:
+                  - id: d4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    roles:
+                    - Candidate
+                    - HR manager
+                    - Viewer 2
+                    - Viewer 3
+                    settings: []
+                    thumbnail:
+                      large: https://api.signnow.com/document/d4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                      small: https://api.signnow.com/document/d4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                      medium: https://api.signnow.com/document/d4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                    document_name: Offerletter
+                    field_invites:
+                    - id: 5aXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      short_link_url: null
+                      signature_type: null
+                      payment_request: null
+                    allowed_to_remove: true
+                    origin_document_id: 7cXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    has_unassigned_field: false
+                    has_credit_card_number: false
+                  - id: d6XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    roles:
+                    - CEO
+                    - Employee
+                    - HR manager
+                    - Viewer 1
+                    settings: []
+                    thumbnail:
+                      large: https://api.signnow.com/document/d6XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                      small: https://api.signnow.com/document/d6XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                      medium: https://api.signnow.com/document/d6XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                    document_name: EMPLOYMENTCONTRACT
+                    field_invites:
+                    - id: 7dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      short_link_url: null
+                      signature_type: null
+                      payment_request: null
+                    - id: 14XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      short_link_url: null
+                      signature_type: null
+                      payment_request: null
+                    allowed_to_remove: true
+                    origin_document_id: 2dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    has_unassigned_field: false
+                    has_credit_card_number: false
+                  folder_id: edXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  invite_id: c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  group_name: Jessica Moore onboarding package
+                  share_info:
+                    role: owner
+                    is_personally_shared_to_others: false
+                  mail_provider: null
+                  freeform_invite:
+                    id: null
+                  scheduled_invite: null
+                  email_action_on_complete: null
+                  document_group_attributes:
+                    from_name: Sample Sender
+                    from_email: owner@email.com
+                  originator_organization_settings:
+                  - value: '0'
+                    setting: no_user_signature_return
+                  - value: https://app.signnow.com/webapp/
+                    setting: invite_completion_redirect_url
+                  - value: https://app.signnow.com/webapp/
+                    setting: invite_decline_redirect_url
+                  - value: '0'
+                    setting: required_preset_signature_name
+                  - value: '0'
+                    setting: require_email_subject
+                  - value: '0'
+                    setting: require_login_for_signing
+                  - value: '0'
+                    setting: logout_on_signing
+                  - value: '0'
+                    setting: front_end_session_length
+                  - value: '0'
+                    setting: add_signature_stamp_with_name
+                  - value: '0'
+                    setting: cfr_title_21_part_11
+                  - value: '0'
+                    setting: require_authentication_for_invites
+                  - value: '1'
+                    setting: document_guide
+                  - value: '0'
+                    setting: disable_email_notifications
+                  - value: 'no'
+                    setting: block_login_via_social_networks
+                  - value: '1'
+                    setting: common_experiments
+                  - value: '0'
+                    setting: hide_decline_to_sign_option_in_signing_session
+                  - value: '0'
+                    setting: hide_upgrade_subscription_button
+                  - value: ''
+                    setting: do_no_consent_redirect_url
+                  - value: '0'
+                    setting: lock_signing_date_by_default
+                  - value: '0'
+                    setting: allow_download_certificate
+                  - value: '0'
+                    setting: have_merged_document_group_option
+                  - value: '1'
+                    setting: guide_signers_only_through_required_fields
+                  - value: '30'
+                    setting: invite_expiration_days
+                  - value: '0'
+                    setting: allow_big_attachment_file
+                  - value: '0'
+                    setting: allow_big_count_of_attachment_fields_per_document
+                  - value: '0'
+                    setting: enable_hyperlink_field
+                  - value: '0'
+                    setting: disable_download_action_in_editor
+                  - value: bottom
+                    setting: signature_stamp_position
+                  - value: '0'
+                    setting: enable_pki
+                  - value: '1'
+                    setting: save_signer_signature_and_initials
+                  - value: '1'
+                    setting: auto_apply_signatures_and_initials_to_document_fields
+                  - value: '0'
+                    setting: receive_signer_email_after_sent_field_invite_to_yourself
+                  - value: '0'
+                    setting: allow_edit_document_after_signing
+                  - value: 'off'
+                    setting: every_signature_and_initials_field_requires_user_authentication
+                  - value: '0'
+                    setting: enable_render_pages_in_editor_as_images
+                  - value: '0'
+                    setting: enable_team_admin_move_docs
+                  - value: '0'
+                    setting: disable_email_recipients
+                  - value: '0'
+                    setting: allow_team_admin_rename_docs
+                  - value: '0'
+                    setting: allow_qes
+                  - value: '0'
+                    setting: enable_qes
+                  - value: https://www.signnow.com/
+                    setting: invite_canceled_redirect_url
+                  - value: https://app.signnow.com/webapp/
+                    setting: save_draft_redirect_url
+                  - value: '0'
+                    setting: add_signers_name_to_document_history_header
+                Example 1:
+                  id: bcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  state: completed
+                  documents:
+                  - id: 19XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    roles:
+                    - Signer 1
+                    thumbnail:
+                      large: https://example.com/document/19XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                      small: https://example.com/document/19XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                      medium: https://example.com/document/19XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                    document_name: Sample document
+                    origin_document_id: 73XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    has_unassigned_field: false
+                    has_credit_card_number: false
+                  - id: 6fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    roles:
+                    - Employer Representative
+                    thumbnail:
+                      large: https://example.com/document/6fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                      small: https://example.com/document/6fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                      medium: https://example.com/document/6fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                    document_name: Sample document 1
+                    field_invites: []
+                    origin_document_id: 76XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    has_unassigned_field: false
+                    has_credit_card_number: false
+                  invite_id: 47XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  group_name: Sample document group
+                  project_id: null
+                  share_info:
+                    role: owner
+                    is_personally_shared_to_others: false
+                  mail_provider: null
+                  scheduled_invite: null
+                  email_action_on_complete: null
+                  document_group_attributes:
+                    from_name: Jane Doe
+                    from_email: sender@email.com
+                  originator_organization_settings: []
+                Success with email_group block:
+                  id: 02XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  state: pending
+                  documents:
+                  - id: 07XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    roles:
+                    - Signer 1
+                    settings: []
+                    thumbnail:
+                      large: https://api.signnow.com/document/07XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                      small: https://api.signnow.com/document/07XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                      medium: https://api.signnow.com/document/07XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                    document_name: Sample document
+                    field_invites:
+                    - id: 2bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      email_group:
+                        id: 3eXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        name: Sample group name
+                      short_link_url: null
+                      signature_type: null
+                      payment_request: null
+                    allowed_to_remove: true
+                    origin_document_id: null
+                    has_unassigned_field: false
+                    has_credit_card_number: false
+                  folder_id: 11XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  invite_id: 22XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  group_name: Group with email_group invite
+                  share_info:
+                    role: owner
+                    is_personally_shared_to_others: false
+                  mail_provider: null
+                  freeform_invite:
+                    id: null
+                  scheduled_invite: null
+                  email_action_on_complete: null
+                  document_group_attributes:
+                    from_name: Sample Sender
+                    from_email: owner@email.com
+                  originator_organization_settings: []
+      security:
+      - Bearer: []
+      tags:
+      - Documentgroup
+  /documentgroup/{document_group_id}/downloadall:
+    post:
+      operationId: post-documentgroup-document-group-id-downloadall
+      summary: Download document group
+      description: This endpoint allows users to download all documents of the document group.
+      parameters:
+      - in: path
+        name: document_group_id
+        required: true
+        description: ID of the document group.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Zipped binary file (application/zip content)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: "Request with any of these cases:\n\n* invalid token \n* expired token \n* empty header\n* authorization = null"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Authorization error:
+                  code: 1537
+                  message: invalid_token
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - type
+              - with_history
+              properties:
+                type:
+                  type: string
+                  description: 'Type of the download format. Allowed values: `zip`, `merged`, `certificate`, `email`.'
+                with_history:
+                  type: string
+                  description: 'Whether or not to attach document history to the download. Allowed values: `no`, `after_each_document`, `after_merged_pdf`.'
+                document_order:
+                  type: array
+                  items:
+                    type: string
+                  description: The order of documents in the merged file.
+              x-examples:
+                Example 1:
+                  type: merged
+                  with_history: after_merged_pdf
+                  document_order:
+                  - 2731940ca423d065d99833df3dacf359a94e3e33
+                  - 4f46709eecac1f77e69deb5d4dd8cc9167356954
+        required: true
+      tags:
+      - Documentgroup
+  /documentgroup/{document_group_id}/historyfull:
+    get:
+      operationId: get-documentgroup-document-group-id-historyfull
+      summary: Get document group history
+      description: 'This endpoint allows users to retrieve full history for a specific Document Group.
+
+
+        For the events:
+
+
+        * `document_group_authentication_success`
+
+        * `document_group_authentication_failure`
+
+
+        the response may contain an additional parameter `phone_number_2fa` which shows the signer''s phone number used for authentication method `phone` or `sms`.
+
+
+        For the event:
+
+
+        * `document_group_authentication_success`
+
+
+        the response may contain an additional parameter `authentication_code` which shows the code used for authentication method `sms`. The signer receives a code by SMS and enters this code to access the opened document.
+
+
+        **View the complete list of document group events:**
+
+
+        | **Event name** | **Meaning** |
+
+        | --- | --- |
+
+        | `document_group_created` | The document group was created. |
+
+        | `document_group_user_logged_in` | A user logged in during interaction with the document group. |
+
+        | `document_group_viewed` | The document group was viewed. |
+
+        | `document_group_approved` | The document group was approved. |
+
+        | `document_group_signed` | The document group was signed. |
+
+        | `document_group_sign_owner_attachment_sent` | The completed document group was sent to the owner as an attachment. |
+
+        | `document_group_sign_signer_attachment_sent` | The completed document group was sent to the signer as an attachment. |
+
+        | `document_group_downloaded` | The document group was downloaded. |
+
+        | `document_group_invite_sent` | The document group invite was sent. |
+
+        | `document_group_invite_resend` | The document group invite was resent. |
+
+        | `document_group_invite_completed` | The document group invite was completed. |
+
+        | `document_group_invite_cancelled` | The document group invite was cancelled. |
+
+        | `document_group_invite_full_declined` | The document group invite was declined by all recipients. |
+
+        | `document_group_invite_approver_full_declined` | The document group invite was declined by all approvers. |
+
+        | `document_group_fieldinvite_declined` | The document group field invite was declined. |
+
+        | `document_group_freeform_invite_sent` | A FreeForm invite for the document group was sent. |
+
+        | `document_group_freeform_invite_resend` | A FreeForm invite for the document group was resent. |
+
+        | `document_group_freeform_invite_cancelled` | A FreeForm invite for the document group was cancelled. |
+
+        | `document_group_freeform_invite_signed_by_user` | A recipient signed a FreeForm invite for the document group. |
+
+        | `document_group_freeform_invite_completed` | A FreeForm invite for the document group was completed. |
+
+        | `document_group_freeform_sign_owner_attachment_sent` | The document group signed in a FreeForm invite was sent to the owner. |
+
+        | `document_group_freeform_sign_signer_attachment_sent` | The document group signed in a FreeForm invite was sent to the signer. |
+
+        | `document_group_authentication_success` | A document group signer successfully passed authentication. |
+
+        | `document_group_authentication_failure` | A document group signer failed to pass authentication. |
+
+        | `document_group_approver_authentication_success` | A document group approver successfully passed authentication. |
+
+        | `document_group_approver_authentication_failure` | A document group approver failed to pass authentication. |
+
+        | `document_group_correction_start` | A correction process started for the document group. |
+
+        | `document_group_correction_finish` | A correction process finished for the document group. |'
+      parameters:
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      - in: path
+        name: document_group_id
+        required: true
+        description: ID of the document group.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: "Successfully get history of a document group: \n  * with a group invite\n  * without invite\n  * for the event `document_group_authentication_success`\n  * for the event `document_group_authentication_failure`\n  \nNote, that the `id_address` attribute in the response body is now deprecated. Instead, the `ip_address` attribute is included."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        email:
+                          type: string
+                        event:
+                          type: string
+                        created:
+                          type: integer
+                        user_id:
+                          type: string
+                        unique_id:
+                          type: string
+                        ip_address:
+                          type: string
+                        session_id:
+                          type:
+                          - integer
+                          - 'null'
+                        client_app_name:
+                          type: string
+                        json_attributes:
+                          type:
+                          - object
+                          - 'null'
+                        client_timestamp:
+                          type:
+                          - integer
+                          - 'null'
+                        document_group_id:
+                          type: string
+                  meta:
+                    type: object
+                    properties:
+                      summary:
+                        type: object
+                        properties:
+                          sender:
+                            type: string
+                          created:
+                            type: integer
+                          group_sent:
+                            type: integer
+                          recipients:
+                            type: array
+                            items:
+                              type: string
+                          group_status:
+                            type: string
+                          last_updated:
+                            type: integer
+                          amount_of_pages:
+                            type: integer
+                      pagination:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                          links:
+                            type: array
+                            items:
+                              type: object
+                          total:
+                            type: integer
+                          per_page:
+                            type: integer
+                          total_pages:
+                            type: integer
+                          current_page:
+                            type: integer
+                x-examples:
+                  Example 1:
+                    data:
+                    - email: sender@email.com
+                      event: document_group_downloaded
+                      created: 1590054771
+                      user_id: ffXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      unique_id: 5aXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      ip_address: 142.32.0.1
+                      session_id: null
+                      client_app_name: Sample Application
+                      json_attributes: null
+                      client_timestamp: 1586165940,
+                      document_group_id: beXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    meta:
+                      summary:
+                        sender: sender@email.com
+                        created: 1625136688
+                        group_sent: 1622029581
+                        recipients:
+                        - recipient1@email.com
+                        - recipient2@email.com
+                        group_status: pending
+                        last_updated: 1625233888
+                        amount_of_pages: 11
+                      pagination:
+                        count: 1
+                        links: []
+                        total: 1
+                        per_page: 15
+                        total_pages: 1
+                        current_page: 1
+              example:
+                Example 1:
+                  data:
+                  - email: sender@email.com
+                    event: document_group_downloaded
+                    created: 1590054771
+                    user_id: ffXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    unique_id: 5aXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    ip_address: 142.32.0.1
+                    session_id: null
+                    client_app_name: Sample Application
+                    json_attributes: null
+                    client_timestamp: 1586165940,
+                    document_group_id: beXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  meta:
+                    summary:
+                      sender: sender@email.com
+                      created: 1625136688
+                      group_sent: 1622029581
+                      recipients:
+                      - recipient1@email.com
+                      - recipient2@email.com
+                      group_status: pending
+                      last_updated: 1625233888
+                      amount_of_pages: 11
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                without invite:
+                  data:
+                  - email: owner@email.com
+                    event: document_group_downloaded
+                    created: 1590054771
+                    user_id: ffXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    unique_id: 5aXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    ip_address: 00.00.00.00
+                    session_id: null
+                    client_app_name: Sample Application
+                    json_attributes: null
+                    client_timestamp: 1586165940
+                    document_group_id: beXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  meta:
+                    summary:
+                      created: 1625136688
+                      amount_of_pages: 11
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                with a group invite:
+                  data:
+                  - email: sender@email.com
+                    event: document_group_downloaded
+                    created: 1590054771
+                    user_id: ffXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    unique_id: 5aXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    ip_address: 142.32.0.1
+                    session_id: null
+                    client_app_name: Sample Application
+                    json_attributes: null
+                    client_timestamp: 1586165940
+                    document_group_id: beXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  meta:
+                    summary:
+                      sender: sender@email.com
+                      created: 1625136688
+                      group_sent: 1622029581
+                      recipients:
+                      - recipient1@email.com
+                      - recipient2@email.com
+                      group_status: pending
+                      last_updated: 1625233888
+                      amount_of_pages: 11
+                    pagination:
+                      count: 1
+                      links: []
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                document group authentication failure:
+                  data:
+                  - email: owner_document_group@email.com
+                    event: document_group_created
+                    created: 1672751428
+                    user_id: 35XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    unique_id: 95XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    ip_address: 00.00.00.00
+                    client_app_name: Sample application
+                    json_attributes: null
+                    client_timestamp: 0
+                    document_group_id: 7dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  - email: owner_document_group@email.com
+                    event: document_group_invite_sent
+                    created: 1672751636
+                    user_id: 35XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    unique_id: c4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    ip_address: 00.00.00.00
+                    client_app_name: Sample application
+                    json_attributes:
+                      signers:
+                      - signer1@email.com
+                      - signer2@email.com
+                      viewers: []
+                      document_unique_ids:
+                      - 01XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      group_invite_unique_id: 8dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    client_timestamp: 1745310494
+                    document_group_id: 7dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  - email: signer1@email.com
+                    event: document_group_authentication_failure
+                    created: 1672751775
+                    user_id: 6aXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    unique_id: 78XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    ip_address: 00.00.00.00
+                    client_app_name: Sample Application
+                    json_attributes:
+                      phone_number_2fa: +1XXX-XXXXXXX
+                      authentication_type: sms
+                      document_unique_ids:
+                      - 01XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      group_invite_unique_id: 8dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    client_timestamp: 1672751775
+                    document_group_id: 7dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  - email: signer2@email.com
+                    event: document_group_authentication_failure
+                    created: 1672751811
+                    user_id: 83XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    unique_id: 0dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    ip_address: 00.00.00.00
+                    client_app_name: Sample Application
+                    json_attributes:
+                      phone_number_2fa: +1XXX-XXXXXXX
+                      authentication_type: phone_call
+                      document_unique_ids:
+                      - 01XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      group_invite_unique_id: 8dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    client_timestamp: 1672751811
+                    document_group_id: 7dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  meta:
+                    summary:
+                      sender: owner_document_group@email.com
+                      created: 1672751428
+                      cc_emails:
+                      - cc-recipient1@email.com
+                      - cc-recipient2@email.com
+                      group_sent: 1672751635
+                      recipients:
+                      - signer1@email.com
+                      - signer2@email.com
+                      group_status: pending
+                      last_updated: 1672751635
+                      amount_of_pages: 2
+                document group authentication success:
+                  data:
+                  - email: owner_document_group@email.com
+                    event: document_group_created
+                    created: 1672751428
+                    user_id: 35XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    unique_id: 95XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    ip_address: 00.00.00.00
+                    client_app_name: Sample application
+                    json_attributes: null
+                    client_timestamp: 0
+                    document_group_id: 7dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  - email: owner_document_group@email.com
+                    event: document_group_invite_sent
+                    created: 1672751636
+                    user_id: 35XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    unique_id: c4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    ip_address: 00.00.00.00
+                    client_app_name: Sample application
+                    json_attributes:
+                      signers:
+                      - signer1@email.com
+                      - signer2@email.com
+                      viewers: []
+                      document_unique_ids:
+                      - 01XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      group_invite_unique_id: 8dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    client_timestamp: 1745310494
+                    document_group_id: 7dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  - email: signer1@email.com
+                    event: document_group_authentication_failure
+                    created: 1672751775
+                    user_id: 6aXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    unique_id: 78XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    ip_address: 00.00.00.00
+                    client_app_name: Sample Application
+                    json_attributes:
+                      phone_number_2fa: +1XXX-XXXXXXX
+                      authentication_type: sms
+                      document_unique_ids:
+                      - 01XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      group_invite_unique_id: 8dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    client_timestamp: 1672751775
+                    document_group_id: 7dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  - email: signer2@email.com
+                    event: document_group_authentication_failure
+                    created: 1672751811
+                    user_id: 83XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    unique_id: 0dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    ip_address: 00.00.00.00
+                    client_app_name: Sample Application
+                    json_attributes:
+                      phone_number_2fa: +1XXX-XXXXXXX
+                      authentication_type: phone_call
+                      document_unique_ids:
+                      - 01XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      group_invite_unique_id: 8dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    client_timestamp: 1672751811
+                    document_group_id: 7dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  meta:
+                    summary:
+                      sender: owner_document_group@email.com
+                      created: 1672751428
+                      cc_emails:
+                      - cc-recipient1@email.com
+                      - cc-recipient2@email.com
+                      group_sent: 1672751635
+                      recipients:
+                      - signer1@email.com
+                      - signer2@email.com
+                      group_status: pending
+                      last_updated: 1672751635
+                      amount_of_pages: 2
+        '400':
+          description: "\t\nRequest with any of these cases:\n\n* The bearer token is incorrect.\n* The token has expired.\n* The authorization header is empty."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 1537
+                    message: invalid_token
+              example:
+                '400':
+                  code: 1537
+                  message: invalid_token
+                Example 1:
+                  code: 1537
+                  message: invalid_token
+        '403':
+          description: The user does not have access to the document group.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - message: Access to DocumentGroup is denied
+              example:
+                Example 1:
+                  errors:
+                  - message: Access to DocumentGroup is denied
+                Document Group does not belong to user and user was not invited on any step:
+                  errors:
+                  - message: Access to DocumentGroup denied
+        '404':
+          description: 'Request with any of these cases:
+
+
+            * The document group was not found.
+
+            * The document group is not active.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - message: Document group `1c25ec9af5a245efa233a2b657d84f8b2aa03529` not found
+              example:
+                Example 1:
+                  errors:
+                  - message: Document group `1c25ec9af5a245efa233a2b657d84f8b2aa03529` not found
+                Document Group is not found or not active:
+                  errors:
+                  - message: Document group `ffXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX` not found
+      security:
+      - Bearer: []
+      tags:
+      - Documentgroup
+  /documentgroup/{group_id}/groupinvite:
+    post:
+      operationId: post
+      summary: Send doc group invite with payment request
+      description: 'This endpoint allows users to send a document group invite with a payment request. Recipients will be redirected to the payment page after completing the documents.
+
+
+        > To request a payment, users must either connect to the payment service individually or accept an invitation to an organization already connected to the payment service.
+
+
+        - To connect your organization to the payment service, see Connect to merchant account.
+
+
+        - To connect a personal SignNow account to the payment service, see Connect to personal merchant account.
+
+
+        A payment request can be linked to a specific field (`calculated` type) or set as a fixed amount (`fixed`type).
+
+
+        This article lists only the parameters required for a payment request. For other document group invite parameters, see Invite to sign doc group.
+
+
+        **Use additional attributes to customize the request**
+
+
+        | Parameter | Description | Example |
+
+        | --- | --- | --- |
+
+        | `field_type` | Type of the field that sets the payment amount. Required if the request `type` is `calculated`. For a payment request invite, `filed_type` is `text_fields`. | |
+
+        | `field_name` | Name of the field that sets the payment amount. Used if the `type` is `calculated`. Can be found in the Get document response (fields.name). | See the screenshot above. |
+
+        | `type` | Defines how the payment amount is set. Allowed values: `fixed` (the amount is set in the amount field) and `calculated` (set using a document field).
+
+
+        Learn how to add a payment request field. | |
+
+        | `currency` | Payment currency in ISO format. | |
+
+        | `amount` | Amount of payment. Required if `type` is ''fixed''. | See the screenshot above. |'
+      parameters:
+      - in: path
+        name: group_id
+        required: true
+        description: ID of the document group
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  pending_invite_link:
+                    type: 'null'
+                x-examples:
+                  Example 1:
+                    id: XXXXe0ea656944f3b833d0baeb1067f02490YYYY
+                    pending_invite_link: null
+              example:
+                Example 1:
+                  id: XXXXe0ea656944f3b833d0baeb1067f02490YYYY
+                  pending_invite_link: null
+        '400':
+          description: "- `field_id` is empty or missing. \n- `field_type` is missing or incorrect.\n- `amount` is empty or missing.\n- `currency` is missing.\n- `type` is missing.\n- `merchants` is empty.\n- Merchant ID is incorrect."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 65536
+                      message: 'Invalid field type, valid types are: text_fields'
+              example:
+                Example 1:
+                  errors:
+                  - code: 65536
+                    message: 'Invalid field type, valid types are: text_fields'
+                Merchants empty:
+                  errors:
+                  - code: 65536
+                    message: Required at least one merchant account in payment request
+                currency missing:
+                  errors:
+                  - code: 65536
+                    message: Must provide currency type for payments
+                Merchant ID incorrect:
+                  errors:
+                  - code: 65536
+                    message: Invalid merchant_id in payment_field_request
+                amount empty or missing:
+                  errors:
+                  - code: 65536
+                    message: For fixed payment types, please enter non zero amount
+                field_id empty or missing:
+                  errors:
+                  - code: 65536
+                    message: Invalid field id provided
+                field_type missing or incorrect:
+                  errors:
+                  - code: 65536
+                    message: 'Invalid field type, valid types are: text_fields'
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - invite_steps
+              properties:
+                invite_steps:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - order
+                    - invite_actions
+                    properties:
+                      order:
+                        type: integer
+                        example: 1
+                        description: 'Signing order step. All signers assigned to a specific order step (e.g., order: 1) receive the invite email simultaneously. Emails for the next order step (e.g., order: 2) are sent only after all actions in the previous order step are completed.'
+                      invite_emails:
+                        type: array
+                        items:
+                          type: object
+                          required:
+                          - email
+                          properties:
+                            email:
+                              type: string
+                              example: signer@email.com
+                              description: Recipient email address.
+                        description: An array of recipient emails within this step.
+                      invite_actions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            email:
+                              type: string
+                              example: signer@email.com
+                              description: Recipient email address.
+                            action:
+                              type: string
+                              example: sign
+                              description: 'The action required from the recipient in the document. Allowed values: `sign`, `view`, `approve`.'
+                            role_name:
+                              type: string
+                              example: Signer
+                              description: Recipient role name.
+                            document_id:
+                              type: string
+                              example: d31bb646ccca47aa9ab91eeb04c27458aeyyyyye
+                              description: ID of the document on which the action is required.
+                            payment_request:
+                              type: object
+                              required:
+                              - type
+                              - currency
+                              - merchants
+                              - field_type
+                              - field_id
+                              - amount
+                              properties:
+                                type:
+                                  type: string
+                                  example: fixed
+                                  description: 'The type of the payment request. Allowed values: `fixed`, `calculated`.'
+                                amount:
+                                  type: string
+                                  example: '1000'
+                                  description: Payment amount. Required for the `fixed` payment type.
+                                currency:
+                                  type: string
+                                  example: USD
+                                  description: Payment currency in ISO format.
+                                field_id:
+                                  type: string
+                                  example: eb1dc1e1946f47cd87fa4a63664803bddbazzzz
+                                  description: The ID of the field that defines the payment amount. Required for the `calculated` payment type. Can be found in the [Get document](/docs/document/operations/get-document) response.
+                                merchants:
+                                  type: array
+                                  items:
+                                    type: string
+                                  description: IDs of connected payment service accounts. Can be found in the [Get merchant account](/docs/request-payments/operations/get-organizations-org-id-merchantaccount-merchant-account-id) response.
+                                field_name:
+                                  type: string
+                                  example: payment_field
+                                  description: The name of the field that defines the payment amount. Used for the `calculated` payment type. Can be found in the [Get document](/docs/document/operations/get-document) response.
+                                field_type:
+                                  type: string
+                                  example: text_fields
+                                  description: The field type that defines the payment amount. Required for the `calculated` payment type. Allowed value is `text_fields`.
+                              description: An object with the payment request configuration.
+                        description: An array of objects, where each object defines a recipient, their role, and the corresponding action for a document.
+                  description: Steps of the document group invite. Every step contains the `order` number, `invite_emails` and `invite_actions` within this step.
+              x-examples:
+                Example 1:
+                  invite_steps:
+                  - order: 1
+                    invite_emails:
+                    - email: seller@email.com
+                    invite_actions:
+                    - email: seller@email.com
+                      action: sign
+                      role_name: Seller
+                      document_id: d31bb646ccca47aa9ab91eeb04c27458aeyyyyye
+                      payment_request:
+                        type: calculated
+                        currency: USD
+                        field_id: eb1dc1e1946f47cd87fa4a63664803bddbazzzz
+                        merchants:
+                        - 5ef7e3853f4a4624a037d90d20513a195937dxxx
+                        field_name: payment_buyer
+                        field_type: text_fields
+                  - order: 2
+                    invite_emails:
+                    - email: buyer@email.com
+                    invite_actions:
+                    - email: buyer@email.com
+                      action: sign
+                      role_name: Buyer
+                      document_id: d31bb646ccca47aa9ab91eeb04c27458aeyyyyye
+                      payment_request:
+                        type: fixed
+                        amount: '1000'
+                        currency: USD
+                        merchants:
+                        - yyyye3853f4a4624a037d90d20513a195937dxxx
+        required: true
+      tags:
+      - Documentgroup
+  /documentgroup/{document_group_id}/scheduled-invite:
+    post:
+      operationId: post-document-group-scheduled-invite
+      summary: Create scheduled invite
+      description: 'This endpoint allows API users to create a scheduled document group invite. At the moment specified by `scheduled_timestamp`, the invite is sent to recipients automatically. Both freeform invite and field invite can be sent.
+
+
+        **Notes**
+
+
+        * A paid API plan or Site License is required to create a scheduled invite.
+
+        * `scheduled_timestamp` must be a Unix timestamp (in seconds) that points to a moment in the future.
+
+        * The invite type is detected from the `invite_data` payload shape:
+
+        * If the documents in the group do **not** contain fields, pass a freeform invite payload in `invite_data`.
+
+        * If the documents in the group contain fields, pass a field invite payload in `invite_data`.
+
+        * Each document group can have only one scheduled invite in the `active` status.'
+      parameters:
+      - in: path
+        name: document_group_id
+        required: true
+        description: ID of the document group for which the scheduled invite is created.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Returned when the scheduled invite passes validation and is stored with the `active` status. The response body is empty.
+        '400':
+          description: 'Validation errors for the scheduled invite payload:
+
+
+            * `scheduled_timestamp` is missing, null, not an integer, or points to a moment in the past.
+
+            * `invite_data` is missing, null, of the wrong type, or empty.
+
+            * The document group already has an active scheduled invite.
+
+            * The document group already has an active group invite.
+
+            * The user is not the document group owner.
+
+
+            In addition, all validation errors that apply to the regular invite payload also apply to the contents of `invite_data`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+              example:
+                invite_data is null:
+                  errors:
+                  - code: 65536
+                    message: The `invite_data` value should not be null.
+                invite_data is empty:
+                  errors:
+                  - code: 65536
+                    message: The `invite_data` value must not be an empty array.
+                invite_data wrong type:
+                  errors:
+                  - code: 65536
+                    message: The `invite_data` value should be of type array.
+                Incorrect scheduled time:
+                  errors:
+                  - code: 65582
+                    message: Incorrect scheduled time for invite.
+                Group invite already exists:
+                  errors:
+                  - code: 65582
+                    message: An invite already exists for this document group.
+                scheduled_timestamp is null:
+                  errors:
+                  - code: 65536
+                    message: The `scheduled_timestamp` value should not be null.
+                scheduled_timestamp wrong type:
+                  errors:
+                  - code: 65536
+                    message: The `scheduled_timestamp` value should be of type int.
+                Scheduled invite already exists:
+                  errors:
+                  - code: 65582
+                    message: A scheduled invite already exists.
+                User is not document group owner:
+                  errors:
+                  - code: 65582
+                    message: User is not document group owner
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - scheduled_timestamp
+              - invite_data
+              properties:
+                invite_data:
+                  type: object
+                  description: 'The full document group invite payload. The invite type is detected from the payload shape:
+
+
+                    * Send the same body as the [Create freeform document group invite](/docs/doc-group-freeform-invite/operations/post-v2-document-groups-document-group-id-free-form-invites) endpoint when the documents in the group do not contain fields.
+
+                    * Send the same body as the [Create field invite](/docs/doc-group-field-invite/operations/invite-to-sign-document-group) endpoint when the documents in the group contain fields.'
+                scheduled_timestamp:
+                  type: integer
+                  example: 1820000000
+                  description: Unix timestamp (in seconds) of the moment when the prepared invite must be sent. Must be a positive integer that points to a moment in the future.
+              x-examples:
+                Field invite (document group with fields):
+                  invite_data:
+                    cc:
+                    - cc-recipient@email.com
+                    order_type: recipient_order
+                    invite_steps:
+                    - order: 1
+                      invite_emails:
+                      - email: approver@email.com
+                        message: Review and approve before sending to the signer.
+                        subject: Please approve the document
+                        expiration_days: 30
+                      invite_actions:
+                      - email: approver@email.com
+                        action: approve
+                        role_name: Approver
+                        document_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        redirect_uri: https://example.com/
+                        authentication:
+                          type: phone
+                          phone: '+12025550123'
+                          method: phone_call
+                        redirect_target: blank
+                    - order: 2
+                      invite_emails:
+                      - email: signer1@email.com
+                        message: Hi, please sign this document group.
+                        subject: Please sign
+                        reminder:
+                          remind_after: 5
+                          remind_before: 3
+                          remind_repeat: 2
+                        expiration_days: 30
+                      invite_actions:
+                      - email: signer1@email.com
+                        action: sign
+                        role_name: Signer 1
+                        document_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        redirect_uri: https://example.com/
+                        allow_reassign: '0'
+                        authentication:
+                          type: password
+                          value: '123456'
+                        redirect_target: blank
+                        decline_by_signature: '0'
+                        decline_redirect_uri: https://example.com/
+                    - order: 3
+                      invite_emails:
+                      - email: viewer@email.com
+                        message: The document has been signed. You can view it.
+                        subject: Signed document
+                      invite_actions:
+                      - email: viewer@email.com
+                        action: view
+                        role_name: Viewer
+                        document_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    sign_as_merged: false
+                  scheduled_timestamp: 1820000000
+                Freeform invite (document group without fields):
+                  invite_data:
+                    cc:
+                    - email: cc-recipient@email.com
+                    to:
+                    - email: signer1@email.com
+                      language: en
+                      redirect_uri: https://example.com/
+                      redirect_target: blank
+                    message: Please sign this document group.
+                    subject: Please sign this document group
+                    redirect_uri: https://example.com/
+                    client_timestamp: 1820000000
+                  scheduled_timestamp: 1820000000
+        required: true
+      tags:
+      - Documentgroup
+    put:
+      operationId: put-document-group-scheduled-invite
+      summary: Update scheduled invite
+      description: 'This endpoint allows API users to update the `scheduled_timestamp` of an active scheduled document group invite. Only the timing can be changed; to change the invite payload itself, cancel the active scheduled invite and create a new one.
+
+
+        **Notes**
+
+
+        * A paid API plan or Site License is required.
+
+        * The new `scheduled_timestamp` must be a Unix timestamp (in seconds) that points to a moment in the future.
+
+        * The document group must have a scheduled invite in the `active` status.'
+      parameters:
+      - in: path
+        name: document_group_id
+        required: true
+        description: ID of the document group for which the scheduled invite is created.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returned when the scheduled invite is successfully rescheduled.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                x-examples:
+                  Success:
+                    result: success
+              example:
+                Success:
+                  result: success
+        '400':
+          description: 'Validation errors for the update payload:
+
+
+            * `scheduled_timestamp` is missing, null, not an integer, or points to a moment in the past.
+
+            * The document group does not have an active scheduled invite.
+
+            * The user is not the document group owner.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+              example:
+                Incorrect scheduled time:
+                  errors:
+                  - code: 65582
+                    message: Incorrect scheduled time for invite.
+                scheduled_timestamp is null:
+                  errors:
+                  - code: 65536
+                    message: The `scheduled_timestamp` value should not be null.
+                scheduled_timestamp wrong type:
+                  errors:
+                  - code: 65536
+                    message: The `scheduled_timestamp` value should be of type int.
+                User is not document group owner:
+                  errors:
+                  - code: 65582
+                    message: User is not document group owner
+                Active scheduled invite not found:
+                  errors:
+                  - code: 65582
+                    message: Active scheduled invite not found.
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - scheduled_timestamp
+              properties:
+                scheduled_timestamp:
+                  type: integer
+                  example: 1820000000
+                  description: New Unix timestamp (in seconds) of the moment when the prepared invite must be sent. Must be a positive integer that points to a moment in the future.
+              x-examples:
+                Correct request:
+                  scheduled_timestamp: 1820000000
+        required: true
+      tags:
+      - Documentgroup
+    delete:
+      operationId: delete-document-group-scheduled-invite
+      summary: Cancel scheduled invite
+      description: This endpoint allows API users to cancel an active scheduled document group invite. Once cancelled, the scheduled invite is no longer in the `active` status and will not be sent at the originally scheduled time. After cancellation, a new scheduled invite can be created for the same document group.
+      parameters:
+      - in: path
+        name: document_group_id
+        required: true
+        description: ID of the document group for which the scheduled invite is created.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returned when the active scheduled invite is successfully cancelled.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                x-examples:
+                  Success:
+                    result: success
+              example:
+                Success:
+                  result: success
+        '400':
+          description: 'Errors:
+
+
+            * The document group does not have an active scheduled invite.
+
+            * The user is not the document group owner.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+              example:
+                User is not document group owner:
+                  errors:
+                  - code: 65582
+                    message: User is not document group owner
+                Active scheduled invite not found:
+                  errors:
+                  - code: 65582
+                    message: Active scheduled invite not found.
+      security:
+      - Bearer: []
+      tags:
+      - Documentgroup
+  /documentgroup/{document_group_id}/scheduled-invite/send:
+    post:
+      operationId: post-document-group-scheduled-invite-send
+      summary: Send scheduled invite
+      description: This endpoint allows API users to send an active scheduled document group invite immediately, bypassing the originally scheduled time. After the invite is sent, the scheduled record is removed from the `active` status.
+      parameters:
+      - in: path
+        name: document_group_id
+        required: true
+        description: ID of the document group whose scheduled invite is sent immediately.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Returned when the scheduled invite is sent successfully. The response shape depends on the invite type: field invite returns `id` and `pending_invite_link`; freeform invite returns a `data` object that contains `id`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                description: 'Field invite shape: `{id, pending_invite_link}`. <br> Freeform invite shape: `{data: {id}}`. <br> See examples.'
+              example:
+                Field invite:
+                  id: cf167dedcbe2466287033ddffb32fb18c4ad5340
+                  pending_invite_link: null
+                Freeform invite:
+                  data:
+                    id: cf167dedcbe2466287033ddffb32fb18c4ad5346
+        '400':
+          description: 'Errors:
+
+
+            * The document group does not have an active scheduled invite.
+
+            * The user is not the document group owner.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+              example:
+                User is not document group owner:
+                  errors:
+                  - code: 65582
+                    message: User is not document group owner
+                Active scheduled invite not found:
+                  errors:
+                  - code: 65582
+                    message: Active scheduled invite not found.
+      security:
+      - Bearer: []
+      tags:
+      - Documentgroup
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

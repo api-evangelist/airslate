@@ -1,0 +1,87 @@
+openapi: 3.2.0
+info:
+  title: SignNow Invite API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Invite
+paths:
+  /invite/{invite_id}/cancel:
+    put:
+      operationId: put-invite-invite-id-cancel
+      summary: Cancel freeform invite
+      description: Cancels a FreeForm invite with a specified cancellation reason.
+      parameters:
+      - in: path
+        name: invite_id
+        required: true
+        description: ID of the invite or signature request.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Success:
+                  id: 96XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        '400':
+          description: '* Invalid authorization
+
+            * Field invite not found
+
+            * Document not found
+
+            * Incorrect invite id or signature request id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Document not found:
+                  errors:
+                  - code: 65582
+                    message: Document not found
+                Invalid authorization:
+                  code: 1537
+                  error: invalid_token
+                Field invite not found:
+                  errors:
+                  - code: 66502
+                    message: Field invite not found
+                Incorrect invite id or signature request id:
+                  errors:
+                  - code: 66360
+                    message: Signature request not found
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  maxLength: 1000
+                  description: The reason for canceling the invite.
+                  x-stoplight:
+                    id: jhmdiyr647dtg
+        required: true
+      tags:
+      - Invite
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

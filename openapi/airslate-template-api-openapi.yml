@@ -1,0 +1,280 @@
+openapi: 3.2.0
+info:
+  title: SignNow Template API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Template
+paths:
+  /template:
+    post:
+      operationId: create-template
+      summary: Create template
+      description: 'This endpoint allows API users to create a template by flattening an existing document.
+
+
+        **Template** - an entity that holds the structure of a document and serves for generating its copies.
+
+
+        SignNow users cannot make a template without uploading a document first. They can generate (clone) a new instance of a document from it.
+
+
+        Recipients always sign a document generated from the template, never the template itself. Each generated document can be customized for its recipient, for example prefilled with account info. Templates can be shared within a team and edited only by the owner.
+
+
+        For the full flow, from creating the template to sending the generated document for signature, see Documents, doc groups, and templates.
+
+
+        For more information, check out our video tutorial.
+
+
+        **Video tutorial**
+
+
+        Note: The design shown in the video is outdated, but the flow is still accurate. You can go ahead and follow the steps as demonstrated.
+
+
+        Video tutorial'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+              example:
+                application/json:
+                  id: ceXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - document_id
+              - document_name
+              properties:
+                document_id:
+                  type: string
+                  description: ID of the document which is the source of a template
+                document_name:
+                  type: string
+                  description: the new template name
+        required: true
+      tags:
+      - Template
+  /template/{document_id}/bulkinvite:
+    post:
+      operationId: bulk-invite
+      summary: Bulk invite
+      description: 'This endpoint allows users to create multiple invites to different signers from one template. A new document is generated for each signer and stored in the needed folder.
+
+
+        To create a bulk invite, you need a CSV file with signers'' roles, emails, and document names. The format is the following:
+
+
+        **For one role**
+
+
+        ```json
+
+
+        Recipient 1|signer1@email.com,document_name
+
+        Recipient 1|signer2@email.com,document_name
+
+
+        ```
+
+
+        **For multiple roles**
+
+
+        ```json
+
+
+        Recipient 1|signer1@email.com,Recipient 2|signer2@email.com,document_name1
+
+        Recipient 1|signer3@email.com,Recipient 2|signer4@email.com,document_name2
+
+
+        ```
+
+
+        All the roles in the CSV must be assigned to at least one field in the template, and all the roles that exist in the template must be in the CSV.'
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        description: unique id of the template
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  status: job queued
+        '400':
+          description: '* Incorrect file type (must be a CSV)
+
+            * Missing CSV file
+
+            * Missing `folder_id`
+
+            * Missing or extra recipients in the CSV file
+
+            * Document name in the CSV file is missing or incorrect
+
+            * QES is not set for this user''s organization
+
+            * User cannot use QES if not in organization
+
+            * Incorrect `signature_type`. Allowed values: `eideasy`,`eideasy-pdf`, `nom151`
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Missing CSV file:
+                  errors:
+                  - code: 65536
+                    message: Must upload one file
+                Missing folder_id:
+                  errors:
+                  - code: 65544
+                    message: The folder_id field is required.
+                Incorrect file type:
+                  errors:
+                  - code: 65578
+                    message: Invalid file type.
+                Incorrect signature type:
+                  errors:
+                  - code: 65536
+                    message: 'The signature_type should have one of the following values: "eideasy", "nom151", "eideasy-pdf".'
+                User not in organization:
+                  errors:
+                  - code: 65582
+                    message: Organization required to send invite with advanced signing
+                Missing or extra recipients:
+                  errors:
+                  - code: 65581
+                    message: CSV file,line no 1 - missing required Actor's information. Required Actors = 2 and CSV provided information for Actors = 1
+                QES not set for organization:
+                  errors:
+                  - code: 65582
+                    message: Invalid advanced sign provider for sender organization
+                Document name missing or incorrect:
+                  errors:
+                  - code: 65581
+                    message: 'CSV file, line no 2 - document name is missing or invalid '
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  description: A CSV file with a list of roles, email addresses, and document names
+                  format: binary
+                folder_id:
+                  type: string
+                  description: ID of the folder to store the documents in. To find the ID, use [`GET /user/folder`](/docs/folder/operations/get-all-folders).
+                subject:
+                  type: string
+                  description: Custom email subject for all signers
+                email_message:
+                  type: string
+                  description: Custom email message for all signers
+                client_timestamp:
+                  type: integer
+                  description: The timestamp in UNIX code
+                signature_type:
+                  type: string
+                  description: 'Type of QES signature requested from signers. Possible values: `eideasy`, `eideasy-pdf`, `nom151`. Available to members of an organization with QES settings enabled. For more information, see the [QES user guide](/docs/qualified-electronic-signature).'
+              required:
+              - file
+              - folder_id
+      tags:
+      - Template
+  /template/{template_id}/copy:
+    post:
+      operationId: get-template-copy
+      summary: Create document from template
+      description: 'This endpoint allows API users to create a new document from a template. If a name is not supplied, the document takes the name of the template.
+
+
+        The new document is a signable copy: the template stays untouched as the master version. The response returns the new document''s `id`. The copy has its own document, field, and role IDs, all different from the template''s, so read the current roles and fields from Get document for the new document rather than reusing the template''s. For the full flow, from preparing the document to sending the copy for signature, see Documents, doc groups, and templates. To let recipients sign the copy inside your own site or app, see Embedded signing. To copy the template itself instead of generating a signable document, use Duplicate template.
+
+
+        For more information, check out our video tutorial.
+
+
+        **Video tutorial**
+
+
+        Note: The design shown in the video is outdated, but the flow is still accurate. You can go ahead and follow the steps as demonstrated.
+
+
+        Video tutorial'
+      parameters:
+      - in: path
+        name: template_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  document_name:
+                    type: string
+              example:
+                application/json:
+                  id: ceXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  document_name: New document
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                document_name:
+                  type: string
+        required: true
+      tags:
+      - Template
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

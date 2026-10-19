@@ -1,0 +1,2973 @@
+openapi: 3.2.0
+info:
+  title: SignNow User API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: User
+paths:
+  /user/documentgroup/templates:
+    get:
+      operationId: get-user-documentgroup-templates
+      summary: Get doc group templates
+      description: This endpoint is used for getting document group templates.
+      parameters:
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      - in: query
+        name: limit
+        required: true
+        description: The number of templates to get
+        schema:
+          type: string
+      - in: query
+        name: offset
+        required: false
+        description: The number of templates to skip from the first one.
+        schema:
+          type: string
+          default: '0'
+      responses:
+        '200':
+          description: Correct request with limit = 2
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document_group_templates:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        folder_id:
+                          type: 'null'
+                        templates:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              name:
+                                type: string
+                              roles:
+                                type: array
+                                items:
+                                  type: string
+                              thumbnail:
+                                type: object
+                                properties:
+                                  large:
+                                    type: string
+                                  small:
+                                    type: string
+                                  medium:
+                                    type: string
+                        is_prepared:
+                          type: boolean
+                        owner_email:
+                          type: string
+                        last_updated:
+                          type: string
+                        routing_details:
+                          type: object
+                          properties:
+                            invite_steps:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  order:
+                                    type: integer
+                                  invite_emails:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        email:
+                                          type: string
+                                        message:
+                                          type: string
+                                        subject:
+                                          type: string
+                                        reminder:
+                                          type: object
+                                          properties:
+                                            remind_after:
+                                              type: integer
+                                            remind_before:
+                                              type: integer
+                                            remind_repeat:
+                                              type: integer
+                                        expiration_days:
+                                          type: integer
+                                        has_sign_actions:
+                                          type: boolean
+                                  invite_actions:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        uuid:
+                                          type: string
+                                        email:
+                                          type: string
+                                        action:
+                                          type: string
+                                        role_name:
+                                          type: string
+                                        document_id:
+                                          type: string
+                                        document_name:
+                                          type: string
+                                        allow_reassign:
+                                          type: integer
+                                        authentication:
+                                          type: object
+                                          properties:
+                                            type:
+                                              type: 'null'
+                                        decline_by_signature:
+                                          type: integer
+                            sign_as_merged:
+                              type: boolean
+                            include_email_attachments:
+                              type: 'null'
+                        template_group_id:
+                          type: string
+                        template_group_name:
+                          type: string
+                  document_group_template_total_count:
+                    type: integer
+                x-examples:
+                  Example 1:
+                    document_group_templates:
+                    - folder_id: null
+                      templates:
+                      - id: a8f84795001f4add81dc8efc45d97fdeed9a00aa
+                        name: Test_PDF 1 T
+                        roles:
+                        - Signer 1
+                        - Signer 2
+                        thumbnail:
+                          large: https://app.signnow.com/api/document/a8f84795001f4add81dc8efc45d97fdeed9a00aa/thumbnail?size=large
+                          small: https://app.signnow.com/api/document/a8f84795001f4add81dc8efc45d97fdeed9a00aa/thumbnail?size=small
+                          medium: https://app.signnow.com/api/document/a8f84795001f4add81dc8efc45d97fdeed9a00aa/thumbnail?size=medium
+                      - id: 40179e8d7f684f07a7fef04719e8a2ff0d18a1a0
+                        name: Test_PDF 1 Template SalesForce 2
+                        roles:
+                        - Igor
+                        - Signer 1
+                        thumbnail:
+                          large: https://app.signnow.com/api/document/40179e8d7f684f07a7fef04719e8a2ff0d18a1a0/thumbnail?size=large
+                          small: https://app.signnow.com/api/document/40179e8d7f684f07a7fef04719e8a2ff0d18a1a0/thumbnail?size=small
+                          medium: https://app.signnow.com/api/document/40179e8d7f684f07a7fef04719e8a2ff0d18a1a0/thumbnail?size=medium
+                      is_prepared: false
+                      owner_email: kulygin.denys@pdffiller.team
+                      last_updated: '1634828541'
+                      routing_details:
+                        invite_steps:
+                        - order: 1
+                          invite_emails:
+                          - email: mail+1@gmail.com
+                            message: kulygin.denys@pdffiller.team invited you to sign some documents.
+                            subject: 'DGT test: Signature Request from kulygin.denys'
+                            reminder:
+                              remind_after: 0
+                              remind_before: 0
+                              remind_repeat: 0
+                            expiration_days: 30
+                            has_sign_actions: true
+                          invite_actions:
+                          - uuid: 46f82586-c16b-463d-8835-52ce5c552e08
+                            email: mail+1@gmail.com
+                            action: sign
+                            role_name: Signer 1
+                            document_id: 5507722db6654b11bd2223b83655443813f2013c
+                            document_name: Test_PDF 1 from templ 2
+                            allow_reassign: 0
+                            authentication:
+                              type: null
+                            decline_by_signature: 0
+                        - order: 2
+                          invite_emails:
+                          - email: mail+1@gmail.com
+                            message: kulygin.denys@pdffiller.team invited you to sign some documents.
+                            subject: 'DGT test: Signature Request from kulygin.denys'
+                            reminder:
+                              remind_after: 0
+                              remind_before: 0
+                              remind_repeat: 0
+                            expiration_days: 30
+                            has_sign_actions: true
+                          invite_actions:
+                          - uuid: 070a1fe5-d0c6-41d9-800d-9ce14c6ba24f
+                            email: mail+1@gmail.com
+                            action: sign
+                            role_name: Signer 2
+                            document_id: 5507722db6654b11bd2223b83655443813f2013c
+                            document_name: Test_PDF 1 from templ 2
+                            allow_reassign: 0
+                            authentication:
+                              type: null
+                            decline_by_signature: 0
+                        - order: 3
+                          invite_emails:
+                          - email: mail+1@gmail.com
+                            message: kulygin.denys@pdffiller.team invited you to sign some documents.
+                            subject: 'DGT test: Signature Request from kulygin.denys'
+                            reminder:
+                              remind_after: 0
+                              remind_before: 0
+                              remind_repeat: 0
+                            expiration_days: 30
+                            has_sign_actions: true
+                          invite_actions:
+                          - uuid: b9b6bc5d-8788-4cb2-95d3-84bfb069cf38
+                            email: mail+1@gmail.com
+                            action: sign
+                            role_name: Signer 1
+                            document_id: a8f84795001f4add81dc8efc45d97fdeed9a00aa
+                            document_name: Test_PDF 1 T
+                            allow_reassign: 0
+                            authentication:
+                              type: null
+                            decline_by_signature: 0
+                        - order: 4
+                          invite_emails:
+                          - email: mail+1@gmail.com
+                            message: kulygin.denys@pdffiller.team invited you to sign some documents.
+                            subject: 'DGT test: Signature Request from kulygin.denys'
+                            reminder:
+                              remind_after: 0
+                              remind_before: 0
+                              remind_repeat: 0
+                            expiration_days: 30
+                            has_sign_actions: true
+                          invite_actions:
+                          - uuid: 2fdf4838-4937-43e0-8859-aa082efa53f6
+                            email: mail+1@gmail.com
+                            action: sign
+                            role_name: Signer 2
+                            document_id: a8f84795001f4add81dc8efc45d97fdeed9a00aa
+                            document_name: Test_PDF 1 T
+                            allow_reassign: 0
+                            authentication:
+                              type: null
+                            decline_by_signature: 0
+                        - order: 5
+                          invite_emails:
+                          - email: mail+1@gmail.com
+                            message: kulygin.denys@pdffiller.team invited you to sign some documents.
+                            subject: 'DGT test: Signature Request from kulygin.denys'
+                            reminder:
+                              remind_after: 0
+                              remind_before: 0
+                              remind_repeat: 0
+                            expiration_days: 30
+                            has_sign_actions: true
+                          invite_actions:
+                          - uuid: 6e437866-ca76-473f-9094-38e116dbdbc5
+                            email: mail+1@gmail.com
+                            action: sign
+                            role_name: Signer 1
+                            document_id: 40179e8d7f684f07a7fef04719e8a2ff0d18a1a0
+                            document_name: Test_PDF 1 Template SalesForce 2
+                            allow_reassign: 0
+                            authentication:
+                              type: null
+                            decline_by_signature: 0
+                        - order: 6
+                          invite_emails:
+                          - email: mail+1@gmail.com
+                            message: kulygin.denys@pdffiller.team invited you to sign some documents.
+                            subject: 'DGT test: Signature Request from kulygin.denys'
+                            reminder:
+                              remind_after: 0
+                              remind_before: 0
+                              remind_repeat: 0
+                            expiration_days: 30
+                            has_sign_actions: true
+                          invite_actions:
+                          - uuid: 4f50d474-c62d-4620-9858-529b5fd8204d
+                            email: mail+1@gmail.com
+                            action: sign
+                            role_name: Igor
+                            document_id: 40179e8d7f684f07a7fef04719e8a2ff0d18a1a0
+                            document_name: Test_PDF 1 Template SalesForce 2
+                            allow_reassign: 0
+                            authentication:
+                              type: null
+                            decline_by_signature: 0
+                        sign_as_merged: true
+                        include_email_attachments: null
+                      template_group_id: 31706abc6e50c977af03c1cacd3875a44fb679b9
+                      template_group_name: DGT test
+                    document_group_template_total_count: 1
+              example:
+                Example 1:
+                  document_group_templates:
+                  - folder_id: null
+                    templates:
+                    - id: a8f84795001f4add81dc8efc45d97fdeed9a00aa
+                      name: Test_PDF 1 T
+                      roles:
+                      - Signer 1
+                      - Signer 2
+                      thumbnail:
+                        large: https://app.signnow.com/api/document/a8f84795001f4add81dc8efc45d97fdeed9a00aa/thumbnail?size=large
+                        small: https://app.signnow.com/api/document/a8f84795001f4add81dc8efc45d97fdeed9a00aa/thumbnail?size=small
+                        medium: https://app.signnow.com/api/document/a8f84795001f4add81dc8efc45d97fdeed9a00aa/thumbnail?size=medium
+                    - id: 40179e8d7f684f07a7fef04719e8a2ff0d18a1a0
+                      name: Test_PDF 1 Template SalesForce 2
+                      roles:
+                      - Igor
+                      - Signer 1
+                      thumbnail:
+                        large: https://app.signnow.com/api/document/40179e8d7f684f07a7fef04719e8a2ff0d18a1a0/thumbnail?size=large
+                        small: https://app.signnow.com/api/document/40179e8d7f684f07a7fef04719e8a2ff0d18a1a0/thumbnail?size=small
+                        medium: https://app.signnow.com/api/document/40179e8d7f684f07a7fef04719e8a2ff0d18a1a0/thumbnail?size=medium
+                    is_prepared: false
+                    owner_email: kulygin.denys@pdffiller.team
+                    last_updated: '1634828541'
+                    routing_details:
+                      invite_steps:
+                      - order: 1
+                        invite_emails:
+                        - email: mail+1@gmail.com
+                          message: kulygin.denys@pdffiller.team invited you to sign some documents.
+                          subject: 'DGT test: Signature Request from kulygin.denys'
+                          reminder:
+                            remind_after: 0
+                            remind_before: 0
+                            remind_repeat: 0
+                          expiration_days: 30
+                          has_sign_actions: true
+                        invite_actions:
+                        - uuid: 46f82586-c16b-463d-8835-52ce5c552e08
+                          email: mail+1@gmail.com
+                          action: sign
+                          role_name: Signer 1
+                          document_id: 5507722db6654b11bd2223b83655443813f2013c
+                          document_name: Test_PDF 1 from templ 2
+                          allow_reassign: 0
+                          authentication:
+                            type: null
+                          decline_by_signature: 0
+                      - order: 2
+                        invite_emails:
+                        - email: mail+1@gmail.com
+                          message: kulygin.denys@pdffiller.team invited you to sign some documents.
+                          subject: 'DGT test: Signature Request from kulygin.denys'
+                          reminder:
+                            remind_after: 0
+                            remind_before: 0
+                            remind_repeat: 0
+                          expiration_days: 30
+                          has_sign_actions: true
+                        invite_actions:
+                        - uuid: 070a1fe5-d0c6-41d9-800d-9ce14c6ba24f
+                          email: mail+1@gmail.com
+                          action: sign
+                          role_name: Signer 2
+                          document_id: 5507722db6654b11bd2223b83655443813f2013c
+                          document_name: Test_PDF 1 from templ 2
+                          allow_reassign: 0
+                          authentication:
+                            type: null
+                          decline_by_signature: 0
+                      - order: 3
+                        invite_emails:
+                        - email: mail+1@gmail.com
+                          message: kulygin.denys@pdffiller.team invited you to sign some documents.
+                          subject: 'DGT test: Signature Request from kulygin.denys'
+                          reminder:
+                            remind_after: 0
+                            remind_before: 0
+                            remind_repeat: 0
+                          expiration_days: 30
+                          has_sign_actions: true
+                        invite_actions:
+                        - uuid: b9b6bc5d-8788-4cb2-95d3-84bfb069cf38
+                          email: mail+1@gmail.com
+                          action: sign
+                          role_name: Signer 1
+                          document_id: a8f84795001f4add81dc8efc45d97fdeed9a00aa
+                          document_name: Test_PDF 1 T
+                          allow_reassign: 0
+                          authentication:
+                            type: null
+                          decline_by_signature: 0
+                      - order: 4
+                        invite_emails:
+                        - email: mail+1@gmail.com
+                          message: kulygin.denys@pdffiller.team invited you to sign some documents.
+                          subject: 'DGT test: Signature Request from kulygin.denys'
+                          reminder:
+                            remind_after: 0
+                            remind_before: 0
+                            remind_repeat: 0
+                          expiration_days: 30
+                          has_sign_actions: true
+                        invite_actions:
+                        - uuid: 2fdf4838-4937-43e0-8859-aa082efa53f6
+                          email: mail+1@gmail.com
+                          action: sign
+                          role_name: Signer 2
+                          document_id: a8f84795001f4add81dc8efc45d97fdeed9a00aa
+                          document_name: Test_PDF 1 T
+                          allow_reassign: 0
+                          authentication:
+                            type: null
+                          decline_by_signature: 0
+                      - order: 5
+                        invite_emails:
+                        - email: mail+1@gmail.com
+                          message: kulygin.denys@pdffiller.team invited you to sign some documents.
+                          subject: 'DGT test: Signature Request from kulygin.denys'
+                          reminder:
+                            remind_after: 0
+                            remind_before: 0
+                            remind_repeat: 0
+                          expiration_days: 30
+                          has_sign_actions: true
+                        invite_actions:
+                        - uuid: 6e437866-ca76-473f-9094-38e116dbdbc5
+                          email: mail+1@gmail.com
+                          action: sign
+                          role_name: Signer 1
+                          document_id: 40179e8d7f684f07a7fef04719e8a2ff0d18a1a0
+                          document_name: Test_PDF 1 Template SalesForce 2
+                          allow_reassign: 0
+                          authentication:
+                            type: null
+                          decline_by_signature: 0
+                      - order: 6
+                        invite_emails:
+                        - email: mail+1@gmail.com
+                          message: kulygin.denys@pdffiller.team invited you to sign some documents.
+                          subject: 'DGT test: Signature Request from kulygin.denys'
+                          reminder:
+                            remind_after: 0
+                            remind_before: 0
+                            remind_repeat: 0
+                          expiration_days: 30
+                          has_sign_actions: true
+                        invite_actions:
+                        - uuid: 4f50d474-c62d-4620-9858-529b5fd8204d
+                          email: mail+1@gmail.com
+                          action: sign
+                          role_name: Igor
+                          document_id: 40179e8d7f684f07a7fef04719e8a2ff0d18a1a0
+                          document_name: Test_PDF 1 Template SalesForce 2
+                          allow_reassign: 0
+                          authentication:
+                            type: null
+                          decline_by_signature: 0
+                      sign_as_merged: true
+                      include_email_attachments: null
+                    template_group_id: 31706abc6e50c977af03c1cacd3875a44fb679b9
+                    template_group_name: DGT test
+                  document_group_template_total_count: 1
+                Correct request with limit = 2:
+                  document_group_templates:
+                  - folder_id: null
+                    templates:
+                    - id: a8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: Sample template name
+                      roles:
+                      - Signer 1
+                      - Signer 2
+                      thumbnail:
+                        large: https://sample.com/thumbnail?size=large
+                        small: https://sample.com/thumbnail?size=small
+                        medium: https://sample.com/thumbnail?size=medium
+                    - id: 40XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: Sample template name 2
+                      roles:
+                      - Signer
+                      - Signer 1
+                      thumbnail:
+                        large: https://sample.com/thumbnail?size=large
+                        small: https://sample.com/thumbnail?size=small
+                        medium: https://sample.com/thumbnail?size=medium
+                    is_prepared: false
+                    owner_email: owner@email.com
+                    last_updated: '1634828541'
+                    routing_details:
+                      invite_steps:
+                      - order: 1
+                        invite_emails:
+                        - email: signer1@email.com
+                          message: owner@email.com invited you to sign some documents.
+                          subject: Signature Request from owner
+                          reminder:
+                            remind_after: 0
+                            remind_before: 0
+                            remind_repeat: 0
+                          expiration_days: 30
+                          has_sign_actions: true
+                        invite_actions:
+                        - uuid: 46XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          email: signer1@email.com
+                          action: sign
+                          role_name: Signer 1
+                          document_id: 55XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          document_name: Sample name 2
+                          allow_reassign: 0
+                          authentication:
+                            type: null
+                          decline_by_signature: 0
+                      - order: 2
+                        invite_emails:
+                        - email: signer1@email.com
+                          message: owner@email.com invited you to sign some documents.
+                          subject: Signature Request from owner
+                          reminder:
+                            remind_after: 0
+                            remind_before: 0
+                            remind_repeat: 0
+                          expiration_days: 30
+                          has_sign_actions: true
+                        invite_actions:
+                        - uuid: 07XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          email: signer1@email.com
+                          action: sign
+                          role_name: Signer 2
+                          document_id: 55XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          document_name: Sample name 2
+                          allow_reassign: 0
+                          authentication:
+                            type: null
+                          decline_by_signature: 0
+                      - order: 3
+                        invite_emails:
+                        - email: signer1@email.com
+                          message: owner@email.com invited you to sign some documents.
+                          subject: Signature Request from owner
+                          reminder:
+                            remind_after: 0
+                            remind_before: 0
+                            remind_repeat: 0
+                          expiration_days: 30
+                          has_sign_actions: true
+                        invite_actions:
+                        - uuid: b9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          email: signer1@email.com
+                          action: sign
+                          role_name: Signer 1
+                          document_id: a8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          document_name: Sample name 1
+                          allow_reassign: 0
+                          authentication:
+                            type: null
+                          decline_by_signature: 0
+                      - order: 4
+                        invite_emails:
+                        - email: signer1@email.com
+                          message: owner@email.com invited you to sign some documents.
+                          subject: Signature Request from owner
+                          reminder:
+                            remind_after: 0
+                            remind_before: 0
+                            remind_repeat: 0
+                          expiration_days: 30
+                          has_sign_actions: true
+                        invite_actions:
+                        - uuid: 2fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          email: signer1@email.com
+                          action: sign
+                          role_name: Signer 2
+                          document_id: a8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          document_name: Sample name 1
+                          allow_reassign: 0
+                          authentication:
+                            type: null
+                          decline_by_signature: 0
+                      - order: 5
+                        invite_emails:
+                        - email: signer1@email.com
+                          message: owner@email.com invited you to sign some documents.
+                          subject: Signature Request from owner
+                          reminder:
+                            remind_after: 0
+                            remind_before: 0
+                            remind_repeat: 0
+                          expiration_days: 30
+                          has_sign_actions: true
+                        invite_actions:
+                        - uuid: 6eXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          email: signer1@email.com
+                          action: sign
+                          role_name: Signer 1
+                          document_id: 40XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          document_name: Sample name 2
+                          allow_reassign: 0
+                          authentication:
+                            type: null
+                          decline_by_signature: 0
+                      - order: 6
+                        invite_emails:
+                        - email: signer1@email.com
+                          message: owner@email.com invited you to sign some documents.
+                          subject: Signature Request from owner
+                          reminder:
+                            remind_after: 0
+                            remind_before: 0
+                            remind_repeat: 0
+                          expiration_days: 30
+                          has_sign_actions: true
+                        invite_actions:
+                        - uuid: 4fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          email: signer1@email.com
+                          action: sign
+                          role_name: Signer
+                          document_id: 40XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          document_name: Sample name 2
+                          allow_reassign: 0
+                          authentication:
+                            type: null
+                          decline_by_signature: 0
+                      sign_as_merged: true
+                      include_email_attachments: null
+                    template_group_id: 31XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    template_group_name: Sample name
+                  document_group_template_total_count: 1
+        '400':
+          description: '* Request without limit parameter, or not in range (1, 50)
+
+            * Incorrect offset parameter
+
+            * Invalid token'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 65582
+                      message: The limit query parameter is required and must be between 1 and 50
+              example:
+                Example 1:
+                  errors:
+                  - code: 65582
+                    message: The limit query parameter is required and must be between 1 and 50
+                Invalid token:
+                  code: 1537
+                  error: invalid_token
+                Incorrect offset parameter:
+                  errors:
+                  - code: 65582
+                    message: The offset query parameter is required and must be 0 or greater
+                Without limit or not in range:
+                  errors:
+                  - code: 65582
+                    message: The limit query parameter is required and must be between 1 and 50
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+        required: true
+      tags:
+      - User
+  /user/documentgroups:
+    get:
+      operationId: get-user-documentgroups
+      summary: Get document groups
+      description: 'Returns back all document groups the user owns.
+
+
+        The call is paginated by last_updated, so offset and limit query parameters are required:
+
+        1. Limit must be greater than 0 but less than or equal to 50.
+
+        2. Offset must be 0 or greater.'
+      parameters:
+      - in: query
+        name: limit
+        required: true
+        description: ''
+        schema:
+          type: integer
+      - in: query
+        name: offset
+        required: true
+        description: ''
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document_groups:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        group_id:
+                          type: string
+                        documents:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              name:
+                                type: string
+                              roles:
+                                type: array
+                                items:
+                                  type: string
+                              thumbnail:
+                                type: object
+                                properties:
+                                  large:
+                                    type: string
+                                  small:
+                                    type: string
+                                  medium:
+                                    type: string
+                              has_credit_card_number:
+                                type: boolean
+                        invite_id:
+                          type: string
+                        group_name:
+                          type: string
+                        last_updated:
+                          type: string
+                        invite_status:
+                          type: string
+                  document_group_total_count:
+                    type: integer
+                  originator_organization_settings:
+                    type: array
+                    items:
+                      type: object
+              example:
+                application/json:
+                  document_groups:
+                  - group_id: bcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    documents:
+                    - id: 19XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: Sample document
+                      roles:
+                      - Signer 1
+                      thumbnail:
+                        large: https://example.com/document/19XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                        small: https://example.com/document/19XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                        medium: https://example.com/document/19XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                      has_credit_card_number: false
+                    - id: 6fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: Sample document 1
+                      roles:
+                      - Employer Representative
+                      thumbnail:
+                        large: https://example.com/document/6fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                        small: https://example.com/document/6fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                        medium: https://example.com/document/6fXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                      has_credit_card_number: false
+                    invite_id: 47XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    group_name: Sample document group
+                    last_updated: '1563886628'
+                    invite_status: pending
+                  - group_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    documents:
+                    - id: f5XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: Sample document
+                      roles:
+                      - Signer 1
+                      thumbnail:
+                        large: https://example.com/document/f5XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                        small: https://example.com/document/f5XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                        medium: https://example.com/document/f5XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                      has_credit_card_number: false
+                    - id: 03XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: Sample document 1
+                      roles:
+                      - Employer Representative
+                      thumbnail:
+                        large: https://example.com/document/03XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                        small: https://example.com/document/03XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                        medium: https://example.com/document/03XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                      has_credit_card_number: false
+                    invite_id: 3aXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    group_name: Sample document group
+                    last_updated: '1549032635'
+                    invite_status: pending
+                  - group_id: 60XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    documents:
+                    - id: 15XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: Sample document 2
+                      roles:
+                      - Signer 1
+                      - signer 2
+                      thumbnail:
+                        large: https://example.com/document/15XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                        small: https://example.com/document/15XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                        medium: https://example.com/document/15XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                      has_credit_card_number: false
+                    - id: c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: Sample document 1
+                      roles:
+                      - Signer 1
+                      - signer 2
+                      thumbnail:
+                        large: https://example.com/document/c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                        small: https://example.com/document/c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                        medium: https://example.com/document/c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                      has_credit_card_number: false
+                    invite_id: 62XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    group_name: Sample document group
+                    last_updated: '1540294396'
+                    invite_status: pending
+                  document_group_total_count: 3
+                  originator_organization_settings:
+                  - value: https://example_2.com
+                    setting: invite_completion_redirect_url
+                  - value: ''
+                    setting: invite_decline_redirect_url
+                  - value: '0'
+                    setting: required_preset_signature_name
+                  - value: '0'
+                    setting: require_email_subject
+                  - value: '0'
+                    setting: require_login_for_signing
+                  - value: '0'
+                    setting: logout_on_signing
+                  - value: '0'
+                    setting: front_end_session_length
+                  - value: '0'
+                    setting: add_signature_stamp_with_name
+                  - value: '0'
+                    setting: cfr_title_21_part_11
+                  - value: '0'
+                    setting: require_authentication_for_invites
+                  - value: '1'
+                    setting: document_guide
+                  - value: '0'
+                    setting: disable_email_notifications
+      security:
+      - Bearer: []
+      tags:
+      - User
+  /user/folder:
+    post:
+      operationId: create-folder
+      summary: Create folder
+      description: 'This endpoint allows API users to create a folder inside the specified parent folder.
+
+
+        **Notes**
+
+
+        * To get the ID of a parent folder, such as `Documents`, call `GET /user/folder`.'
+      responses:
+        '200':
+          description: The folder was created. Returns its ID.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID of the created folder.
+              example:
+                Folder created:
+                  id: a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0
+        '400':
+          description: '* `name` is missing or empty
+
+            * The parent folder does not exist'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                          description: Error code.
+                        message:
+                          type: string
+                          description: Error message.
+                    description: List of errors.
+              example:
+                Empty name:
+                  errors:
+                  - code: 65536
+                    message: name must not be empty
+                Parent folder not found:
+                  errors:
+                  - code: 65626
+                    message: parent resource does not exist
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              - parent_id
+              properties:
+                name:
+                  type: string
+                  description: Name of the new folder.
+                parent_id:
+                  type: string
+                  description: ID of the folder to create the new folder in.
+        required: true
+      tags:
+      - User
+    get:
+      operationId: get-all-folders
+      summary: Get all folders
+      description: 'This endpoint allows API users to get the root folder of the user and its top-level folders, including the system folders (`Documents`, `Archive`, `Templates`, `Trash Bin`) and team folders.
+
+
+        **Notes**
+
+
+        * The same operation is also available at `GET /folder`.
+
+        * `document_count` and `template_count` depend on `entity_type`. By default (`document-all`), a folder counts only documents or only templates, depending on the folder type.
+
+        * To get the contents of a specific folder, call `GET /folder/{folder_id}`.'
+      parameters:
+      - in: query
+        name: filters
+        required: false
+        description: 'Filter to apply to the document list. Possible values: `signing-status`, `documents-created`, `documents-updated`. Set the filter value in `filter-values`.'
+        schema:
+          type: string
+      - in: query
+        name: filter-values
+        required: false
+        description: 'Value for the filter set in `filters`. For `signing-status`: `signed`, `pending`, `waiting-for-me`, `waiting-for-others`, `unsent`. For `documents-created` and `documents-updated`: a Unix timestamp; documents created or updated from that time are returned. Date filters do not apply to templates.'
+        schema:
+          type: string
+      - in: query
+        name: sortby
+        required: false
+        description: 'Field to sort documents by. Possible values: `created`, `updated`, `recently_used`. `recently_used` sorts templates by the date the last invite was sent and applies to `Templates` folders.'
+        schema:
+          type: string
+      - in: query
+        name: order
+        required: false
+        description: 'Sort order. Can be used only with `sortby`. Possible values: `desc`, `asc`. Default: `desc`.'
+        schema:
+          type: string
+      - in: query
+        name: limit
+        required: false
+        description: 'Maximum number of documents to return. Max: `100`. Larger values are reduced to `100`.'
+        schema:
+          type: integer
+      - in: query
+        name: offset
+        required: false
+        description: Number of documents to skip before the returned page starts.
+        schema:
+          type: integer
+      - in: query
+        name: subfolder-data
+        required: false
+        description: 'Whether to include subfolders in the response. Possible values: `1`, `0`. Must be used with `include_documents_subfolders`.'
+        schema:
+          type: string
+      - in: query
+        name: include_documents_subfolders
+        required: false
+        description: 'Whether to include subfolders in the response. Possible values: `1`, `0`. Must be used with `subfolder-data`.'
+        schema:
+          type: string
+      - in: query
+        name: with_team_documents
+        required: false
+        description: 'Whether to include `Team Documents` folders. Possible values: `true`, `false`.'
+        schema:
+          type: string
+      - in: query
+        name: only_favorites
+        required: false
+        description: 'Whether to return only favorite documents and document groups. Possible values: `true`, `false`. Default: `false`.'
+        schema:
+          type: string
+      - in: query
+        name: entity_type
+        required: false
+        description: 'Entities counted in `document_count` and `template_count`. Possible values: `document-all` (default): only documents or only templates, depending on the folder type. `all`: all entity types in the folder. `document`: documents that are not in a document group; `Documents`, `Archive`, and `Trash Bin` folders only. `document-group`: documents in document groups; `Documents`, `Archive`, and `Trash Bin` folders only. `template`: templates; `Templates` and `Trash Bin` folders only. `dgt`: document group templates; `Templates` and `Trash Bin` folders only.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: '* Success
+
+            * With document group invite where user is the owner
+
+            * With document group invite where user is the signer
+
+            * With viewer field invites
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID of the root folder.
+                  name:
+                    type: string
+                    description: Name of the root folder. Always `Root`.
+                  shared:
+                    type: boolean
+                    description: Whether the folder is shared.
+                  created:
+                    type: string
+                    description: Unix timestamp of when the root folder was created, as a string.
+                  folders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: ID of the folder.
+                        name:
+                          type: string
+                          description: Name of the folder, for example `Documents`, `Templates`, or `Trash Bin`.
+                        shared:
+                          type: boolean
+                          description: Whether the folder is shared.
+                        created:
+                          type: string
+                          description: Unix timestamp of when the folder was created, as a string.
+                        team_id:
+                          type: string
+                          description: ID of the team. Team folders only.
+                        user_id:
+                          type: string
+                          description: ID of the folder owner.
+                        team_name:
+                          type: string
+                          description: Name of the team. Team folders only.
+                        team_type:
+                          type: string
+                          description: Access type of the team folder, for example `VIEWABLE`. Team folders only.
+                        folder_count:
+                          type: string
+                          description: Number of subfolders in the folder, as a string.
+                        document_count:
+                          type: string
+                          description: Number of documents in the folder, as a string. Which entities are counted depends on `entity_type`.
+                        template_count:
+                          type: string
+                          description: Number of templates in the folder, as a string. Which entities are counted depends on `entity_type`.
+                    description: Top-level folders of the user, including system folders and team folders.
+                  user_id:
+                    type: string
+                    description: ID of the user.
+                  documents:
+                    type: array
+                    items:
+                      type: object
+                    description: Documents directly in the root folder. Usually empty.
+                  parent_id:
+                    type:
+                    - string
+                    - 'null'
+                    description: ID of the parent folder. Always `null` for the root folder.
+                  system_folder:
+                    type: boolean
+                    description: Whether the folder is a system folder. Always `true` for the root folder.
+                  total_documents:
+                    type: integer
+                    description: Number of documents directly in the root folder.
+              example:
+                Success:
+                  id: 38XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  name: Root Folder
+                  shared: false
+                  created: '1532531633'
+                  folders:
+                  - id: 25XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: Templates
+                    shared: false
+                    created: '1532531633'
+                    user_id: 89XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    sub_folders: []
+                    folder_count: '0'
+                    document_count: '0'
+                    template_count: '11'
+                  - id: 3bXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: Team Templates
+                    shared: true
+                    created: '1557915422'
+                    team_id: c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    user_id: 89XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    team_name: Sample team
+                    team_type: VIEWABLE
+                    sub_folders: []
+                    folder_count: '0'
+                    document_count: '0'
+                    template_count: '3'
+                  - id: 54XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: Team Templates
+                    shared: true
+                    created: '1543922139'
+                    team_id: 96XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    user_id: 89XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    team_name: My team
+                    team_type: VIEWABLE
+                    sub_folders: []
+                    folder_count: '0'
+                    document_count: '0'
+                    template_count: '1'
+                  - id: 83XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: Archive
+                    shared: false
+                    created: '1532531633'
+                    user_id: 89XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    sub_folders: []
+                    folder_count: '0'
+                    document_count: '21'
+                    template_count: 0
+                  - id: 9eXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: Trash Bin
+                    shared: false
+                    created: '1567466970'
+                    user_id: 89XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    sub_folders: []
+                    folder_count: '0'
+                    document_count: '0'
+                    template_count: 0
+                  - id: c8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: Documents
+                    shared: false
+                    created: '1532531633'
+                    user_id: 89XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    sub_folders: []
+                    folder_count: '0'
+                    document_count: '74'
+                    template_count: 0
+                  user_id: 89XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  documents: []
+                  parent_id: null
+                  system_folder: false
+                  total_documents: 0
+                With viewer field invites:
+                  id: a9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  name: Documents
+                  shared: false
+                  created: '1616586778'
+                  folders: []
+                  user_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  documents:
+                  - id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    owner: document-owner@email.com
+                    created: 1616586981
+                    invites:
+                    - email: signer@email.com
+                      order: '1'
+                      action: sign
+                      status: fulfilled
+                      document_id: 06XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      document_name: Performance review
+                      authentication: null
+                      expiration_time: null
+                    - email: manager@email.com
+                      order: '2'
+                      action: sign
+                      status: fulfilled
+                      document_id: 06XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      document_name: Performance review
+                      authentication: null
+                      expiration_time: null
+                    - order: '2'
+                      action: view
+                      status: pending
+                      document_id: 06XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      email_group:
+                        id: e7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        name: HR team
+                      document_name: Performance review
+                      authentication: null
+                      expiration_time: 1618210633
+                    updated: 1616586981
+                    user_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    documents:
+                    - id: d2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: sample
+                      roles:
+                      - Signer 1
+                      - Manager
+                    invite_id: eeXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    document_group_name: Document Group 24-3-2021
+                    viewer_field_invites:
+                    - id: eeXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      email_group:
+                        id: e7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        name: HR team
+                  parent_id: 66XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  system_folder: true
+                  total_documents: 1
+                With document group where user is a signer:
+                  id: a9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  name: Documents
+                  shared: false
+                  created: '1616586778'
+                  folders: []
+                  user_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  documents:
+                  - id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    owner: owner-email@email.com
+                    created: 1616586981
+                    updated: 1616586981
+                    user_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    documents:
+                    - id: d2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: sample
+                      roles:
+                      - Signer 1
+                      - Signer 2
+                      field_invites:
+                      - id: e4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        email_group:
+                          id: f6XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          name: Contact group
+                      - id: u8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        email_group:
+                          id: c2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          name: Contact group
+                    invite_id: eeXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    document_group_name: Document Group 24-3-2021
+                  parent_id: 66XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  system_folder: true
+                  total_documents: 1
+                With document group invite where user is the owner:
+                  id: a9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  name: Documents
+                  shared: false
+                  created: '1616586778'
+                  folders: []
+                  user_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  documents:
+                  - id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    owner: document-owner@email.com
+                    created: 1616586981
+                    invites:
+                    - email: signer@email.com
+                      order: '1'
+                      action: sign
+                      status: fulfilled
+                      document_id: 06XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      document_name: Performance review
+                      authentication: null
+                      expiration_time: null
+                    - email: manager@email.com
+                      order: '2'
+                      action: sign
+                      status: fulfilled
+                      document_id: 06XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      document_name: Performance review
+                      authentication: null
+                      expiration_time: null
+                    - order: '2'
+                      action: view
+                      status: pending
+                      document_id: 06XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      email_group:
+                        id: e7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        name: HR team
+                      document_name: Performance review
+                      authentication: null
+                      expiration_time: 1618210633
+                    updated: 1616586981
+                    user_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    documents:
+                    - id: d2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: sample
+                      roles:
+                      - Signer 1
+                      - Manager
+                    invite_id: eeXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    document_group_name: Document Group 24-3-2021
+                  parent_id: 66XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  system_folder: true
+                  total_documents: 1
+        '400':
+          description: '* Get info about specific folder which doesn''t belong to the user'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                          description: Error code.
+                        message:
+                          type: string
+                          description: Error message.
+                    description: List of errors.
+              example:
+                Get info about specific folder which doesn't belong to the user:
+                  errors:
+                  - code: 65611
+                    message: resource does not exist
+      security:
+      - Bearer: []
+      tags:
+      - User
+  /user/folder/{folder_id}:
+    put:
+      operationId: rename-folder
+      summary: Rename folder
+      description: 'This endpoint allows API users to rename a folder.
+
+
+        **Notes**
+
+
+        * The same operation is also available at `PUT /folder/{folder_id}`.'
+      parameters:
+      - in: path
+        name: folder_id
+        required: true
+        description: ID of the folder to rename.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The folder was renamed. Returns its ID.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID of the renamed folder.
+              example:
+                Folder renamed:
+                  id: a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0
+        '400':
+          description: '* `name` is missing
+
+            * The folder does not exist or does not belong to the user'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                          description: Error code.
+                        message:
+                          type: string
+                          description: Error message.
+                    description: List of errors.
+              example:
+                Missing name:
+                  errors:
+                  - code: 65536
+                    message: Invalid payload
+                Folder not found:
+                  errors:
+                  - code: 65611
+                    message: resource does not exist
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                name:
+                  type: string
+                  description: New name of the folder.
+        required: true
+      tags:
+      - User
+    delete:
+      operationId: delete-folder
+      summary: Delete folder
+      description: 'This endpoint allows API users to delete a folder.
+
+
+        **Notes**
+
+
+        * The same operation is also available at `DELETE /folder/{folder_id}`.'
+      parameters:
+      - in: path
+        name: folder_id
+        required: true
+        description: ID of the folder to delete.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The folder was deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: '`true` if the folder was deleted.'
+              example:
+                Folder deleted:
+                  success: true
+        '400':
+          description: The folder does not exist or does not belong to the user.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                          description: Error code.
+                        message:
+                          type: string
+                          description: Error message.
+                    description: List of errors.
+              example:
+                Folder not found:
+                  errors:
+                  - code: 65611
+                    message: resource does not exist
+      security:
+      - Bearer: []
+      tags:
+      - User
+  /user:
+    post:
+      operationId: post-user
+      summary: Create user
+      description: 'Creates an account for a `user`
+
+
+        `user` object in SignNow allows you to track the `invite`s, `document`s and `template`s associated with one user. Using API you can create, update and delete users, retrieve their info, verify their emails, reset passwords, track changes with user''s documents, templates, document groups, folders and teams, add them to or remove from organizations. The `user` object is also crucial to event subscriptions: SignNow enables you to trigger callbacks by an event of a specific user.'
+      parameters:
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  email:
+                    type: string
+                  verified:
+                    type: integer
+                x-examples:
+                  Example 1:
+                    id: aad13814e8f369089ee2f12b533545f9534e6cf8
+                    email: user@signnow.com
+                    verified: 0
+              example:
+                Example 1:
+                  id: aad13814e8f369089ee2f12b533545f9534e6cf8
+                  email: user@signnow.com
+                  verified: 0
+                application/json:
+                  id: aaXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  email: user@email.com
+                  verified: 0
+        '400':
+          description: "* \"unverified_email\" - email has been registered on site before, but not verified\n* \"internal api error\" - request without a required field in body \n* \"User with email exists\" - email has been registered and verified on site before\n* \"Invalid payload\" - request without body"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                email exists:
+                  errors:
+                  - code: 66330
+                    message: User with email exists
+                invalid payload:
+                  errors:
+                  - code: 65536
+                    message: Invalid payload
+                unverified email:
+                  errors:
+                  - code: 66396
+                    message: unverified_email
+                internal api error:
+                  errors:
+                  - code: 65544
+                    message: internal api error
+      security:
+      - Basic: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              - password
+              properties:
+                email:
+                  type: string
+                  description: User's email address.
+                number:
+                  type: string
+                  description: User's phone number.
+                password:
+                  type: string
+                  description: 'User''s password: 6 characters minimum.'
+                last_name:
+                  type: string
+                  description: User's last name.
+                first_name:
+                  type: string
+                  description: User's first name.
+        required: true
+      tags:
+      - User
+    put:
+      operationId: update-user-info
+      summary: Change user details
+      description: Updates user informaition i.e. first name, last name
+      parameters:
+      - in: header
+        name: Content-Type
+        required: false
+        description: ''
+        schema:
+          type: string
+          default: application/json
+      responses:
+        '200':
+          description: '* Correct change of the first and last name
+
+            * First\last name is a space
+
+            * Too long last name more than 64 chars is cut to 64 chars
+
+            * Correct change password
+
+            * Old password is empty '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  last_name:
+                    type: string
+                  first_name:
+                    type: string
+              example:
+                Old password is empty:
+                  id: unique_id
+                  last_name: last_name
+                  first_name: fist_name
+                Correct change password:
+                  id: unique_id
+                  last_name: last_name
+                  first_name: first_name
+                First\last name is a space:
+                  id: unique_id
+                  last_name: ''
+                  first_name: ''
+                Correct change of the first and last name:
+                  id: unique_id
+                  last_name: new_last_name
+                  first_name: new_first_name
+                Too long last name more than 64 chars is cut to 64 chars:
+                  id: 26XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  last_name: New last name
+                  first_name: '123456789_123456789_123456789_123456789_123456789_123456789_1234'
+        '400':
+          description: "* Too long fist name (first name more than 64 charters)\n* Incorrect old password \n* The value of \"old_password\" is a space\n* New password is empty \n* The value of \"password\" is a space\n* User password which doesn't respect the rules added to \"password_creation_rules\" if there are any\n* airSlate is not reachable"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                'New password is empty ':
+                  errors:
+                  - code: 65563
+                    message: Must provide password
+                'Incorrect old password ':
+                  errors:
+                  - code: 65563
+                    message: Incorrect old password
+                airSlate is not reachable:
+                  code: 5001
+                  message: Temporary unable to process this request. Please try again later.
+                The value of "password" is a space:
+                  errors:
+                  - code: 65563
+                    message: Must provide password
+                The value of "old_password" is a space:
+                  errors:
+                  - code: 65563
+                    message: Incorrect old password
+                Too long fist name (first name more than 64 charters):
+                  errors:
+                  - code: 65564
+                    message: First name is too long
+                User password which doesn't respect the rules added to "password_creation_rules" if there are any:
+                  errors:
+                  - code: 65662
+                    message: 'Password must contain at least one letter. Password Policy: Passwords must contain one letter, one number and one special character. Passwords must be at minimum 8 characters long. When updating passwords, reusing a password form the last 12 passwords is not allowed.'
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                last_name:
+                  type: string
+                first_name:
+                  type: string
+                logout_all:
+                  type: string
+                  description: "if \"true\" - all user tokens with \"scope =*\" expire\n\nif \"false\" - all user tokens except current one are expired \n\nNote: parameter must have string format. \n\nDefault value - \"true\""
+                old_password:
+                  type: string
+                  description: if "password" parameter is added to the body, then this one is required
+        required: true
+      tags:
+      - User
+    get:
+      operationId: get-user-info
+      summary: Get user info
+      description: Returns a user resource
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  pro:
+                    type: integer
+                  type:
+                    type: integer
+                    default: 1
+                  teams:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        role:
+                          type: string
+                        team:
+                          type: string
+                        type:
+                          type: string
+                        admins:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              email:
+                                type: string
+                              billing:
+                                type: integer
+                              primary:
+                                type: boolean
+                              is_secondary:
+                                type: string
+                              document_access:
+                                type: integer
+                        created_since:
+                          type: string
+                        document_count:
+                          type: integer
+                    description: whether user is a member or admin of a Team
+                  active:
+                    type: string
+                  emails:
+                    type: array
+                    items:
+                      type: string
+                  status:
+                    type: object
+                    properties:
+                      bad_copy_token:
+                        type: boolean
+                      has_copy_token:
+                        type: boolean
+                      has_salesforce_token:
+                        type: boolean
+                      bad_cloud_export_token:
+                        type: boolean
+                      has_cloud_export_token:
+                        type: boolean
+                  created:
+                    type: string
+                    description: Unix timestamp for when the user was created
+                  credits:
+                    type: integer
+                  settings:
+                    type: object
+                    properties:
+                      copy_export:
+                        type: boolean
+                      upload_limit:
+                        type: boolean
+                      document_guide:
+                        type: boolean
+                      sso-only-login:
+                        type: boolean
+                      mobileweb_option:
+                        type: boolean
+                      cloud_auto_export:
+                        type: boolean
+                      logout_on_signing:
+                        type: boolean
+                      restrict_download:
+                        type: boolean
+                      add_signature_stamp:
+                        type: boolean
+                      cfr_title_21_part_11:
+                        type: boolean
+                      no_document_attachment:
+                        type: boolean
+                      electronic_consent_text:
+                        type: boolean
+                      org_allowed_team_admins:
+                        type: boolean
+                      document_schema_extended:
+                        type: boolean
+                      front_end_session_length:
+                        type: boolean
+                      no_user_signature_return:
+                        type: boolean
+                      require_drawn_signatures:
+                        type: boolean
+                      cloud_export_with_history:
+                        type: boolean
+                      enable_full_story_tracker:
+                        type: boolean
+                      require_login_for_signing:
+                        type: boolean
+                      disable_email_notifications:
+                        type: boolean
+                      electronic_consent_required:
+                        type: boolean
+                      email_admin_on_banned_login:
+                        type: boolean
+                      enable_hyperlink_protection:
+                        type: boolean
+                      invite_decline_redirect_url:
+                        type: boolean
+                      emailed_docs_include_history:
+                        type: boolean
+                      no_document_file_attachments:
+                        type: boolean
+                      add_signature_stamp_with_name:
+                        type: boolean
+                      digitally_sign_dowloaded_docs:
+                        type: boolean
+                      watermark_downloaded_document:
+                        type: boolean
+                      invite_completion_redirect_url:
+                        type: boolean
+                      required_preset_signature_name:
+                        type: boolean
+                      signing_link_document_download:
+                        type: boolean
+                      block_login_via_social_networks:
+                        type: boolean
+                      enable_advanced_threat_protection:
+                        type: boolean
+                      document_completion_retention_days:
+                        type: boolean
+                      require_authentication_for_invites:
+                        type: boolean
+                      document_attachment_only_for_signer:
+                        type: boolean
+                      unsuccessful_logout_attempts_allowed:
+                        type: boolean
+                      audit_trail_completion_retention_days:
+                        type: boolean
+                      pending_invite_document_view_notification:
+                        type: boolean
+                      only_administrator_is_able_to_invite_to_the_team:
+                        type: boolean
+                      block_export_options_when_credit_card_validation_is_used:
+                        type: boolean
+                      invite_update_notifications_for_all_invites_at_invite_create:
+                        type: boolean
+                  companies:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        full_access:
+                          type: boolean
+                  last_name:
+                    type: string
+                  first_name:
+                    type: string
+                  googleapps:
+                    type: boolean
+                  facebookapps:
+                    type: boolean
+                  is_logged_in:
+                    type: boolean
+                  organization:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      logos:
+                        type: array
+                        items:
+                          type: object
+                      teams:
+                        type: array
+                        items:
+                          type: object
+                      created:
+                        type: string
+                      deleted:
+                        type: string
+                      domains:
+                        type: array
+                        items:
+                          type: object
+                      updated:
+                        type: string
+                      is_admin:
+                        type: boolean
+                      active_logo:
+                        type: array
+                        items:
+                          type: object
+                      is_superadmin:
+                        type: boolean
+                    description: whether user is a member/admin/Superadmin of an Organization
+                  primary_email:
+                    type: string
+                  subscriptions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: {}
+                        name: {}
+                        plan:
+                          type: string
+                        term: {}
+                        trial:
+                          type: boolean
+                        created: {}
+                        expired:
+                          type: integer
+                        updated: {}
+                        credit_card:
+                          type: boolean
+                        subscription_id: {}
+                        mobile_plan_type:
+                          type: string
+                  billing_period:
+                    type: object
+                    properties:
+                      end_date:
+                        type: string
+                      start_date:
+                        type: string
+                      end_timestamp:
+                        type: integer
+                      start_timestamp:
+                        type: integer
+                  document_count:
+                    type: integer
+                  premium_access:
+                    type: object
+                    properties:
+                      plan:
+                        type: string
+                      user:
+                        type: object
+                        properties:
+                          admin:
+                            type: string
+                          email:
+                            type: string
+                          status:
+                            type: string
+                          username:
+                            type: string
+                          last_name: {}
+                          added_date:
+                            type: integer
+                          first_name: {}
+                      error:
+                        type: boolean
+                      trial:
+                        type: boolean
+                      active:
+                        type: boolean
+                      business:
+                        type: boolean
+                      credit_card:
+                        type: boolean
+                      subscription:
+                        type: object
+                        properties:
+                          key: {}
+                          name: {}
+                          term: {}
+                          created_at: {}
+                          expired_at:
+                            type: integer
+                          updated_at: {}
+                          serial_number: {}
+                  merchant_accounts:
+                    type: array
+                    items:
+                      type: object
+                  has_atticus_access:
+                    type: boolean
+                  issue_notifications:
+                    type: array
+                    items:
+                      type: object
+                  registration_source: {}
+                  organization_settings:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        value:
+                          type: string
+                        setting:
+                          type: string
+                  monthly_document_count:
+                    type: integer
+                  lifetime_document_count:
+                    type: integer
+                  cloud_export_account_details: {}
+        '400':
+          description: Request with Incorrect or missing token
+          content:
+            application/json:
+              example:
+                application/json:
+                  code: 1537
+                  error: invalid_token
+      security:
+      - Bearer: []
+      tags:
+      - User
+  /user/documents:
+    get:
+      operationId: get-user-documents
+      summary: Get user documents
+      description: 'Returns information of user''s documents that were not modified yet.
+
+
+        > [!WARNING]
+
+        > This endpoint is deprecated. To retrieve a user''s documents, fetch the contents of a folder with `GET /folder/{folder_id}`.'
+      parameters:
+      - in: query
+        name: sortby=recently_used&order
+        required: false
+        description: 'Sort templates by date of the last sending of the invite. Applies to system Template folders and custom Template folders. Allowed values: desc, asc'
+        schema:
+          type: string
+          default: desc
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: object ID
+                    tags:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          type:
+                            type: string
+                    owner:
+                      type: string
+                      description: user who uploaded the document to SignNow
+                    roles:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          unique_id:
+                            type: string
+                          signing_order:
+                            type: string
+                      description: roles assigned to fields, e.g. Signer 1, Signer 2
+                    seals:
+                      type: array
+                      items:
+                        type: object
+                      description: all seals on the document
+                    texts:
+                      type: array
+                      items:
+                        type: object
+                      description: all field input, if there are fillable fields and they are completed
+                    checks:
+                      type: array
+                      items:
+                        type: object
+                      description: all checkmarks on the document
+                    fields:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          role:
+                            type: string
+                          type:
+                            type: string
+                          role_id:
+                            type: string
+                          field_id: {}
+                          fulfiller: {}
+                          element_id: {}
+                          originator:
+                            type: string
+                          json_attributes:
+                            type: object
+                            properties:
+                              x:
+                                type: integer
+                              y:
+                                type: integer
+                              bold:
+                                type: boolean
+                              font:
+                                type: string
+                              name:
+                                type: string
+                              size:
+                                type: integer
+                              align:
+                                type: string
+                              width:
+                                type: integer
+                              height:
+                                type: integer
+                              italic:
+                                type: boolean
+                              valign:
+                                type: string
+                              required:
+                                type: boolean
+                              max_chars:
+                                type: integer
+                              max_lines:
+                                type: integer
+                              underline:
+                                type: boolean
+                              arrangement:
+                                type: string
+                              page_number:
+                                type: integer
+                          field_request_id: {}
+                          template_field_id: {}
+                          field_request_canceled: {}
+                      description: all fields on the document
+                    created:
+                      type: string
+                      description: Unix timestamp of when the document was created
+                    inserts:
+                      type: array
+                      items:
+                        type: object
+                    updated:
+                      type: string
+                      description: Unix timestamp of when the document was updated
+                    user_id:
+                      type: string
+                      description: user's ID
+                    requests:
+                      type: array
+                      items:
+                        type: object
+                      description: requests with this document
+                    settings:
+                      type: object
+                      properties:
+                        copy_export:
+                          type: boolean
+                        upload_limit:
+                          type: boolean
+                        document_guide:
+                          type: boolean
+                        sso-only-login:
+                          type: boolean
+                        mobileweb_option:
+                          type: boolean
+                        cloud_auto_export:
+                          type: boolean
+                        logout_on_signing:
+                          type: boolean
+                        restrict_download:
+                          type: boolean
+                        add_signature_stamp:
+                          type: boolean
+                        cfr_title_21_part_11:
+                          type: boolean
+                        require_email_subject:
+                          type: boolean
+                        no_document_attachment:
+                          type: boolean
+                        electronic_consent_text:
+                          type: boolean
+                        org_allowed_team_admins:
+                          type: boolean
+                        document_schema_extended:
+                          type: boolean
+                        front_end_session_length:
+                          type: boolean
+                        no_user_signature_return:
+                          type: boolean
+                        require_drawn_signatures:
+                          type: boolean
+                        cloud_export_with_history:
+                          type: boolean
+                        enable_full_story_tracker:
+                          type: boolean
+                        require_login_for_signing:
+                          type: boolean
+                        disable_email_notifications:
+                          type: boolean
+                        electronic_consent_required:
+                          type: boolean
+                        email_admin_on_banned_login:
+                          type: boolean
+                        enable_hyperlink_protection:
+                          type: boolean
+                        invite_decline_redirect_url:
+                          type: boolean
+                        emailed_docs_include_history:
+                          type: boolean
+                        no_document_file_attachments:
+                          type: boolean
+                        add_signature_stamp_with_name:
+                          type: boolean
+                        digitally_sign_dowloaded_docs:
+                          type: boolean
+                        watermark_downloaded_document:
+                          type: boolean
+                        invite_completion_redirect_url:
+                          type: boolean
+                        required_preset_signature_name:
+                          type: boolean
+                        signing_link_document_download:
+                          type: boolean
+                        block_login_via_social_networks:
+                          type: boolean
+                        enable_advanced_threat_protection:
+                          type: boolean
+                        document_completion_retention_days:
+                          type: boolean
+                        require_authentication_for_invites:
+                          type: boolean
+                        document_attachment_only_for_signer:
+                          type: boolean
+                        unsuccessful_logout_attempts_allowed:
+                          type: boolean
+                        audit_trail_completion_retention_days:
+                          type: boolean
+                        pending_invite_document_view_notification:
+                          type: boolean
+                        only_administrator_is_able_to_invite_to_the_team:
+                          type: boolean
+                        block_export_options_when_credit_card_validation_is_used:
+                          type: boolean
+                        invite_update_notifications_for_all_invites_at_invite_create:
+                          type: boolean
+                      description: user's settings applied
+                    template:
+                      type: boolean
+                      description: whether or not this document is a template
+                    thumbnail:
+                      type: object
+                      properties:
+                        large:
+                          type: string
+                        small:
+                          type: string
+                        medium:
+                          type: string
+                    page_count:
+                      type: string
+                      description: how many pages in the document
+                    signatures:
+                      type: array
+                      items:
+                        type: object
+                      description: all signatures on the document
+                    attachments:
+                      type: array
+                      items:
+                        type: object
+                      description: all attachments to the document
+                    integrations:
+                      type: array
+                      items:
+                        type: object
+                    radiobuttons:
+                      type: array
+                      items:
+                        type: object
+                      description: all radiobuttons in the document
+                    version_time:
+                      type: string
+                    document_name:
+                      type: string
+                      description: the name of the document
+                    field_invites:
+                      type: array
+                      items:
+                        type: object
+                      description: the invites sent to sign this document
+                    recently_used:
+                      type: string
+                      description: Timestamp of the last time the document was used.
+                    notary_invites:
+                      type: array
+                      items:
+                        type: object
+                    origin_user_id: {}
+                    routing_details:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          cc:
+                            type: array
+                            items:
+                              type: object
+                          id:
+                            type: string
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                role_id:
+                                  type: string
+                                inviter_role:
+                                  type: boolean
+                                default_email:
+                                  type: string
+                                signing_order:
+                                  type: integer
+                          cc_step:
+                            type: array
+                            items:
+                              type: object
+                          created:
+                            type: string
+                          updated: {}
+                          invite_link_instructions: {}
+                    original_filename:
+                      type: string
+                    origin_document_id: {}
+                    document_group_info:
+                      type: object
+                      properties:
+                        invite_id: {}
+                        invite_status: {}
+                        document_group_id: {}
+                        doc_count_in_group:
+                          type: integer
+                        document_group_name: {}
+                      description: whether or not this document is part of a Document group
+                    enumeration_options:
+                      type: array
+                      items:
+                        type: object
+                      description: if there is a Dropdown field on the document, these are the options to choose from
+                    document_group_template_info:
+                      type: array
+                      items:
+                        type: object
+                      description: whether or not this document is a part of a Document group template
+        '400':
+          description: '* Request without documents
+
+            * Request with query param `per_page=0` or `page=0`
+
+            * Request with query param `per_page/page`  as string or negative number
+
+            * Request with query param `per_page` more than 100'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Request without documents:
+                  errors:
+                  - code: 65536
+                    message: 'error: could not get document ids for user (user_id) api action id (api_action_id)'
+                Request with query param `per_page=0` or `page=0`:
+                  errors:
+                  - code: 0
+                    message: Query parameter `per_page` must be more than 0
+                  - code: 0
+                    message: Query parameter `page` must be more than 0
+                Request with query param `per_page` more than 100:
+                  errors:
+                  - code: 0
+                    message: Query parameter `per_page` must be less than or equal 100
+                Request with query param  per_page/ page  as string  or negative number:
+                  errors:
+                  - code: 0
+                    message: Query parameter `per_page` must be a digit
+                  - code: 0
+                    message: Query parameter `page` must be a digit
+      security:
+      - Bearer: []
+      tags:
+      - User
+  /user/documentsv2:
+    get:
+      operationId: user-documents-modified
+      summary: Get modified documents
+      description: 'Returns an array of user''s documents that were modified (added fields, texts, signatures, etc.)
+
+
+        > [!WARNING]
+
+        > This endpoint is deprecated. To retrieve a user''s documents, fetch the contents of a folder with `GET /folder/{folder_id}`.'
+      parameters:
+      - in: header
+        name: Content-type
+        required: false
+        description: ''
+        schema:
+          type: string
+          default: application/json
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: object ID
+                    tags:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          type:
+                            type: string
+                    owner:
+                      type: string
+                      description: user who uploaded the document to SignNow
+                    roles:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          unique_id:
+                            type: string
+                          signing_order:
+                            type: string
+                      description: roles assigned to fields, e.g. Signer 1, Signer 2
+                    seals:
+                      type: array
+                      items:
+                        type: object
+                      description: all seals on the document
+                    texts:
+                      type: array
+                      items:
+                        type: object
+                      description: all field input, if there are fillable fields and they are completed
+                    checks:
+                      type: array
+                      items:
+                        type: object
+                      description: all checkmarks on the document
+                    fields:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          role:
+                            type: string
+                          type:
+                            type: string
+                          role_id:
+                            type: string
+                          field_id: {}
+                          fulfiller: {}
+                          element_id: {}
+                          originator:
+                            type: string
+                          json_attributes:
+                            type: object
+                            properties:
+                              x:
+                                type: integer
+                              y:
+                                type: integer
+                              bold:
+                                type: boolean
+                              font:
+                                type: string
+                              name:
+                                type: string
+                              size:
+                                type: integer
+                              align:
+                                type: string
+                              width:
+                                type: integer
+                              height:
+                                type: integer
+                              italic:
+                                type: boolean
+                              valign:
+                                type: string
+                              required:
+                                type: boolean
+                              max_chars:
+                                type: integer
+                              max_lines:
+                                type: integer
+                              underline:
+                                type: boolean
+                              arrangement:
+                                type: string
+                              page_number:
+                                type: integer
+                          field_request_id: {}
+                          template_field_id: {}
+                          field_request_canceled: {}
+                      description: all fields on the document
+                    created:
+                      type: string
+                      description: Unix timestamp of when the document was created
+                    inserts:
+                      type: array
+                      items:
+                        type: object
+                    updated:
+                      type: string
+                      description: Unix timestamp of when the document was updated
+                    user_id:
+                      type: string
+                      description: user's ID
+                    requests:
+                      type: array
+                      items:
+                        type: object
+                      description: requests with this document
+                    settings:
+                      type: object
+                      properties:
+                        copy_export:
+                          type: boolean
+                        upload_limit:
+                          type: boolean
+                        document_guide:
+                          type: boolean
+                        sso-only-login:
+                          type: boolean
+                        mobileweb_option:
+                          type: boolean
+                        cloud_auto_export:
+                          type: boolean
+                        logout_on_signing:
+                          type: boolean
+                        restrict_download:
+                          type: boolean
+                        add_signature_stamp:
+                          type: boolean
+                        cfr_title_21_part_11:
+                          type: boolean
+                        require_email_subject:
+                          type: boolean
+                        no_document_attachment:
+                          type: boolean
+                        electronic_consent_text:
+                          type: boolean
+                        org_allowed_team_admins:
+                          type: boolean
+                        document_schema_extended:
+                          type: boolean
+                        front_end_session_length:
+                          type: boolean
+                        no_user_signature_return:
+                          type: boolean
+                        require_drawn_signatures:
+                          type: boolean
+                        cloud_export_with_history:
+                          type: boolean
+                        enable_full_story_tracker:
+                          type: boolean
+                        require_login_for_signing:
+                          type: boolean
+                        disable_email_notifications:
+                          type: boolean
+                        electronic_consent_required:
+                          type: boolean
+                        email_admin_on_banned_login:
+                          type: boolean
+                        enable_hyperlink_protection:
+                          type: boolean
+                        invite_decline_redirect_url:
+                          type: boolean
+                        emailed_docs_include_history:
+                          type: boolean
+                        no_document_file_attachments:
+                          type: boolean
+                        add_signature_stamp_with_name:
+                          type: boolean
+                        digitally_sign_dowloaded_docs:
+                          type: boolean
+                        watermark_downloaded_document:
+                          type: boolean
+                        invite_completion_redirect_url:
+                          type: boolean
+                        required_preset_signature_name:
+                          type: boolean
+                        signing_link_document_download:
+                          type: boolean
+                        block_login_via_social_networks:
+                          type: boolean
+                        enable_advanced_threat_protection:
+                          type: boolean
+                        document_completion_retention_days:
+                          type: boolean
+                        require_authentication_for_invites:
+                          type: boolean
+                        document_attachment_only_for_signer:
+                          type: boolean
+                        unsuccessful_logout_attempts_allowed:
+                          type: boolean
+                        audit_trail_completion_retention_days:
+                          type: boolean
+                        pending_invite_document_view_notification:
+                          type: boolean
+                        only_administrator_is_able_to_invite_to_the_team:
+                          type: boolean
+                        block_export_options_when_credit_card_validation_is_used:
+                          type: boolean
+                        invite_update_notifications_for_all_invites_at_invite_create:
+                          type: boolean
+                      description: user's settings applied
+                    template:
+                      type: boolean
+                      description: whether or not this document is a template
+                    thumbnail:
+                      type: object
+                      properties:
+                        large:
+                          type: string
+                        small:
+                          type: string
+                        medium:
+                          type: string
+                    hyperlinks:
+                      type: array
+                      items:
+                        type: object
+                      description: all hyperlinks in the document
+                    page_count:
+                      type: string
+                      description: how many pages in the document
+                    signatures:
+                      type: array
+                      items:
+                        type: object
+                      description: all signatures on the document
+                    attachments:
+                      type: array
+                      items:
+                        type: object
+                      description: all attachments to the document
+                    integrations:
+                      type: array
+                      items:
+                        type: object
+                    radiobuttons:
+                      type: array
+                      items:
+                        type: object
+                      description: all radiobuttons in the document
+                    version_time:
+                      type: string
+                    document_name:
+                      type: string
+                      description: the name of the document
+                    field_invites:
+                      type: array
+                      items:
+                        type: object
+                      description: the invites sent to sign this document
+                    recently_used:
+                      type: string
+                      description: Timestamp of the last time the document was used.
+                    notary_invites:
+                      type: array
+                      items:
+                        type: object
+                    origin_user_id: {}
+                    routing_details:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          cc:
+                            type: array
+                            items:
+                              type: object
+                          id:
+                            type: string
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                role_id:
+                                  type: string
+                                inviter_role:
+                                  type: boolean
+                                default_email:
+                                  type: string
+                                signing_order:
+                                  type: integer
+                          cc_step:
+                            type: array
+                            items:
+                              type: object
+                          created:
+                            type: string
+                          updated: {}
+                          invite_link_instructions: {}
+                    original_filename:
+                      type: string
+                    origin_document_id: {}
+                    document_group_info:
+                      type: object
+                      properties:
+                        invite_id: {}
+                        invite_status: {}
+                        document_group_id: {}
+                        doc_count_in_group:
+                          type: integer
+                        document_group_name: {}
+                      description: whether or not this document is part of a Document group
+                    enumeration_options:
+                      type: array
+                      items:
+                        type: object
+                      description: if there is a Dropdown field on the document, these are the options to choose from
+                    document_group_template_info:
+                      type: array
+                      items:
+                        type: object
+                      description: whether or not this document is a part of a Document group template
+                    originator_organization_settings:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          value:
+                            type: string
+                          setting:
+                            type: string
+        '400':
+          description: '* Request without documents
+
+            * Request with query param `per_page=0` or `page=0`
+
+            * Request with query param `per_page/page`  as string or negative number
+
+            * Request with query param `per_page` more than 100'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Request without documents:
+                  errors:
+                  - code: 65536
+                    message: 'error: could not get document ids for user (user_id) api action id (api_action_id)'
+                Request with query param `per_page=0` or `page=0`:
+                  errors:
+                  - code: 0
+                    message: Query parameter `per_page` must be more than 0
+                  - code: 0
+                    message: Query parameter `page` must be more than 0
+                Request with query param `per_page` more than 100:
+                  errors:
+                  - code: 0
+                    message: Query parameter `per_page` must be less than or equal 100
+                Request with query param  per_page/ page  as string  or negative number:
+                  errors:
+                  - code: 0
+                    message: Query parameter `per_page` must be a digit
+                  - code: 0
+                    message: Query parameter `page` must be a digit
+      security:
+      - Bearer: []
+      tags:
+      - User
+  /user/forgotpassword:
+    post:
+      operationId: user-forgot-password
+      summary: Reset password
+      description: Sends password reset link via email
+      parameters:
+      - in: header
+        name: Content-type
+        required: false
+        description: ''
+        schema:
+          type: string
+          default: application/json
+      responses:
+        '200':
+          description: '* Correct request
+
+            * Correct re-request'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Correct request:
+                  status: success
+                Correct re-request:
+                  errors:
+                  - code: 0
+                    message: The limit of attempts has been exceeded. Please try again later.
+        '400':
+          description: 'Request with incorrect or missing email '
+          content:
+            application/json:
+              example:
+                application/json:
+                  errors:
+                  - code: 65544
+                    message: Invalid email.
+      security:
+      - Basic: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: user's email address that receives the password reset link
+        required: true
+      tags:
+      - User
+  /user/verifyemail:
+    post:
+      operationId: post-user-verifyemail
+      summary: Send verification email
+      description: This endpoint allows API users to send a verification email to a new user’s email address. Once the user clicks the link in the email, their account will be verified.
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                x-examples:
+                  Example 1:
+                    status: success
+              example:
+                Example 1:
+                  status: success
+        '400':
+          description: '- The email address is incorrect.
+
+            - The email address is required.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 65536
+                      message: Could not send verification email
+              example:
+                Example 1:
+                  errors:
+                  - code: 65536
+                    message: Could not send verification email
+                Email required:
+                  errors:
+                  - code: 65582
+                    message: Email is required.
+                Incorrect email:
+                  errors:
+                  - code: 65536
+                    message: Could not send verification email
+      security:
+      - Basic: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              properties:
+                email:
+                  type: string
+                  description: The user's email address where the verification email will be sent.
+              x-examples:
+                Example 1:
+                  email: user@email.com
+        required: true
+      tags:
+      - User
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

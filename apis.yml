@@ -161,16 +161,6 @@ apis:
   properties:
   - type: Website
     url: https://www.airslate.com/
-- aid: airslate:airslate-document-fields-api
-  name: airSlate Document Fields API
-  description: The Document Fields API from airSlate — 3 operation(s) for document fields.
-  humanURL: https://www.airslate.com/workflow
-  baseURL: https://www.airslate.com/workflow
-  tags:
-  - Document Fields
-  properties:
-  - type: OpenAPI
-    url: openapi/airslate-document-fields-api-openapi.yml
 - aid: airslate:airslate-document-groups-api
   name: airSlate Document Groups API
   description: The Document Groups API from airSlate — 4 operation(s) for document groups.
@@ -191,16 +181,6 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/airslate-documents-api-openapi.yml
-- aid: airslate:airslate-embedded-api
-  name: airSlate Embedded API
-  description: The Embedded API from airSlate — 3 operation(s) for embedded.
-  humanURL: https://www.airslate.com/workflow
-  baseURL: https://www.airslate.com/workflow
-  tags:
-  - Embedded
-  properties:
-  - type: OpenAPI
-    url: openapi/airslate-embedded-api-openapi.yml
 - aid: airslate:airslate-folders-api
   name: airSlate Folders API
   description: The Folders API from airSlate — 2 operation(s) for folders.
@@ -211,26 +191,6 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/airslate-folders-api-openapi.yml
-- aid: airslate:airslate-invites-api
-  name: airSlate Invites API
-  description: The Invites API from airSlate — 5 operation(s) for invites.
-  humanURL: https://www.airslate.com/workflow
-  baseURL: https://www.airslate.com/workflow
-  tags:
-  - Invites
-  properties:
-  - type: OpenAPI
-    url: openapi/airslate-invites-api-openapi.yml
-- aid: airslate:airslate-smart-fields-api
-  name: airSlate Smart Fields API
-  description: The Smart Fields API from airSlate — 1 operation(s) for smart fields.
-  humanURL: https://www.airslate.com/workflow
-  baseURL: https://www.airslate.com/workflow
-  tags:
-  - Smart Fields
-  properties:
-  - type: OpenAPI
-    url: openapi/airslate-smart-fields-api-openapi.yml
 - aid: airslate:airslate-templates-api
   name: airSlate Templates API
   description: The Templates API from airSlate — 4 operation(s) for templates.
@@ -241,42 +201,349 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/airslate-templates-api-openapi.yml
-- aid: airslate:airslate-users-api
-  name: airSlate Users API
-  description: The Users API from airSlate — 3 operation(s) for users.
+- aid: airslate:airslate-application-api
+  name: airSlate Application API
+  description: The Application API from airSlate — 2 operation(s) for application.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Application
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-application-api-openapi.yml
+- aid: airslate:airslate-applications-api
+  name: airSlate Applications API
+  description: The Applications API from airSlate — 1 operation(s) for applications.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Applications
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-applications-api-openapi.yml
+- aid: airslate:airslate-brands-api
+  name: airSlate Brands API
+  description: The Brands API from airSlate — 24 operation(s) for brands.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Brands
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-brands-api-openapi.yml
+- aid: airslate:airslate-crm-api
+  name: airSlate CRM API
+  description: The Crm API from airSlate — 11 operation(s) for crm.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Crm
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-crm-api-openapi.yml
+- aid: airslate:airslate-document-api
+  name: airSlate Document API
+  description: The Document API from airSlate — 20 operation(s) for document.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Document
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-document-api-openapi.yml
+- aid: airslate:airslate-document-generations-api
+  name: airSlate Document Generations API
+  description: The Document Generations API from airSlate — 3 operation(s) for document generations.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Document Generations
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-document-generations-api-openapi.yml
+- aid: airslate:airslate-document-group-templates-api
+  name: airSlate Document Group Templates API
+  description: >-
+    The Document Group Templates API from airSlate — 11 operation(s) for document group templates.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Document Group Templates
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-document-group-templates-api-openapi.yml
+- aid: airslate:airslate-documentgroup-api
+  name: airSlate Documentgroup API
+  description: The Documentgroup API from airSlate — 14 operation(s) for documentgroup.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Documentgroup
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-documentgroup-api-openapi.yml
+- aid: airslate:airslate-event-subscription-api
+  name: airSlate Event Subscription API
+  description: The Event Subscription API from airSlate — 2 operation(s) for event subscription.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Event Subscription
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-event-subscription-api-openapi.yml
+- aid: airslate:airslate-event-subscriptions-api
+  name: airSlate Event Subscriptions API
+  description: The Event Subscriptions API from airSlate — 8 operation(s) for event subscriptions.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Event Subscriptions
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-event-subscriptions-api-openapi.yml
+- aid: airslate:airslate-events-api
+  name: airSlate Events API
+  description: The Events API from airSlate — 3 operation(s) for events.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Events
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-events-api-openapi.yml
+- aid: airslate:airslate-favorites-api
+  name: airSlate Favorites API
+  description: The Favorites API from airSlate — 1 operation(s) for favorites.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Favorites
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-favorites-api-openapi.yml
+- aid: airslate:airslate-faxes-api
+  name: airSlate Faxes API
+  description: The Faxes API from airSlate — 1 operation(s) for faxes.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Faxes
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-faxes-api-openapi.yml
+- aid: airslate:airslate-field-invite-api
+  name: airSlate Field Invite API
+  description: The Field Invite API from airSlate — 2 operation(s) for field invite.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Field Invite
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-field-invite-api-openapi.yml
+- aid: airslate:airslate-fieldinvite-api
+  name: airSlate Fieldinvite API
+  description: The Fieldinvite API from airSlate — 1 operation(s) for fieldinvite.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Fieldinvite
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-fieldinvite-api-openapi.yml
+- aid: airslate:airslate-folder-api
+  name: airSlate Folder API
+  description: The Folder API from airSlate — 2 operation(s) for folder.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Folder
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-folder-api-openapi.yml
+- aid: airslate:airslate-import-api
+  name: airSlate Import API
+  description: The Import API from airSlate — 1 operation(s) for import.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Import
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-import-api-openapi.yml
+- aid: airslate:airslate-invite-api
+  name: airSlate Invite API
+  description: The Invite API from airSlate — 1 operation(s) for invite.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Invite
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-invite-api-openapi.yml
+- aid: airslate:airslate-link-api
+  name: airSlate Link API
+  description: The Link API from airSlate — 1 operation(s) for link.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Link
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-link-api-openapi.yml
+- aid: airslate:airslate-merchant-accounts-api
+  name: airSlate Merchant Accounts API
+  description: The Merchant Accounts API from airSlate — 2 operation(s) for merchant accounts.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Merchant Accounts
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-merchant-accounts-api-openapi.yml
+- aid: airslate:airslate-oauth2-api
+  name: airSlate Oauth2 API
+  description: The Oauth2 API from airSlate — 3 operation(s) for oauth2.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Oauth2
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-oauth2-api-openapi.yml
+- aid: airslate:airslate-organizations-api
+  name: airSlate Organizations API
+  description: The Organizations API from airSlate — 31 operation(s) for organizations.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Organizations
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-organizations-api-openapi.yml
+- aid: airslate:airslate-paid-request-logs-api
+  name: airSlate Paid Request Logs API
+  description: The Paid Request Logs API from airSlate — 2 operation(s) for paid request logs.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Paid Request Logs
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-paid-request-logs-api-openapi.yml
+- aid: airslate:airslate-paid-request-monthly-totals-api
+  name: airSlate Paid Request Monthly Totals API
+  description: >-
+    The Paid Request Monthly Totals API from airSlate — 1 operation(s) for paid request monthly totals.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Paid Request Monthly Totals
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-paid-request-monthly-totals-api-openapi.yml
+- aid: airslate:airslate-paid-request-totals-api
+  name: airSlate Paid Request Totals API
+  description: The Paid Request Totals API from airSlate — 1 operation(s) for paid request totals.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Paid Request Totals
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-paid-request-totals-api-openapi.yml
+- aid: airslate:airslate-request-logs-api
+  name: airSlate Request Logs API
+  description: The Request Logs API from airSlate — 2 operation(s) for request logs.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Request Logs
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-request-logs-api-openapi.yml
+- aid: airslate:airslate-search-api
+  name: airSlate Search API
+  description: The Search API from airSlate — 1 operation(s) for search.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Search
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-search-api-openapi.yml
+- aid: airslate:airslate-shared-entities-api
+  name: airSlate Shared Entities API
+  description: The Shared Entities API from airSlate — 1 operation(s) for shared entities.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Shared Entities
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-shared-entities-api-openapi.yml
+- aid: airslate:airslate-signing-session-settings-api
+  name: airSlate Signing Session Settings API
+  description: >-
+    The Signing Session Settings API from airSlate — 1 operation(s) for signing session settings.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Signing Session Settings
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-signing-session-settings-api-openapi.yml
+- aid: airslate:airslate-team-api
+  name: airSlate Team API
+  description: The Team API from airSlate — 11 operation(s) for team.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Team
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-team-api-openapi.yml
+- aid: airslate:airslate-teams-api
+  name: airSlate Teams API
+  description: The Teams API from airSlate — 4 operation(s) for teams.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Teams
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-teams-api-openapi.yml
+- aid: airslate:airslate-template-api
+  name: airSlate Template API
+  description: The Template API from airSlate — 3 operation(s) for template.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Template
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-template-api-openapi.yml
+- aid: airslate:airslate-trash-api
+  name: airSlate Trash API
+  description: The Trash API from airSlate — 1 operation(s) for trash.
+  humanURL: https://www.airslate.com/workflow
+  baseURL: https://www.airslate.com/workflow
+  tags:
+  - Trash
+  properties:
+  - type: OpenAPI
+    url: openapi/airslate-trash-api-openapi.yml
+- aid: airslate:airslate-user-api
+  name: airSlate User API
+  description: The User API from airSlate — 9 operation(s) for user.
   humanURL: https://www.airslate.com/workflow
   baseURL: https://www.airslate.com/workflow
   tags:
   - User
-  tags_raw:
-  - Users
   properties:
   - type: OpenAPI
-    url: openapi/airslate-users-api-openapi.yml
-- aid: airslate:airslate-webhooks-api
-  name: airSlate Webhooks API
-  description: The Webhooks API from airSlate — 2 operation(s) for webhooks.
-  humanURL: https://www.airslate.com/workflow
-  baseURL: https://www.airslate.com/workflow
-  tags:
-  - Webhook
-  tags_raw:
-  - Webhooks
-  properties:
-  - type: OpenAPI
-    url: openapi/airslate-webhooks-api-openapi.yml
-- aid: airslate:airslate-oauth-api
-  name: airSlate O Auth API
-  description: The OAuth API from airSlate — 1 operation(s) for oauth.
-  humanURL: https://www.airslate.com/workflow
-  baseURL: https://www.airslate.com/workflow
-  tags:
-  - Authentication
-  tags_raw:
-  - OAuth
-  properties:
-  - type: OpenAPI
-    url: openapi/airslate-oauth-api-openapi.yml
+    url: openapi/airslate-user-api-openapi.yml
 common:
   - type: Plans
     url: plans/airslate-plans-pricing.yml

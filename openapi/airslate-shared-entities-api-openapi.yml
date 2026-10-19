@@ -1,0 +1,384 @@
+openapi: 3.2.0
+info:
+  title: SignNow Shared Entities API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Shared Entities
+paths:
+  /v2/shared-entities:
+    post:
+      operationId: share-document
+      summary: Share document
+      description: 'This endpoint allows API users to share documents with one or more users. For each document-email pair, assign a `viewer` or `sender` role.
+
+
+        **Notes**
+
+
+        * **Viewer** - can view and download the document; **sender** - can view, download, invite to sign, and manage document invites.
+
+        * Only documents owned by the authenticated user may be shared.
+
+        * If the recipient already has access, their role is updated to the value sent in the request.
+
+        * The recipient receives an email notification with a link to the shared document.
+
+        * If the recipient does not exist in the system, a new account is created automatically.
+
+        * The document owner''s email must not appear among the recipients.
+
+        * Documents belonging to a document group cannot be shared individually.
+
+        * Documents created from a template already shared with the target user are rejected with a conflict error.
+
+
+        **Request limits:** At most **100 distinct recipient emails** and **20 distinct documents** per request.'
+      responses:
+        '200':
+          description: Document successfully shared.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Unique identifier of the recipient user.
+                        email:
+                          type: string
+                          description: Email address of the recipient.
+                        entities:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              role:
+                                type: string
+                              entity_id:
+                                type: string
+                              entity_type:
+                                type: string
+                x-examples:
+                  Example 1:
+                    data:
+                    - id: def456abc123def456abc123def456abc123def4
+                      email: user1@email.com
+                      entities:
+                      - role: viewer
+                        entity_id: aaa111bbb222aaa111bbb222aaa111bbb222aaa1
+                        entity_type: document
+                    - id: bf567a8af1b544afa55b40c40063652891ffcd31
+                      email: user2@email.com
+                      entities:
+                      - role: sender
+                        entity_id: bbb222ccc333bbb222ccc333bbb222ccc333bbb2
+                        entity_type: document
+              example:
+                Example 1:
+                  data:
+                  - id: def456abc123def456abc123def456abc123def4
+                    email: user1@email.com
+                    entities:
+                    - role: viewer
+                      entity_id: aaa111bbb222aaa111bbb222aaa111bbb222aaa1
+                      entity_type: document
+                  - id: bf567a8af1b544afa55b40c40063652891ffcd31
+                    email: user2@email.com
+                    entities:
+                    - role: sender
+                      entity_id: bbb222ccc333bbb222ccc333bbb222ccc333bbb2
+                      entity_type: document
+                application/json:
+                  data:
+                  - id: def456abc123def456abc123def456abc123def4
+                    email: user1@email.com
+                    entities:
+                    - role: viewer
+                      entity_id: aaa111bbb222aaa111bbb222aaa111bbb222aaa1
+                      entity_type: document
+                  - id: bf567a8af1b544afa55b40c40063652891ffcd31
+                    email: user2@email.com
+                    entities:
+                    - role: sender
+                      entity_id: bbb222ccc333bbb222ccc333bbb222ccc333bbb2
+                      entity_type: document
+        '400':
+          description: 'Bad request. Possible errors:
+
+
+            * Data is null.
+
+            * Data is not an array.
+
+            * Data array is empty.
+
+            * `entity_type` is not a string or is empty.
+
+            * `entity_type` value is not `document`.
+
+            * `entity_id` is not a string or is empty.
+
+            * `email` is not a string, is empty, or is not a valid email.
+
+            * `role` is not a string, is empty, or is not `viewer` or `sender`.
+
+            * Duplicate `email` and `entity_id` pair.
+
+            * Cannot share entity with the same owner.
+
+            * `message` field errors.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 12030002
+                      message: 'Data should not be null, value: [null] given.'
+              example:
+                Example 1:
+                  errors:
+                  - code: 12030002
+                    message: 'Data should not be null, value: [null] given.'
+                Data is null:
+                  errors:
+                  - code: 12030002
+                    message: 'Data should not be null, value: [null] given.'
+                role is empty:
+                  errors:
+                  - code: 12030013
+                    message: Field role should not be empty.
+                email is empty:
+                  errors:
+                  - code: 12030010
+                    message: Field email should not be empty.
+                message is empty:
+                  errors:
+                  - code: 12030021
+                    message: Field message must not be empty.
+                message too long:
+                  errors:
+                  - code: 12030023
+                    message: Field message should not exceed 10000 characters.
+                message too short:
+                  errors:
+                  - code: 12030023
+                    message: Field message should be not less than 1 characters.
+                Invalid role value:
+                  errors:
+                  - code: 12030014
+                    message: 'Field role value should be one of ["viewer", "sender"], value: [admin] given.'
+                email is not valid:
+                  errors:
+                  - code: 12030011
+                    message: Field email should be valid email.
+                entity_id is empty:
+                  errors:
+                  - code: 12030008
+                    message: Field entity_id should not be empty.
+                Data array is empty:
+                  errors:
+                  - code: 12030024
+                    message: The data field should not be an empty array.
+                Data is not an array:
+                  errors:
+                  - code: 12030001
+                    message: The data field must be an array.
+                entity_type is empty:
+                  errors:
+                  - code: 12030005
+                    message: Field entity_type should not be empty.
+                role is not a string:
+                  errors:
+                  - code: 12030012
+                    message: 'Field role should be string, value: [1] given.'
+                email is not a string:
+                  errors:
+                  - code: 12030009
+                    message: 'Field email should be string, value: [1] given.'
+                Cannot share with owner:
+                  errors:
+                  - code: 12030016
+                    message: Cannot share entity with the same owner.
+                message is not a string:
+                  errors:
+                  - code: 12030022
+                    message: 'Field message should be string, value: [...] given.'
+                Invalid entity_type value:
+                  errors:
+                  - code: 12030006
+                    message: 'Field entity_type value should be one of ["document"], value: [group] given.'
+                entity_id is not a string:
+                  errors:
+                  - code: 12030007
+                    message: 'Field entity_id should be string, value: [1] given.'
+                entity_type is not a string:
+                  errors:
+                  - code: 12030004
+                    message: 'Field entity_type should be string, value: [1] given.'
+                Duplicate email and entity_id:
+                  errors:
+                  - code: 12030015
+                    message: Duplicated fields email and entity_id.
+        '401':
+          description: Incorrect or missing bearer token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  error:
+                    type: string
+                x-examples:
+                  Example 1:
+                    code: 1537
+                    error: invalid_token
+              example:
+                Example 1:
+                  code: 1537
+                  error: invalid_token
+                Unauthorized:
+                  code: 1537
+                  error: invalid_token
+        '403':
+          description: 'Forbidden. Possible errors:
+
+
+            * User is not the owner of the shared entity.
+
+            * Document already shared with target user.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 12030017
+                      message: User is not owner of shared entity.
+              example:
+                Example 1:
+                  errors:
+                  - code: 12030017
+                    message: User is not owner of shared entity.
+                User is not owner:
+                  errors:
+                  - code: 12030017
+                    message: User is not owner of shared entity.
+                Parent entity already shared:
+                  errors:
+                  - code: 12030020
+                    message: 'Sharing entity conflict: parent entity already shared.'
+        '409':
+          description: The document is part of a group and cannot be shared separately.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 12030025
+                      message: 'Sharing entity conflict: not allowed to share separately a document that is part of a group.'
+              example:
+                Example 1:
+                  errors:
+                  - code: 12030025
+                    message: 'Sharing entity conflict: not allowed to share separately a document that is part of a group.'
+                Document is part of a group:
+                  errors:
+                  - code: 12030025
+                    message: 'Sharing entity conflict: not allowed to share separately a document that is part of a group.'
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - data
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - entity_type
+                    - entity_id
+                    - email
+                    - role
+                    properties:
+                      role:
+                        type: string
+                        example: viewer
+                        description: 'Role to assign. Allowed values: `viewer`, `sender`.'
+                      email:
+                        type: string
+                        example: user@email.com
+                        description: Valid email address of the recipient.
+                      message:
+                        type: string
+                        example: Please review the document.
+                        description: Custom message to include in the notification email.
+                      entity_id:
+                        type: string
+                        example: abc123def456abc123def456abc123def456abc1
+                        description: Document unique ID.
+                      entity_type:
+                        type: string
+                        example: document
+                        description: 'Type of the entity to share. Allowed value: `document`.'
+                  description: Non-empty array of share requests.
+        required: true
+      tags:
+      - Shared Entities
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

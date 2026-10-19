@@ -1,0 +1,226 @@
+openapi: 3.2.0
+info:
+  title: SignNow Paid Request Logs API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Paid Request Logs
+paths:
+  /v2/paid-request-logs:
+    get:
+      operationId: get-v2-paid-request-logs
+      summary: Get paid request logs
+      description: Retrieve logs of the paid requests.
+      parameters:
+      - in: query
+        name: page
+        required: false
+        description: 'Allowed values: any positive integer starting from 1.'
+        schema:
+          type: string
+      - in: query
+        name: filter:type
+        required: false
+        description: 'Possible values: ''free_form_invite'', ''invite_to_sign'', ''signing_link'', ''document_group_invite'', ''bulk_invite''. Format: `?filters=[{"type":{"type":"in","value":["free_form_invite"]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filter:date
+        required: false
+        description: 'Possible values: two integers in array or null. Format: `?filters=[{"date":{"type":"between","value":[null,100]}}]`'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Returns paid request logs in case of successful response. Returns an error when:
+
+
+            * User does not have an active subscription, "code": 0. Message: "User does not have active subscription"'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        uri:
+                          type: string
+                        date:
+                          type: integer
+                        rate:
+                          type: integer
+                        method:
+                          type: string
+                        is_seat:
+                          type: boolean
+                        request_type:
+                          type: string
+                        application_mode:
+                          type: string
+                        request_owner_email:
+                          type: string
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                          links:
+                            type: array
+                            items:
+                              type: object
+                              properties: {}
+                          total:
+                            type: integer
+                          per_page:
+                            type: integer
+                          total_pages:
+                            type: integer
+                          current_page:
+                            type: integer
+                x-examples:
+                  Example 1:
+                    data:
+                    - id: 62a8f4d295b348239fcd32b6b7e1223f
+                      uri: /oauth2/token
+                      date: 1572600281
+                      rate: 1
+                      method: POST
+                      is_seat: false
+                      request_type: signing_link
+                      application_mode: production
+                      request_owner_email: user1@example.com
+                    - id: 62b3e1dfe8274acfb65e7c12a9c544d9
+                      uri: /oauth2/token
+                      date: 1572600281
+                      rate: 1
+                      method: POST
+                      is_seat: false
+                      request_type: free_form_invite
+                      application_mode: development
+                      request_owner_email: user2@example.com
+                    meta:
+                      pagination:
+                        count: 2
+                        links: []
+                        total: 2
+                        per_page: 15
+                        total_pages: 1
+                        current_page: 1
+              example:
+                Example 1:
+                  data:
+                  - id: 62a8f4d295b348239fcd32b6b7e1223f
+                    uri: /oauth2/token
+                    date: 1572600281
+                    rate: 1
+                    method: POST
+                    is_seat: false
+                    request_type: signing_link
+                    application_mode: production
+                    request_owner_email: user1@example.com
+                  - id: 62b3e1dfe8274acfb65e7c12a9c544d9
+                    uri: /oauth2/token
+                    date: 1572600281
+                    rate: 1
+                    method: POST
+                    is_seat: false
+                    request_type: free_form_invite
+                    application_mode: development
+                    request_owner_email: user2@example.com
+                  meta:
+                    pagination:
+                      count: 2
+                      links: []
+                      total: 2
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+                Successful request:
+                  data:
+                  - id: 62a8f4d295b348239fcd32b6b7e1223f
+                    uri: /oauth2/token
+                    date: 1572600281
+                    rate: 1
+                    method: POST
+                    is_seat: false
+                    request_type: signing_link
+                    application_mode: production
+                    request_owner_email: user1@email.com
+                  - id: 62b3e1dfe8274acfb65e7c12a9c544d9
+                    uri: /oauth2/token
+                    date: 1572600281
+                    rate: 1
+                    method: POST
+                    is_seat: false
+                    request_type: free_form_invite
+                    application_mode: development
+                    request_owner_email: user2@email.com
+                  meta:
+                    pagination:
+                      count: 2
+                      links: []
+                      total: 2
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+      security:
+      - Bearer: []
+      tags:
+      - Paid Request Logs
+  /v2/paid-request-logs/export:
+    get:
+      operationId: get-v2-paid-request-logs-export
+      summary: Export paid request logs
+      description: Export logs of the paid requests in an XLSX file.
+      parameters:
+      - in: query
+        name: filter:date
+        required: false
+        description: 'Possible values: two UNIX timestamps in array or null. Format: `?filters=[{"date":{"type":"between","value":["2019-10-31","2019-10-31"]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filter:client_id
+        required: false
+        description: 'Possible values: client_id of the application to get paid request logs for. Format: `?filters=[{"client_id":{"type":"in","value":["{{client_id}}"]}}]`'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Returns an XLSX file in case of successful response. Returns an error when:
+
+
+            * Filter covers more than 90 days, "code": 0. Message: "The `date` filter gap should be 90 days or less."
+
+            * Request with invalid filter, "code": 0. Message: "Wrong filters format."
+
+            * User does not have an active subscription, "code": 0. Message: "User does not have active subscription"
+
+            * Request by the user whose bearer is generated by api dashboard app, "code": 200. empty xlsx file'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security:
+      - Bearer: []
+      tags:
+      - Paid Request Logs
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

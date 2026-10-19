@@ -1,0 +1,83 @@
+openapi: 3.2.0
+info:
+  title: SignNow Link API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Link
+paths:
+  /link:
+    post:
+      operationId: post-link-smart-fields
+      summary: Add smart fields values to redirect URI
+      description: 'Add smart field values into the redirect URI via placeholders when creating a link for a template that contains smart fields.
+
+
+        1. Create a template with smart fields
+
+        2. Create a single signing link for the template with `redirect_uri` parameter that contains field placeholders to match field values.
+
+
+        *Example*
+
+
+        ```
+
+        https://example.com?firstname=[smart_fields.firstname]&lastname=[smart_fields.lastname]
+
+
+        ```'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                  url_no_signup:
+                    type: string
+                x-examples:
+                  example-1:
+                    url: http://signnow.com/s/1IFqEIt
+                    url_no_signup: https://google.com?firstname=[smart_fields.firstname]&lastname=[smart_fields.lastname]
+              example:
+                example-1:
+                  url: http://example.com/12XXXXXX
+                  url_no_signup: https://example.com?firstname=[smart_fields.firstname]&lastname=[smart_fields.lastname]
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - document_id
+              - redirect_uri
+              properties:
+                document_id:
+                  type: string
+                  description: ID of the document to create link for.
+                redirect_uri:
+                  type: string
+                  description: The URI that opens after completing the document.
+              x-examples:
+                example-1:
+                  document_id: '{{document_id}}'
+                  redirect_uri: https://google.com?firstname=[smart_fields.firstname]&lastname=[smart_fields.lastname]
+        required: true
+      tags:
+      - Link
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

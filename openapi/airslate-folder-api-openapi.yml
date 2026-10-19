@@ -1,0 +1,1855 @@
+openapi: 3.2.0
+info:
+  title: SignNow Folder API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Folder
+paths:
+  /folder/{folder_unique_id}/documents:
+    put:
+      operationId: put-folder-folder-unique-id-documents
+      summary: Move documents in bulk
+      description: This endpoint allows users to move their documents in bulk to the specified folder.
+      parameters:
+      - in: path
+        name: folder_unique_id
+        required: true
+        description: ID of the target folder to move documents
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Documents moved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                x-examples:
+                  Example 1:
+                    status: success
+              example:
+                Example 1:
+                  status: success
+                'Documents moved successfully ':
+                  status: success
+        '400':
+          description: "- Document limit (maximum: 25) is exceeded.\n- Bad request, including:\n  - Document does not exist;\n  - Operation is not allowed (user tries to move Document into Template folder etc.);\n  - User does not have rights to move the Document.\n- Target folder does not exist.\n- Invalid document ID."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 65536
+                      message: Invalid payload length
+              example:
+                Example 1:
+                  errors:
+                  - code: 65536
+                    message: Invalid payload length
+                Bad request:
+                  code: 160
+                  errors:
+                  - code: 75
+                    message: Resource doesn't exist
+                    unique_id: abc42eecf4sc41aabe1803280d379562930a1964
+                  - code: 79
+                    message: operation not allowed
+                    unique_id: b605d4d971cd48d1ba3af6b15eaa467aa091e282
+                  - code: 74
+                    message: not readable
+                    unique_id: 398392b4f4ac421c92bbffa74a04d706a75fc969
+                  message: Bad request
+                Invalid document ID:
+                  errors:
+                  - code: 65536
+                    message: Invalid unique id
+                Document limit exceeded:
+                  errors:
+                  - code: 65536
+                    message: Invalid payload length
+                Target folder does not exist:
+                  errors:
+                  - code: 65611
+                    message: folder Resource doesn't exist
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                required:
+                - unique_id
+                properties:
+                  unique_id:
+                    type: string
+                    description: 'ID of moving documents. Limit: 25 documents.'
+              x-examples:
+                Example 1:
+                - unique_id: abc42eecf44c41aabe1803280d379562930a1964
+                - unique_id: ebe10d8381b34fca86ed09d87b8a4130b146e80d
+        required: true
+      tags:
+      - Folder
+  /folder/{folder_id}:
+    get:
+      operationId: get-folder-by-id
+      summary: Get folder by id
+      description: 'This endpoint allows API users to retrieve the details of a folder, including its subfolders and the documents it contains. Use query parameters to filter, sort, and paginate the document list.
+
+
+        **Notes**
+
+
+        * `total_documents` is the total number of documents in the folder. The `documents` array contains only the page selected by `limit` and `offset`.
+
+        * To include document group templates, set `entity_type` to `dgt` or `all`. By default, a templates folder returns only templates.
+
+        * Each document''s `document_group_template_info` lists the active document group templates that include it. For a document that isn''t part of any document group template, the array is empty.'
+      parameters:
+      - in: path
+        name: folder_id
+        required: true
+        description: ID of the folder to return.
+        schema:
+          type: string
+      - in: query
+        name: filter-values
+        required: false
+        description: 'Value for the filter set in `filters`. For `filters=signing-status`, one of: `signed`, `pending`, `waiting-for-me`, `waiting-for-others`, `unsent`, `expired`. For `filters=documents-created` or `filters=documents-updated`, a Unix timestamp: the response includes documents created or updated after this time.'
+        schema:
+          type: string
+      - in: query
+        name: sortby
+        required: false
+        description: 'Field to sort documents by. Possible values: `updated`, `created`, `document-name`.'
+        schema:
+          type: string
+      - in: query
+        name: order
+        required: false
+        description: 'Order of sorting. Can be used only with `sortby`. Possible values: `asc`, `desc`.'
+        schema:
+          type: string
+          default: desc
+      - in: query
+        name: offset
+        required: false
+        description: Number of documents to skip before the returned page starts.
+        schema:
+          type: integer
+      - in: query
+        name: limit
+        required: false
+        description: 'Maximum number of documents to return. Max: `100`.'
+        schema:
+          type: integer
+      - in: query
+        name: entity_type
+        required: false
+        description: 'Entities to include in the response. Possible values: `document-all` (documents, including documents in document groups), `document` (documents that aren''t in document groups), `document-group` (document groups only), `template` (templates only), `dgt` (document group templates only), `all` (documents and document groups, or templates and document group templates in a templates folder).'
+        schema:
+          type: string
+          default: document-all
+      - in: query
+        name: entity_labels
+        required: false
+        description: 'Label to filter documents and document groups by. Possible values: `declined` (the invite was declined), `undelivered` (the invite email wasn''t delivered). To use both, separate them with a comma: `declined,undelivered`.'
+        schema:
+          type: string
+      - in: query
+        name: filters
+        required: false
+        description: 'Filter to apply to the document list. Possible values: `signing-status`, `documents-created`, `documents-updated`. Use with `filter-values`. The `documents-created` and `documents-updated` filters exclude templates.'
+        schema:
+          type: string
+      - in: query
+        name: include_documents_subfolders
+        required: false
+        description: 'Whether to include subfolders to the response. Allowed values: `1`, `0`.'
+        schema:
+          type: boolean
+      - in: query
+        name: with_team_documents
+        required: false
+        description: Whether to display Team Documents folders.
+        schema:
+          type: boolean
+      - in: query
+        name: only_favorites
+        required: false
+        description: Whether to show only favorite documents and document groups.
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: '* Success
+
+            * With document group where user is a signer (+email group)
+
+            * With document group where user is the owner (+email group)
+
+            * With viewer field invites (+email group)
+
+            * With `entity_type=document-group` query
+
+            * With `entity_type=dgt` query'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID of the folder.
+                  name:
+                    type: string
+                    description: Name of the folder.
+                  shared:
+                    type: boolean
+                    description: Whether the folder is shared.
+                  created:
+                    type: string
+                    description: Folder creation time as a Unix timestamp.
+                  folders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: ID of the subfolder.
+                        name:
+                          type: string
+                          description: Name of the subfolder.
+                        shared:
+                          type: boolean
+                          description: Whether the subfolder is shared.
+                        created:
+                          type: string
+                          description: Unix timestamp of when the subfolder was created, as a string.
+                        team_id:
+                          type: string
+                          description: ID of the team. Team folders only.
+                        user_id:
+                          type: string
+                          description: ID of the subfolder owner.
+                        team_name:
+                          type: string
+                          description: Name of the team. Team folders only.
+                        team_type:
+                          type: string
+                          description: Access type of the team folder, for example `VIEWABLE`. Team folders only.
+                        folder_count:
+                          type: string
+                          description: Number of subfolders inside the subfolder, as a string.
+                        document_count:
+                          type: string
+                          description: Number of documents in the subfolder, as a string.
+                        template_count:
+                          type: string
+                          description: Number of templates in the subfolder, as a string.
+                    description: Subfolders of the folder. Empty if the folder has no subfolders.
+                  team_id:
+                    type: string
+                    description: ID of the team. Team folders only.
+                  user_id:
+                    type: string
+                    description: ID of the folder owner.
+                  documents:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: ID of the document, template, document group, or document group template.
+                        tags:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                                description: Name of the tag.
+                              type:
+                                type: string
+                                description: Type of the tag, for example `system`.
+                          description: List of tags assigned to the document. Documents and templates only.
+                        lines:
+                          type: array
+                          items:
+                            type: object
+                          description: List of line elements drawn on the document. Documents and templates only.
+                        owner:
+                          type: string
+                          description: Email address of the owner.
+                        roles:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                                description: Name of the role, for example `Signer 1`.
+                              unique_id:
+                                type: string
+                                description: ID of the role.
+                              signing_order:
+                                type: string
+                                description: Position of the role in the signing order, as a string.
+                          description: List of signer roles defined for the document. Documents and templates only.
+                        seals:
+                          type: array
+                          items:
+                            type: object
+                          description: List of applied seal elements on the document. Documents and templates only.
+                        state:
+                          type: string
+                          description: State of the document group, such as `created`, `pending`, or `completed`. Can be `null` for document group templates. Document groups and document group templates only.
+                        texts:
+                          type: array
+                          items:
+                            type: object
+                          description: List of text elements added to the document. Documents and templates only.
+                        checks:
+                          type: array
+                          items:
+                            type: object
+                          description: List of checkmark elements added to the document. Documents and templates only.
+                        fields:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: ID of the field.
+                              role:
+                                type: string
+                                description: Name of the role the field is assigned to.
+                              type:
+                                type: string
+                                description: Field type, for example `text`, `signature`, `initials`, `checkbox`, or `enumeration`.
+                              role_id:
+                                type: string
+                                description: ID of the role the field is assigned to.
+                              field_id:
+                                type: string
+                                description: ID of the field the element belongs to. Can be `null`.
+                              fulfiller:
+                                type: string
+                                description: Email address of the user who filled in the field. `null` until the field is filled.
+                              element_id:
+                                type: string
+                                description: ID of the element that fills the field. `null` until the field is filled.
+                              originator:
+                                type: string
+                                description: Email address of the document owner.
+                              json_attributes:
+                                type: object
+                                properties:
+                                  x:
+                                    type: integer
+                                    description: Horizontal position of the field on the page, in pixels.
+                                  y:
+                                    type: integer
+                                    description: Vertical position of the field on the page, in pixels.
+                                  bold:
+                                    type: boolean
+                                    description: '`true` if the text is bold.'
+                                  font:
+                                    type: string
+                                    description: Font name, for example `Arial`.
+                                  name:
+                                    type: string
+                                    description: Name of the field.
+                                  size:
+                                    type: integer
+                                    description: Font size in the SignNow editor scale.
+                                  align:
+                                    type: string
+                                    description: Horizontal text alignment, for example `left`.
+                                  color:
+                                    type: string
+                                    description: Text color as a 6-character hex code without `#`, for example `000000`.
+                                  label:
+                                    type: string
+                                    description: Label of the field shown to the recipient. Returned only if a label is set.
+                                  width:
+                                    type: integer
+                                    description: Width of the field, in pixels.
+                                  height:
+                                    type: integer
+                                    description: Height of the field, in pixels.
+                                  italic:
+                                    type: boolean
+                                    description: '`true` if the text is italic.'
+                                  valign:
+                                    type: string
+                                    description: Vertical text alignment, for example `top`.
+                                  required:
+                                    type: boolean
+                                    description: '`true` if the recipient must fill in the field.'
+                                  font_size:
+                                    type: integer
+                                    description: Font size on the document page, in PDF points.
+                                  max_chars:
+                                    type: integer
+                                    description: Maximum number of characters. `0` means no limit.
+                                  max_lines:
+                                    type: integer
+                                    description: Maximum number of lines. `0` means no limit.
+                                  underline:
+                                    type: boolean
+                                    description: '`true` if the text is underlined.'
+                                  arrangement:
+                                    type: string
+                                    description: 'How the text is laid out in the field. `none`: regular text. `cells`: one character per cell.'
+                                  page_number:
+                                    type: integer
+                                    description: Zero-based number of the page the field is on.
+                                  stretch_mode:
+                                    type: string
+                                    description: How the field resizes to fit its content, for example `fixed`.
+                                  validator_id:
+                                    type: string
+                                    description: ID of the validator applied to the field. See `field_validators`.
+                                  allowed_types:
+                                    type: array
+                                    items:
+                                      type: string
+                                    description: 'For `signature` fields: the ways the recipient can add a signature. Possible values: `type`, `draw`, `upload`.'
+                                  prefilled_text:
+                                    type: string
+                                    description: Default value of the field. Returned only if set.
+                                  lock_to_sign_date:
+                                    type: boolean
+                                    description: 'For date fields: `true` if the field is filled with the signing date and cannot be changed.'
+                                  lock_to_sign_prefill:
+                                    type: boolean
+                                    description: '`true` if the prefilled value cannot be changed by the recipient.'
+                                description: Position, size, and settings of the field. The set of keys depends on the field type.
+                              field_request_id:
+                                type: string
+                                description: ID of the field invite the field belongs to. Can be `null`.
+                              template_field_id:
+                                type:
+                                - string
+                                - 'null'
+                                description: ID of the corresponding field in the source template. Can be `null`.
+                              field_request_canceled:
+                                type:
+                                - string
+                                - 'null'
+                                description: Whether the field request was canceled. Can be `null`.
+                          description: List of fillable fields defined on the document. Documents and templates only.
+                        pinned:
+                          type: boolean
+                          description: Whether the entity is pinned.
+                        status:
+                          type: string
+                          description: Status of the document group. Document groups only.
+                        created:
+                          description: Unix timestamp of when the entity was created. A string for documents and templates, an integer for document groups and document group templates.
+                        inserts:
+                          type: array
+                          items:
+                            type: object
+                          description: List of text inserts added to the document. Documents and templates only.
+                        invites:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: ID of the invite.
+                              email:
+                                type: string
+                                description: Email address of the recipient.
+                              order:
+                                type: integer
+                                description: Step of the invite in the signing order.
+                              action:
+                                type: string
+                                description: Action requested from the recipient.
+                              status:
+                                type: string
+                                description: Status of the invite.
+                              created:
+                                type: integer
+                                description: Unix timestamp of when the invite was created.
+                              updated:
+                                type: integer
+                                description: Unix timestamp of the last invite update.
+                              compliance:
+                                type: object
+                                properties:
+                                  cfr:
+                                    description: 21 CFR Part 11 settings. Can be `null`.
+                                description: Compliance settings of the invite.
+                              document_id:
+                                type: string
+                                description: ID of the document.
+                              email_group:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                    description: ID of the email group. Can be `null`.
+                                  name:
+                                    type: string
+                                    description: Name of the email group. Can be `null`.
+                                description: Email group the invite was sent to. `id` and `name` are `null` if the invite was sent to a single recipient.
+                              is_embedded:
+                                type: boolean
+                                description: Whether the invite is an embedded invite.
+                              document_name:
+                                type: string
+                                description: Name of the document.
+                              authentication:
+                                type: string
+                                description: Authentication method required from the recipient, for example `password`. `null` if none.
+                              signature_type:
+                                description: Type of signature required from the recipient. Can be `null`.
+                              expiration_time:
+                                type: integer
+                                description: Unix timestamp of when the invite expires. Can be `null`.
+                              is_draft_exists:
+                                description: Whether the recipient has saved a draft.
+                              password_method:
+                                type: string
+                                description: Method used to deliver the invite password. Empty if no password is set.
+                              payment_request:
+                                description: Payment request attached to the invite. Can be `null`.
+                              is_full_declined:
+                                type: boolean
+                                description: Whether the recipient declined the invite.
+                              sms_sent_statuses:
+                                type: array
+                                items:
+                                  type: object
+                                description: SMS delivery events for the invite. Empty for email invites.
+                              is_document_locked:
+                                type: string
+                                description: '`"1"` if the document is locked for this recipient, otherwise `"0"`.'
+                              password_protected:
+                                type: string
+                                description: '`"1"` if the invite is password-protected, otherwise `"0"`.'
+                              email_sent_statuses:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    status:
+                                      type: string
+                                      description: Delivery status.
+                                    created_at:
+                                      type: integer
+                                      description: Unix timestamp of when the status was first recorded.
+                                    last_reaction_at:
+                                      type: integer
+                                      description: Unix timestamp of the latest status update.
+                                description: Delivery statuses of the invite email.
+                              signer_phone_invite:
+                                type: string
+                                description: Phone number the SMS invite was sent to. `null` for email invites.
+                          description: Invites sent for the document group. Document groups and document group templates only.
+                        updated:
+                          description: Unix timestamp of the last update. A string for documents and templates, an integer for document groups and document group templates.
+                        user_id:
+                          type: string
+                          description: ID of the owner.
+                        requests:
+                          type: array
+                          items:
+                            type: object
+                          description: List of document requests. Documents and templates only.
+                        settings:
+                          type:
+                          - object
+                          - 'null'
+                          description: Account and organization settings that apply to the document, keyed by setting name, for example `require_drawn_signatures` or `restrict_download`. The set of keys depends on the account and can change. Documents and templates only. Can be `null`.
+                          additionalProperties: true
+                        template:
+                          type: boolean
+                          description: Indicates whether the document is a template. `true` if it is a template, `false` otherwise. Documents and templates only.
+                        documents:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: ID of the document.
+                              name:
+                                type: string
+                                description: Name of the document.
+                              roles:
+                                type: array
+                                items:
+                                  type: string
+                                description: Names of the roles in the document.
+                              updated:
+                                type: integer
+                                description: Unix timestamp of the last document update.
+                              settings:
+                                type:
+                                - object
+                                - 'null'
+                                description: Settings of the document in the group, for example `advanced_signing_flow`. Can be `null`.
+                                additionalProperties: true
+                              thumbnail:
+                                type: object
+                                properties:
+                                  large:
+                                    type: string
+                                    description: URL of the large thumbnail.
+                                  small:
+                                    type: string
+                                    description: URL of the small thumbnail.
+                                  medium:
+                                    type: string
+                                    description: URL of the medium thumbnail.
+                                description: Links to the document thumbnail images.
+                              has_fields:
+                                type: boolean
+                                description: Whether the document has fillable fields.
+                              page_count:
+                                type: integer
+                                description: Number of pages in the document. Can be `null` for templates in a document group template.
+                              signatures:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: ID of the signature.
+                                    created:
+                                      type: string
+                                      description: Unix timestamp of when the signature was added.
+                                    user_id:
+                                      type: string
+                                      description: ID of the signer.
+                                description: Signatures applied to the document.
+                          description: Documents in the group. Document groups and document group templates only.
+                        invite_id:
+                          type: string
+                          description: ID of the document group invite. Can be `null`. Document groups and document group templates only.
+                        parent_id:
+                          type: string
+                          description: ID of the folder that contains the entity.
+                        thumbnail:
+                          type: object
+                          properties:
+                            large:
+                              type: string
+                              description: URL of the large thumbnail.
+                            small:
+                              type: string
+                              description: URL of the small thumbnail.
+                            medium:
+                              type: string
+                              description: URL of the medium thumbnail.
+                          description: Links to the document thumbnail images in `small`, `medium`, and `large` sizes. Documents and templates only.
+                        page_count:
+                          type: string
+                          description: Number of pages in the document, as a string. Documents and templates only.
+                        share_info:
+                          type: object
+                          properties:
+                            role:
+                              type: string
+                              description: 'Access level of the current user. Possible values: `sender`, `viewer`, `owner`.'
+                          description: Sharing information. Templates only.
+                        signatures:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              x:
+                                type: string
+                                description: Horizontal position of the signature, in pixels, as a string.
+                              y:
+                                type: string
+                                description: Vertical position of the signature, in pixels, as a string.
+                              id:
+                                type: string
+                                description: ID of the signature.
+                              data:
+                                type: string
+                                description: Base64-encoded image of the signature.
+                              email:
+                                type: string
+                                description: Email address of the user who added the signature.
+                              width:
+                                type: string
+                                description: Width of the signature, in pixels, as a string.
+                              height:
+                                type: string
+                                description: Height of the signature, in pixels, as a string.
+                              created:
+                                type: string
+                                description: Unix timestamp of when the signature was added, as a string.
+                              user_id:
+                                type: string
+                                description: ID of the user who added the signature.
+                              page_number:
+                                type: string
+                                description: Zero-based number of the page the signature is on, as a string.
+                          description: List of applied signature elements on the document. Documents and templates only.
+                        attachments:
+                          type: array
+                          items:
+                            type: object
+                          description: List of file attachments on the document. Documents and templates only.
+                        entity_type:
+                          type: string
+                          description: 'Type of the entity. Possible values: `document`, `template`, `document-group`, `dgt`.'
+                        is_favorite:
+                          type: boolean
+                          description: Whether the entity is marked as a favorite.
+                        integrations:
+                          type: array
+                          items:
+                            type: object
+                          description: List of third-party integrations associated with the document. Documents and templates only.
+                        radiobuttons:
+                          type: array
+                          items:
+                            type: object
+                          description: List of radio button groups on the document. Documents and templates only.
+                        version_time:
+                          type: string
+                          description: Unix timestamp of the document version. Documents and templates only.
+                        viewer_roles:
+                          type: array
+                          items:
+                            type: object
+                            x-stoplight:
+                              id: 6ftboaddm6opk
+                          description: List of viewer roles defined for the document. Documents and templates only.
+                          x-stoplight:
+                            id: om4q3nh5hu360
+                        document_name:
+                          type: string
+                          description: Name of the document. Documents and templates only.
+                        entity_labels:
+                          type: array
+                          items:
+                            type: object
+                          description: System labels assigned to the entity, such as `declined` or `undelivered`.
+                        field_invites:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: ID of the field invite.
+                              role:
+                                type: string
+                                description: Name of the signer role.
+                              email:
+                                type: string
+                                description: Email address of the signer. For an SMS invite, a generated placeholder address.
+                              pfrid:
+                                type:
+                                - string
+                                - 'null'
+                                description: ID of the payment request.
+                              status:
+                                type: string
+                                description: Status of the invite, for example `pending`, `fulfilled`, or `declined`.
+                              created:
+                                type: string
+                                description: Unix timestamp of when the invite was created, as a string.
+                              pfrtype:
+                                type:
+                                - string
+                                - 'null'
+                                description: Type of the payment request.
+                              role_id:
+                                type: string
+                                description: ID of the signer role.
+                              updated:
+                                type: string
+                                description: Unix timestamp of the last invite update, as a string.
+                              declined:
+                                type: array
+                                items:
+                                  type: object
+                                description: Decline details. Empty if the signer has not declined.
+                              reassign:
+                                type: string
+                                description: '`"1"` if the signer can reassign the invite, otherwise `"0"`.'
+                              reminder:
+                                type: string
+                                description: '`"1"` if reminders are enabled for the invite, otherwise `"0"`.'
+                              pframount:
+                                type:
+                                - string
+                                - 'null'
+                                description: Amount of the payment request.
+                              pfrstatus:
+                                type:
+                                - string
+                                - 'null'
+                                description: Status of the payment request.
+                              compliance:
+                                type: object
+                                properties:
+                                  cfr:
+                                    type:
+                                    - object
+                                    - 'null'
+                                    description: 21 CFR Part 11 settings. Can be `null`.
+                                description: Compliance settings of the invite.
+                              pfrcreated:
+                                type:
+                                - string
+                                - 'null'
+                                description: Unix timestamp of when the payment request was created.
+                              email_group:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                    description: ID of the email group. Can be `null`.
+                                  name:
+                                    type: string
+                                    description: Name of the email group. Can be `null`.
+                                description: Email group the invite was sent to. `id` and `name` are `null` if the invite was sent to a single recipient.
+                              id_verified:
+                                type: string
+                                description: ID verification status of the signer, for example `UNVERIFIED`.
+                              is_embedded:
+                                type: boolean
+                                description: Whether the invite is an embedded invite.
+                              redirect_uri:
+                                type:
+                                - string
+                                - 'null'
+                                description: URL the signer is redirected to after signing.
+                              delivery_type:
+                                type: string
+                                description: 'How the invite is delivered. Possible values: `email`, `sms`.'
+                              password_type:
+                                type: string
+                                description: Type of the invite password. Empty if no password is set.
+                              pfrmerchant_id:
+                                type:
+                                - string
+                                - 'null'
+                                description: ID of the merchant account.
+                              signature_type:
+                                type:
+                                - string
+                                - 'null'
+                                description: Type of signature required from the signer. Can be `null`.
+                              signer_user_id:
+                                type: string
+                                description: ID of the signer user.
+                              expiration_time:
+                                type: string
+                                description: Unix timestamp of when the invite expires, as a string.
+                              is_draft_exists:
+                                type: string
+                                description: '`"1"` if the signer has saved a draft, otherwise `"0"`.'
+                              password_method:
+                                type: string
+                                description: Method used to deliver the invite password. Empty if no password is set.
+                              payment_request:
+                                type:
+                                - string
+                                - 'null'
+                                description: Payment request attached to the invite. Can be `null`.
+                              is_full_declined:
+                                type: boolean
+                                description: Whether the signer declined the invite.
+                              pfrcurrency_name:
+                                type:
+                                - string
+                                - 'null'
+                                description: Currency of the payment request.
+                              pfrmerchant_type:
+                                type:
+                                - string
+                                - 'null'
+                                description: Type of the merchant account.
+                              sms_sent_statuses:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    status:
+                                      type: string
+                                      description: SMS delivery status, for example `sent`.
+                                    created_at:
+                                      type: integer
+                                      description: Unix timestamp of when the event was recorded.
+                                    updated_at:
+                                      type: integer
+                                      description: Unix timestamp of the last status update.
+                                description: SMS delivery events for the invite. Empty for email invites.
+                              verification_type:
+                                type:
+                                - string
+                                - 'null'
+                                description: Type of signer verification.
+                              is_document_locked:
+                                type: string
+                                description: '`"1"` if the document is locked for this signer, otherwise `"0"`.'
+                              password_protected:
+                                type: string
+                                description: '`"1"` if the invite is password-protected, otherwise `"0"`.'
+                              pfrjson_attributes:
+                                type:
+                                - string
+                                - 'null'
+                                description: Additional attributes of the payment request.
+                              email_sent_statuses:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    status:
+                                      enum:
+                                      - sent
+                                      - mail_open
+                                      - bounce
+                                      - mail_click
+                                      - reminder_sent
+                                      - undefined
+                                      type: string
+                                      description: 'Email delivery event status. Possible values: `sent` — email was successfully sent to the recipient; `mail_open` — email was opened by the recipient; `bounce` — email bounced, delivery failed (e.g. invalid address); `mail_click` — a link in the email was clicked by the recipient; `reminder_sent` — a reminder email was sent to the recipient; `undefined` — the event status is unknown.'
+                                    created_at:
+                                      type: integer
+                                      description: Unix timestamp when the event was recorded.
+                                    last_reaction_at:
+                                      type: integer
+                                      description: Unix timestamp of the last status update.
+                                description: List of email delivery events recorded for this invite. Each object represents one event. The array is empty (`[]`) if no email events have been recorded yet.
+                              force_new_signature:
+                                type:
+                                - integer
+                                - 'null'
+                                description: '`1` if the signer must create a new signature instead of reusing a saved one. Can be `null`.'
+                              signer_phone_invite:
+                                type:
+                                - string
+                                - 'null'
+                                description: Phone number the SMS invite was sent to. `null` for email invites.
+                              decline_by_signature:
+                                type:
+                                - boolean
+                                - 'null'
+                                description: Whether the signer can decline by signature. Can be `null`.
+                              signing_instructions:
+                                type:
+                                - string
+                                - 'null'
+                                description: Instructions shown to the signer. Can be `null`.
+                              electronic_consent_id:
+                                type:
+                                - string
+                                - 'null'
+                                description: ID of the electronic consent the signer accepted. Can be `null`.
+                              prefill_signature_name:
+                                type:
+                                - string
+                                - 'null'
+                                description: Name prefilled in the signature field. Can be `null`.
+                              id_verification_required:
+                                type: string
+                                description: Whether ID verification is required, for example `NO`.
+                              pfrmerchant_account_name:
+                                type:
+                                - string
+                                - 'null'
+                                description: Name of the merchant account that receives the payment.
+                              pfrpayment_transaction_id:
+                                type:
+                                - string
+                                - 'null'
+                                description: ID of the payment transaction.
+                              electronic_consent_required:
+                                type: integer
+                                description: '`1` if the signer must accept the electronic consent before signing, otherwise `0`.'
+                              required_preset_signature_name:
+                                type:
+                                - string
+                                - 'null'
+                                description: Name the signer must use in the signature. Can be `null`.
+                              stripe_ach_bank_account_present:
+                                type: string
+                                description: Whether a Stripe ACH bank account is connected for the payment request.
+                              stripe_ach_bank_account_verified:
+                                type: string
+                                description: Whether the Stripe ACH bank account is verified.
+                          description: List of signer field invites for the document. Documents and templates only.
+                        own_as_merged:
+                          type: boolean
+                          description: 'Whether the document group template has merged status: `true` if merged, `false` if not. Document groups and document group templates only.'
+                        recently_used:
+                          description: Unix timestamp of when the entity was last used. A string for documents and templates, an integer for document groups and document group templates.
+                        approver_roles:
+                          type: array
+                          items:
+                            type: object
+                            x-stoplight:
+                              id: arai495ar4gv8
+                          description: List of approver roles defined for the document. Documents and templates only.
+                          x-stoplight:
+                            id: 4tofxp1z7ohu5
+                        notary_invites:
+                          type: array
+                          items:
+                            type: object
+                          description: List of notary invites on the document. Documents and templates only.
+                        origin_user_id:
+                          type:
+                          - string
+                          - 'null'
+                          description: Identifier of the user who owns the source document. Can be `null`. Documents and templates only.
+                        sign_as_merged:
+                          type: boolean
+                          description: Whether the documents in the group are signed as one merged document. Document groups and document group templates only.
+                        routing_details:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              cc:
+                                type: array
+                                items:
+                                  type: object
+                                description: Email addresses that receive a copy of the completed document.
+                              id:
+                                type: string
+                                description: ID of the routing details record.
+                              data:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                      description: Name of the role.
+                                    role_id:
+                                      type: string
+                                      description: ID of the role.
+                                    reassign:
+                                      type: boolean
+                                      description: Whether the recipient can reassign the invite.
+                                    reminder:
+                                      type: object
+                                      properties:
+                                        remind_after:
+                                          type: integer
+                                          description: Days after the invite is sent to send the first reminder. `0` means no reminder.
+                                        remind_before:
+                                          type: integer
+                                          description: Days before expiration to send a reminder. `0` means no reminder.
+                                        remind_repeat:
+                                          type: integer
+                                          description: Interval in days between repeated reminders. `0` means no repeat.
+                                      description: Reminder settings for the invite.
+                                    attributes:
+                                      type: array
+                                      items:
+                                        type: object
+                                      description: Additional attributes of the role.
+                                    inviter_role:
+                                      type: boolean
+                                      description: '`true` if the document owner is the recipient for this role.'
+                                    phone_invite:
+                                      type:
+                                      - string
+                                      - 'null'
+                                      description: Phone number for SMS delivery. Can be `null`.
+                                    default_email:
+                                      type: string
+                                      description: Default email address of the recipient for this role. Empty if not set.
+                                    delivery_type:
+                                      type: string
+                                      description: 'How the invite is delivered. Possible values: `email`, `sms`.'
+                                    signing_order:
+                                      type: integer
+                                      description: Position of the role in the signing order.
+                                    expiration_days:
+                                      type: integer
+                                      description: Number of days before the invite expires.
+                                    decline_by_signature:
+                                      type: boolean
+                                      description: Whether the recipient can decline by signature.
+                                description: Signer roles and their invite settings.
+                              cc_step:
+                                type: array
+                                items:
+                                  type: object
+                                description: Steps after which `cc` recipients are notified.
+                              created:
+                                type: string
+                                description: Unix timestamp of when the routing details were created, as a string.
+                              updated:
+                                type:
+                                - string
+                                - 'null'
+                                description: Unix timestamp of the last update, as a string.
+                              viewers:
+                                type: array
+                                items:
+                                  type: object
+                                description: Viewer roles and their invite settings. Empty if the document has no viewers.
+                              approvers:
+                                type: array
+                                items:
+                                  type: object
+                                description: Approver roles and their invite settings. Empty if the document has no approvers.
+                              attributes:
+                                type:
+                                - object
+                                - 'null'
+                                description: Additional routing attributes. Can be `null`.
+                              invite_link_instructions:
+                                type:
+                                - string
+                                - 'null'
+                                description: Instructions shown with the invite link. Can be `null`.
+                          description: Invite routing configuration, including signer order, `cc` recipients, and invite link instructions. Documents and templates only.
+                        field_validators:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: ID of the validator.
+                              name:
+                                type: string
+                                description: Name of the validator.
+                              scope:
+                                type: string
+                                description: Scope of the validator. `system` for built-in validators.
+                              description:
+                                type: string
+                                description: Description of the expected value.
+                              error_message:
+                                type: string
+                                description: Message shown when the value does not match.
+                              regex_expression:
+                                type: string
+                                description: Regular expression the value must match.
+                              display_json_attributes:
+                                type: object
+                                properties:
+                                  common:
+                                    type: boolean
+                                    description: Whether the validator is shown in the common list.
+                                  disabled:
+                                    type: boolean
+                                    description: Whether the validator is disabled.
+                                  web_locale_key:
+                                    type: string
+                                    description: Localization key of the validator.
+                                  web_short_name:
+                                    type: string
+                                    description: Short name shown in the web app.
+                                  web_description:
+                                    type: string
+                                    description: Description shown in the web app.
+                                  date_time_field_order:
+                                    type: integer
+                                    description: Order of the validator in the date and time list.
+                                description: Display settings of the validator in the SignNow web app.
+                          description: List of field validation rules. Documents and templates only.
+                        freeform_actions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: ID of the action.
+                              email:
+                                type: string
+                                description: Email address of the recipient.
+                              status:
+                                type: string
+                                description: Status of the action.
+                              created:
+                                type: integer
+                                description: Unix timestamp of when the action was created.
+                              user_id:
+                                type: string
+                                description: ID of the recipient.
+                              document_id:
+                                type: string
+                                description: ID of the document.
+                              email_sent_statuses:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    status:
+                                      type: string
+                                      description: Delivery status, for example `sent`.
+                                    created_at:
+                                      type: integer
+                                      description: Unix timestamp of when the status was first recorded.
+                                    last_reaction_at:
+                                      type: integer
+                                      description: Unix timestamp of the latest status update.
+                                description: Delivery statuses of the invite email.
+                          description: Freeform invite actions. Document groups and document group templates only.
+                        scheduled_invite:
+                          type:
+                          - object
+                          - 'null'
+                          description: Scheduled invite configuration. Can be `null` if no invite is scheduled. Documents and templates only.
+                        original_filename:
+                          type: string
+                          description: Original filename of the uploaded document. Documents and templates only.
+                        freeform_invite_id:
+                          type: string
+                          description: ID of the freeform invite. Can be `null`. Document groups and document group templates only.
+                        origin_document_id:
+                          type:
+                          - string
+                          - 'null'
+                          description: Identifier of the source document if this document was created as a copy. Can be `null`. Documents and templates only.
+                        document_group_info:
+                          type: object
+                          properties:
+                            state:
+                              type:
+                              - string
+                              - 'null'
+                              description: State of the document group, for example `created` or `pending`. `null` if the document is not in a group.
+                            invite_id:
+                              type:
+                              - string
+                              - 'null'
+                              description: ID of the document group invite. `null` if no invite has been sent.
+                            invite_status:
+                              type:
+                              - string
+                              - 'null'
+                              description: Status of the document group invite. `null` if no invite has been sent.
+                            sign_as_merged:
+                              type: boolean
+                              description: '`true` if the documents in the group are signed as a single merged document.'
+                            freeform_invite:
+                              type: object
+                              properties:
+                                id:
+                                  type:
+                                  - string
+                                  - 'null'
+                                  description: ID of the freeform invite. `null` if no freeform invite has been sent.
+                              description: Freeform invite sent for the document group.
+                            document_group_id:
+                              type:
+                              - string
+                              - 'null'
+                              description: ID of the document group. `null` if the document is not in a group.
+                            doc_count_in_group:
+                              type: integer
+                              description: Number of documents in the document group. `0` if the document is not in a group.
+                            document_group_name:
+                              type:
+                              - string
+                              - 'null'
+                              description: Name of the document group. `null` if the document is not in a group.
+                          description: Document group information if this document belongs to a group. Documents and templates only.
+                        document_group_name:
+                          type: string
+                          description: Name of the document group or document group template. Document groups and document group templates only.
+                        enumeration_options:
+                          type: array
+                          items:
+                            type: object
+                          description: List of enumeration options for dropdown fields. Documents and templates only.
+                        viewer_field_invites:
+                          type: array
+                          items:
+                            type: object
+                          description: List of viewer field invites for the document. Documents and templates only.
+                        approver_field_invites:
+                          type: array
+                          items:
+                            type: object
+                          description: List of approver field invites for the document. Documents and templates only.
+                        email_action_on_complete:
+                          type: string
+                          description: Email action to perform when the group is completed. Can be `null`. Document groups and document group templates only.
+                        document_group_template_info:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              shared:
+                                type: integer
+                                description: Always `0` in this response. To check whether a document group template is shared with a team, use [`GET /document/{document_id}`](/docs/document/operations/get-document).
+                              own_as_merged:
+                                type: boolean
+                                description: 'Whether the document group template has merged status: `true` if the template is merged, `false` if not.'
+                              document_group_template_id:
+                                type: string
+                                description: ID of the document group template.
+                              document_group_template_name:
+                                type: string
+                                description: Name of the document group template.
+                          description: Active document group templates that include this document. Empty if the document isn't part of any document group template.
+                        originator_organization_settings:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              value:
+                                type: string
+                                description: Value of the setting, as a string.
+                              setting:
+                                type: string
+                                description: Name of the organization setting.
+                          description: Organization-level settings that apply to the document's originator. Each item has a `setting` name and its `value`.
+                    description: Entities in the folder, limited by `limit` and `offset`. Depending on `entity_type`, the array can contain documents, templates, document groups, and document group templates. Fields marked as documents-only or groups-only appear only for that entity type.
+                  parent_id:
+                    type: string
+                    description: ID of the parent folder.
+                  team_name:
+                    type: string
+                    description: Name of the team. Team folders only.
+                  team_type:
+                    type: string
+                    description: Type of the team. Team folders only.
+                  system_folder:
+                    type: boolean
+                    description: Whether the folder is a system folder, such as `Documents` or `Templates`.
+                  total_documents:
+                    type: integer
+                    description: Total number of documents in the folder, across all pages.
+              example:
+                Success:
+                  id: 18XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  name: Documents
+                  shared: false
+                  created: '1409253077'
+                  folders: []
+                  user_id: 38XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  documents:
+                  - id: 85XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    tags:
+                    - name: fields
+                      type: system
+                    owner: document_owner@email.com
+                    roles:
+                    - name: Client
+                      unique_id: 10XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      signing_order: '1'
+                    seals: []
+                    texts:
+                    - x: '281'
+                      y: '195'
+                      id: d2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      data: 10/16/14
+                      font: Arial
+                      size: '8'
+                      email: email_address@email.com
+                      created: '1413485018'
+                      user_id: abXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      line_height: '9.08'
+                      page_number: '0'
+                    checks: []
+                    fields:
+                    - id: ecXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      role: Client
+                      type: text
+                      role_id: 10XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_id: 40XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      fulfiller: fulfiller@email.com
+                      element_id: d2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      originator: originator@email.com
+                      json_attributes:
+                        x: 281
+                        y: 195
+                        label: Date
+                        width: 102
+                        height: 21
+                        required: true
+                        page_number: 0
+                        prefilled_text: ''
+                      field_request_id: 40XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      template_field_id: 72XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_request_canceled: null
+                    - id: 43XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      role: Client
+                      type: signature
+                      role_id: 10XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_id: 4dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      fulfiller: fulfiller@email.com
+                      element_id: 5cXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      originator: originator@email.com
+                      json_attributes:
+                        x: 91
+                        y: 186
+                        width: 122
+                        height: 34
+                        required: true
+                        page_number: 0
+                      field_request_id: 4dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      template_field_id: e9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_request_canceled: null
+                    created: '1413307342'
+                    inserts: []
+                    updated: '1413485018'
+                    user_id: 38XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    requests:
+                    - email_sent_statuses:
+                      - status: sent
+                        created_at: 1640108848
+                        last_reaction_at: 1640108848
+                      - status: mail_open
+                        created_at: 1640108848
+                        last_reaction_at: 1640108849
+                      - status: bounce
+                        created_at: 1640108848
+                        last_reaction_at: 1640108851
+                      - status: mail_click
+                        created_at: 1640108848
+                        last_reaction_at: 1640108850
+                    template: false
+                    parent_id: 18XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    thumbnail:
+                      large: http://example.com/document/85XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                      small: http://example.com/document/85XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                      medium: http://example.com/document/85XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                    page_count: '1'
+                    signatures:
+                    - x: '91'
+                      y: '195'
+                      id: 5cXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      email: email_address@email.com
+                      width: '122'
+                      height: '25'
+                      created: '1413485018'
+                      user_id: abXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      page_number: '0'
+                    attachments: []
+                    exported_to:
+                    - is_exported: false
+                      export_domain: example.com
+                      exported_user_ids: []
+                    is_favorite: false
+                    version_time: '1413485018'
+                    document_name: Document 1
+                    entity_labels: []
+                    field_invites:
+                    - id: 73XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      role: Client
+                      email: user@email.com
+                      status: fulfilled
+                      updated: '1413485018'
+                    - email_sent_statuses:
+                      - status: sent
+                        created_at: 1640108848
+                        last_reaction_at: 1640108848
+                      - status: mail_open
+                        created_at: 1640108848
+                        last_reaction_at: 1640108849
+                      - status: bounce
+                        created_at: 1640108848
+                        last_reaction_at: 1640108851
+                      - status: mail_click
+                        created_at: 1640108848
+                        last_reaction_at: 1640108850
+                    notary_invites: []
+                    origin_user_id: 38XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    original_filename: document_sample.pdf
+                    origin_document_id: 4aXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    enumeration_options: []
+                    document_group_template_info:
+                    - shared: 0
+                      own_as_merged: false
+                      document_group_template_id: a1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      document_group_template_name: Onboarding package
+                  parent_id: 07XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  system_folder: true
+                  total_documents: 1
+                'With declined document ':
+                  id: 18XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  name: Documents
+                  shared: false
+                  created: '1409253077'
+                  folders: []
+                  user_id: 38XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  documents:
+                  - id: 85XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    tags:
+                    - name: fields
+                      type: system
+                    owner: document_owner@email.com
+                    roles:
+                    - name: Client
+                      unique_id: 10XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      signing_order: '1'
+                    seals: []
+                    texts: []
+                    checks: []
+                    fields:
+                    - id: ecXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      role: Client
+                      type: text
+                      role_id: 10XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_id: 40XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      fulfiller: fulfiller@email.com
+                      element_id: d2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      originator: originator@email.com
+                      json_attributes:
+                        x: 281
+                        y: 195
+                        label: Date
+                        width: 102
+                        height: 21
+                        required: true
+                        page_number: 0
+                        prefilled_text: ''
+                      field_request_id: 40XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      template_field_id: 72XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_request_canceled: null
+                    - id: 43XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      role: Client
+                      type: signature
+                      role_id: 10XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_id: 4dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      fulfiller: fulfiller@email.com
+                      element_id: 5cXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      originator: originator@email.com
+                      json_attributes:
+                        x: 91
+                        y: 186
+                        width: 122
+                        height: 34
+                        required: true
+                        page_number: 0
+                      field_request_id: 4dXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      template_field_id: e9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      field_request_canceled: null
+                    created: '1413307342'
+                    inserts: []
+                    updated: '1413485018'
+                    user_id: 38XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    requests: []
+                    template: false
+                    parent_id: 18XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    thumbnail:
+                      large: http://example.com/document/85XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                      small: http://example.com/document/85XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                      medium: http://example.com/document/85XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                    page_count: '1'
+                    signatures: []
+                    attachments: []
+                    exported_to:
+                    - is_exported: false
+                      export_domain: example.com
+                      exported_user_ids: []
+                    is_favorite: false
+                    version_time: '1413485018'
+                    document_name: Document 1
+                    entity_labels:
+                    - updated: 1716320189
+                      is_system: true
+                      label_name: declined
+                    field_invites:
+                    - id: 73XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      role: Client
+                      email: user@email.com
+                      status: fulfilled
+                      updated: '1413485018'
+                    - email_sent_statuses:
+                      - status: sent
+                        created_at: 1640108848
+                        last_reaction_at: 1640108848
+                      - status: mail_open
+                        created_at: 1640108848
+                        last_reaction_at: 1640108849
+                      - status: bounce
+                        created_at: 1640108848
+                        last_reaction_at: 1640108851
+                      - status: mail_click
+                        created_at: 1640108848
+                        last_reaction_at: 1640108850
+                    notary_invites: []
+                    origin_user_id: 38XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    original_filename: document_sample.pdf
+                    origin_document_id: 4aXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    enumeration_options: []
+                  parent_id: 07XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  system_folder: true
+                  total_documents: 1
+                With viewer field invites:
+                  id: a9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  name: Documents
+                  shared: false
+                  created: '1616586778'
+                  folders: []
+                  user_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  documents:
+                  - id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    owner: document-owner@email.com
+                    created: 1616586981
+                    invites:
+                    - email: signer@email.com
+                      order: '1'
+                      action: sign
+                      status: fulfilled
+                      document_id: 06XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      document_name: Performance review
+                      authentication: null
+                      expiration_time: null
+                    - email: manager@email.com
+                      order: '2'
+                      action: sign
+                      status: fulfilled
+                      document_id: 06XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      document_name: Performance review
+                      authentication: null
+                      expiration_time: null
+                    - order: '2'
+                      action: view
+                      status: pending
+                      document_id: 06XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      email_group:
+                        id: e7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        name: HR team
+                      document_name: Performance review
+                      authentication: null
+                      expiration_time: 1618210633
+                    updated: 1616586981
+                    user_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    documents:
+                    - id: d2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: sample
+                      roles:
+                      - Signer 1
+                      - Manager
+                    invite_id: eeXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    entity_labels: []
+                    document_group_name: Document Group 24-3-2021
+                    viewer_field_invites:
+                    - id: eeXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      email_group:
+                        id: e7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        name: HR team
+                  parent_id: 66XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  system_folder: true
+                  total_documents: 1
+                With `entity_type=dgt` query:
+                  id: daXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  owner: document-group-owner@email.com
+                  state: null
+                  pinned: false
+                  created: 1693474793
+                  invites: []
+                  updated: 1693474793
+                  user_id: 09XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  documents:
+                  - id: 10XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: Sample image
+                    roles: []
+                    settings: null
+                  - id: 13XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: Sample image
+                    roles:
+                    - Recipient 1
+                    settings: null
+                  invite_id: null
+                  parent_id: f1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  entity_type: dgt
+                  is_favorite: false
+                  entity_labels: []
+                  recently_used: 1693474793
+                  sign_as_merged: false
+                  freeform_actions: []
+                  freeform_invite_id: null
+                  document_group_name: Sample Document group
+                  originator_organization_settings: []
+                With `entity_type=document-group` query:
+                  id: 49XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  owner: document-group-owner@email.com
+                  state: created
+                  pinned: false
+                  status: created
+                  created: 1695288759
+                  invites: []
+                  updated: 1695288759
+                  user_id: 09XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  documents:
+                  - id: 2cXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: Sample image
+                    roles: []
+                    settings:
+                      advanced_signing_flow: false
+                  - id: 82XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    name: Sample image
+                    roles:
+                    - Recipient 1
+                    settings:
+                      advanced_signing_flow: false
+                  invite_id: null
+                  parent_id: fbXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  entity_type: document-group
+                  is_favorite: false
+                  entity_labels: []
+                  recently_used: 1695288759
+                  sign_as_merged: false
+                  freeform_actions: []
+                  freeform_invite_id: null
+                  document_group_name: Sample Document group
+                  originator_organization_settings: []
+                With document group where user is a signer:
+                  id: a9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  name: Documents
+                  shared: false
+                  created: '1616586778'
+                  folders: []
+                  user_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  documents:
+                  - id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    owner: owner-email@email.com
+                    created: 1616586981
+                    updated: 1616586981
+                    user_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    documents:
+                    - id: d2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: sample
+                      roles:
+                      - Signer 1
+                      - Signer 2
+                      field_invites:
+                      - id: e4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        email_group:
+                          id: f6XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          name: Contact group
+                      - id: u8XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        email_group:
+                          id: c2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                          name: Contact group
+                    invite_id: eeXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    entity_labels: []
+                    document_group_name: Document Group 24-3-2021
+                  parent_id: 66XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  system_folder: true
+                  total_documents: 1
+                With document group invite where user is the owner:
+                  id: a9XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  name: Documents
+                  shared: false
+                  created: '1616586778'
+                  folders: []
+                  user_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  documents:
+                  - id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    owner: document-owner@email.com
+                    created: 1616586981
+                    invites:
+                    - email: signer@email.com
+                      order: '1'
+                      action: sign
+                      status: fulfilled
+                      document_id: 06XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      document_name: Performance review
+                      authentication: null
+                      expiration_time: null
+                    - email: manager@email.com
+                      order: '2'
+                      action: sign
+                      status: fulfilled
+                      document_id: 06XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      document_name: Performance review
+                      authentication: null
+                      expiration_time: null
+                    - order: '2'
+                      action: view
+                      status: pending
+                      document_id: 06XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      email_group:
+                        id: e7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        name: HR team
+                      document_name: Performance review
+                      authentication: null
+                      expiration_time: 1618210633
+                    updated: 1616586981
+                    user_id: 30XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    documents:
+                    - id: d2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: sample
+                      roles:
+                      - Signer 1
+                      - Manager
+                    invite_id: eeXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    entity_labels: []
+                    document_group_name: Document Group 24-3-2021
+                  parent_id: 66XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  system_folder: true
+                  total_documents: 1
+        '400':
+          description: The folder does not exist or does not belong to the user.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                          description: Error code.
+                        message:
+                          type: string
+                          description: Error message.
+                    description: List of errors.
+              example:
+                Folder not found:
+                  errors:
+                  - code: 65611
+                    message: resource does not exist
+      security:
+      - Bearer: []
+      tags:
+      - Folder
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

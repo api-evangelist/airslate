@@ -1,0 +1,339 @@
+openapi: 3.2.0
+info:
+  title: SignNow Document Generations API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Document Generations
+paths:
+  /v2/document-generations/{process_id}/status:
+    get:
+      operationId: get-v2-document-generations-process-id-status
+      summary: Get document generation status
+      description: 'This endpoint allows API users to get the status of a document generation process.
+
+
+        Learn more about document generation.'
+      parameters:
+      - in: path
+        name: process_id
+        required: true
+        description: ID of the document generation process.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        enum:
+                        - in_progress
+                        - completed
+                        - failed
+                        type: string
+                        description: Current status of the document generation process.
+                      entity_id:
+                        type:
+                        - string
+                        - 'null'
+                        description: ID of the generated entity. Returns `null` while the process is in progress or failed.
+                      process_id:
+                        type: string
+                        description: ID of the document generation process.
+                      entity_type:
+                        enum:
+                        - document
+                        - document_group
+                        - null
+                        type:
+                        - string
+                        - 'null'
+                        description: Type of the generated entity. Returns `null` while the process is in progress or failed.
+              example:
+                Success:
+                  data:
+                    status: in_progress
+                    entity_id: null
+                    process_id: 48bc7836-194a-11f1-a657-0a39a0b006c0
+                    entity_type: null
+        '404':
+          description: Document generation not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+              example:
+                Document generation not found:
+                  errors:
+                  - code: 21008006
+                    message: Document generation not found.
+      security:
+      - Bearer: []
+      tags:
+      - Document Generations
+  /v2/document-generations/upload:
+    post:
+      operationId: post-v2-document-generations-upload
+      summary: Generate document from uploaded file
+      description: 'This endpoint allows API users to generate a PDF document by uploading a `.docx` file with tags.
+
+
+        > In development mode, downloaded generated documents will include a watermark.
+
+
+        Learn more about document generation.'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        enum:
+                        - in_progress
+                        - completed
+                        - failed
+                        type: string
+                        description: Current status of the document generation process.
+                      process_id:
+                        type: string
+                        description: ID of the document generation process.
+              example:
+                Success:
+                  data:
+                    status: in_progress
+                    process_id: 348bf62a-1c97-11f1-a071-5a78fa528452
+        '400':
+          description: '* `data` is empty.
+
+            * `single_document` is not a boolean.
+
+            * Uploaded file is empty.
+
+            * Uploaded file exceeds 10 MB.
+
+            * `data` is not an array.
+
+            * Uploaded file is not a `.docx`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+              example:
+                Empty data:
+                  errors:
+                  - code: 21008003
+                    message: The `data` field must not be empty.
+                data is not an array:
+                  errors:
+                  - code: 21008007
+                    message: The `data` field must be an array.
+                Uploaded file is empty:
+                  errors:
+                  - code: 21008004
+                    message: The uploaded file must not be empty.
+                Uploaded file is not a .docx:
+                  errors:
+                  - code: 21008009
+                    message: The uploaded file must have a .docx extension.
+                single_document is not a boolean:
+                  errors:
+                  - code: 21008008
+                    message: The `single_document` field must be a boolean.
+                Uploaded file exceeds maximum size:
+                  errors:
+                  - code: 21008005
+                    message: The uploaded file exceeds the maximum allowed size of 10 MB.
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: 'The `.docx` file to upload. Maximum size: 10 MB.'
+                data:
+                  type: string
+                  description: 'A JSON string containing variable mappings. Keys correspond to tag names in the `.docx` template; values are the pre-filled text for each tag. Supports arrays of objects for repeating sections, such as tables and lists. Example for a document with a Products table: `{"Products": [{"ItemPrice": "8", "ItemName": "T-shirt", "ItemQuantity": "10"}, {"ItemPrice": "4", "ItemName": "Belt", "ItemQuantity": "5"}, {"ItemPrice": "20", "ItemName": "Dress", "ItemQuantity": "2"}]}`.'
+                single_document:
+                  type: boolean
+                  default: false
+                  description: If `true`, a single document is generated. If `false`, a document group is generated.
+              required:
+              - file
+              - data
+      tags:
+      - Document Generations
+  /v2/document-generations/url:
+    post:
+      operationId: post-v2-document-generations-url
+      summary: Generate document from URL
+      description: 'This endpoint allows API users to generate a PDF document by providing a publicly accessible URL to a `.docx` file with tags.
+
+
+        > In development mode, downloaded generated documents will include a watermark.
+
+
+        Learn more about document generation.'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        enum:
+                        - in_progress
+                        - completed
+                        - failed
+                        type: string
+                        description: Current status of the document generation process.
+                      process_id:
+                        type: string
+                        description: ID of the document generation process.
+              example:
+                Success:
+                  data:
+                    status: in_progress
+                    process_id: 348bf62a-1c97-11f1-a071-5a78fa528452
+        '400':
+          description: '* `docx_url` is not a valid URL.
+
+            * `docx_url` is an empty string.
+
+            * `data` is empty.
+
+            * `single_document` is not a boolean.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+              example:
+                Empty data:
+                  errors:
+                  - code: 21008003
+                    message: The `data` field must not be empty.
+                Empty docx_url:
+                  errors:
+                  - code: 21008002
+                    message: The `docx_url` field must not be empty.
+                docx_url is not a valid URL:
+                  errors:
+                  - code: 21008001
+                    message: The `docx_url` must be a valid URL.
+                single_document is not a boolean:
+                  errors:
+                  - code: 21008008
+                    message: The `single_document` field must be a boolean.
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - docx_url
+              - data
+              properties:
+                data:
+                  type: object
+                  example:
+                    Products:
+                    - ItemName: T-shirt
+                      ItemPrice: '8'
+                      ItemQuantity: '10'
+                    - ItemName: Belt
+                      ItemPrice: '4'
+                      ItemQuantity: '5'
+                    - ItemName: Dress
+                      ItemPrice: '20'
+                      ItemQuantity: '2'
+                  description: An object containing variable mappings. Keys correspond to tag names in the `.docx` template; values are the pre-filled text for each tag. Supports arrays of objects for repeating sections (e.g., tables, lists).
+                docx_url:
+                  type: string
+                  example: https://example.com/template.docx
+                  description: Publicly accessible URL to the `.docx` file.
+                single_document:
+                  type: boolean
+                  default: false
+                  description: If `true`, a single document is generated. If `false`, a document group is generated.
+              x-examples:
+                Request example for generating a document with a Products table:
+                  data:
+                    Products:
+                    - ItemName: T-shirt
+                      ItemPrice: '8'
+                      ItemQuantity: '10'
+                    - ItemName: Belt
+                      ItemPrice: '4'
+                      ItemQuantity: '5'
+                    - ItemName: Dress
+                      ItemPrice: '20'
+                      ItemQuantity: '2'
+                  docx_url: https://example.com/template.docx
+                  single_document: true
+        required: true
+      tags:
+      - Document Generations
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

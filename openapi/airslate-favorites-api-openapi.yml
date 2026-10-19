@@ -1,0 +1,82 @@
+openapi: 3.2.0
+info:
+  title: SignNow Favorites API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Favorites
+paths:
+  /v2/favorites:
+    get:
+      operationId: get-v2-favorites
+      summary: Retrieve all favorites
+      description: The endpoint retrieves the list of documents and document groups which are marked as favorites.
+      parameters:
+      - in: query
+        name: page
+        required: false
+        description: Default value by page = 1
+        schema:
+          type: string
+      - in: query
+        name: per_page
+        required: false
+        description: Number of documents per page. Default value = 15
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Request  with correct token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Request  with correct token:
+                  data:
+                  - id: b2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    entity_type: document-group
+                  - id: cbXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    entity_type: document
+                  meta:
+                    pagination:
+                      count: 2
+                      links: []
+                      total: 2
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+        '400':
+          description: '* Request with Incorrect or missing token
+
+            * Request with incorrect query string'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Request with incorrect query string:
+                  errors:
+                  - code: 13003004
+                    message: Query parameter `page` must be a digit
+                  - code: 13003005
+                    message: Query parameter `page` must be more than 0
+                Request with Incorrect or missing token:
+                  code: 1537
+                  error: invalid_token
+      security:
+      - Bearer: []
+      tags:
+      - Favorites
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

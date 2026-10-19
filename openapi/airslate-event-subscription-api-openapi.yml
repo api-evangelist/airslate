@@ -1,0 +1,133 @@
+openapi: 3.2.0
+info:
+  title: SignNow Event Subscription API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Event Subscription
+paths:
+  /event_subscription:
+    post:
+      operationId: post-event-subscription
+      summary: Create event subscription
+      description: '> Deprecated
+
+        >
+
+        > This endpoint is deprecated. Click here to check a newer version.
+
+
+        Creates a webhook that is triggered when the specified event takes place.
+
+
+        We have recently released a new version of Webhooks. Find out more details here.'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  created:
+                    type: integer
+                  updated:
+                    type: integer
+              example:
+                application/json:
+                  id: 5a8123c4059a03f6eli47d66ef84694b9109845e
+                  created: 1414441545
+                  updated: 1414442202
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - event
+              - callback_url
+              properties:
+                event:
+                  type: string
+                use_tls_12:
+                  type: boolean
+                callback_url:
+                  type: string
+        required: true
+      tags:
+      - Event Subscription
+    get:
+      operationId: get-event-subscription
+      summary: Get event subscription
+      description: '> Deprecated
+
+        >
+
+        > This endpoint is deprecated. Click here to check a newer version.'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  subscriptions:
+                  - id: event_id
+                    event: document.update
+                    created: '1410301010'
+                  - id: event_id
+                    event: document.create
+                    created: '1410301010'
+      security:
+      - Bearer: []
+      tags:
+      - Event Subscription
+  /event_subscription/{event_subscription_id}:
+    delete:
+      operationId: delete-event-subscription-event-subscription-id
+      summary: Delete event subscription
+      description: '> Deprecated
+
+        >
+
+        > This endpoint is deprecated. Click here to check a newer version.
+
+
+        Deletes an event subscription'
+      parameters:
+      - in: path
+        name: event_subscription_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              example:
+                application/json:
+                  id: 016f4ca9e5a002ea766d457d087df16f51536703
+                  status: deleted
+      security:
+      - Bearer: []
+      tags:
+      - Event Subscription
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

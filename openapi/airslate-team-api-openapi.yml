@@ -1,0 +1,949 @@
+openapi: 3.2.0
+info:
+  title: SignNow Team API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Team
+paths:
+  /team/{team_id}/documentgroup/template/{doc_group_id}/share:
+    post:
+      operationId: share-team-document-group-template
+      summary: Share doc group template
+      description: 'This endpoint allows user to share their document group templates with a team.
+
+
+        > The endpoint is deprecated. To add a DGT to a team space, move it into a team folder or subfolder using `PATCH /v2/document-group-templates/{{doc_group_template_id}}/move`.'
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      - in: path
+        name: doc_group_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  result: success
+        '400':
+          description: '* User is not in the team.
+
+            * Document group template not found.
+
+            * User doesn''t own document group template.
+
+            * Team not found.'
+          content:
+            application/json:
+              example:
+                Team not found:
+                  code: 66391
+                  message: Team not found
+                User is not in the team:
+                  code: 65582
+                  message: User is not part of this team
+                User doesn't own the DGT:
+                  code: 65582
+                  message: User does not own document group template
+                Doc group template not found:
+                  code: 65536
+                  message: unable to find document group template
+      security:
+      - Bearer: []
+      tags:
+      - Team
+    delete:
+      operationId: delete-team-team-id-documentgroup-template-doc-group-id-share
+      summary: Delete doc group templates for a team
+      description: 'This endpoint allows team user to delete their document group templates from team and team admins to delete any document group templates.
+
+
+        > The endpoint is deprecated. To remove a DGT from the team space, move it back to a personal folder using `PATCH /v2/document-group-templates/{{doc_group_template_id}}/move`.'
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      - in: path
+        name: doc_group_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  result: success
+        '400':
+          description: '* Document group template not found.
+
+            * User is not in the team.
+
+            * User doesn''t own the document group template.
+
+            * Team not found.'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Team not found:
+                  code: 66391
+                  message: Team not found
+                User not in the team:
+                  code: 65582
+                  message: User is not part of this team
+                Doc group template not found:
+                  code: 65536
+                  message: unable to find document group template
+                User not owner of doc group template:
+                  code: 65582
+                  message: User does not own document group template
+      security:
+      - Bearer: []
+      tags:
+      - Team
+  /team/{team_id}/documentgroup/templates:
+    get:
+      operationId: get-team-document-group-templates
+      summary: Get team doc group templates
+      description: 'This endpoint returns all document group templates shared with the team.
+
+
+        > The endpoint is deprecated. To retrieve DGTs shared with a team, users should now fetch the content of specific team folders/subfolders.'
+      parameters:
+      - in: query
+        name: limit
+        required: true
+        description: 'allowed values: numbers from 1 to 50'
+        schema:
+          type: string
+      - in: query
+        name: offset
+        required: false
+        description: 'allowed values: positive numbers starting from 0'
+        schema:
+          type: string
+          default: '0'
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  document_group_templates:
+                  - templates:
+                    - id: bcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: Template 1
+                      roles:
+                      - Signer 1
+                      thumbnail:
+                        large: http://example.com/document/bcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                        small: http://example.com/document/bcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                        medium: http://example.com/document/bcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                    - id: efXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      name: Template with fixed role and field
+                      roles:
+                      - Signer 1
+                      thumbnail:
+                        large: http://example.com/document/bcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=large
+                        small: http://example.com/document/bcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=small
+                        medium: http://example.com/document/bcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/thumbnail?size=medium
+                    owner_email: owner@email.com
+                    last_updated: '1534146166'
+                    template_group_id: 23XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    template_group_name: Template group 2
+                  document_group_template_total_count: 1
+        '400':
+          description: '* Incorrect or missing `limit`
+
+            * User is not in the team
+
+            * Incorrect or missing `offset`
+
+            * Team not found'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Team not found:
+                  code: 66391
+                  message: Team not found
+                User is not in the team:
+                  code: 65582
+                  message: User is not part of this team
+                Incorrect or missing limit:
+                  code: 65582
+                  message: The limit query parameter is required and must be between 1 and 50
+                Incorrect or missing offset:
+                  code: 65582
+                  message: The offset query parameter is required and must be 0 or greater
+      security:
+      - Bearer: []
+      tags:
+      - Team
+  /team/{team_id}/admin:
+    post:
+      operationId: grant-admin-permissions
+      summary: Grant admin permissions
+      description: This endpoint allows team primary admin to grant admin permissions to a team member
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  result: success
+        '400':
+          description: '* Either request body or email address is missing.
+
+            * User with this email address is not in the team.
+
+            * User is not a primary admin of the team.
+
+            * Team not found.
+
+            * User not found.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Team not found:
+                  code: 66391
+                  message: Team not found
+                User not found:
+                  code: 65582
+                  message: User not found
+                Email address missing:
+                  code: 65582
+                  message: Email is required.
+                User not primary admin:
+                  code: 65615
+                  message: Operation not allowed
+                User is not in the team:
+                  code: 65582
+                  message: User is not a part of this team
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+        required: true
+      tags:
+      - Team
+  /team/{team_id}/admin/{user_id}:
+    delete:
+      operationId: cancel-admin-permissions
+      summary: Cancel admin permissions
+      description: 'This endpoint cancels admin permissions for a team admin, removes the user from the team, revokes access of the user to shared folders, and removes all documents that the user shared from shared folders to user''s folders.
+
+
+        If the path parameter `downgrade_only=true` is used, the user loses admin permissions but remains a member of the team and keeps access to shared folders.
+
+
+        ***Requires access token of team primary admin or admin.***'
+      parameters:
+      - in: query
+        name: downgrade_only
+        required: false
+        description: 'If true, the user remains a member of the team and keeps access to shared folders. '
+        schema:
+          type: boolean
+          default: false
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      - in: path
+        name: user_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  result: success
+        '400':
+          description: '* Trying to cancel rights for a user that is not a team admin.
+
+            * Admin is trying to cancel their own admin permissions.
+
+            * Team admin cannot cancel rights for a primary admin.
+
+            * User is not a team admin.
+
+            * Team not found.
+
+            * User not found.
+
+            * `downgrade_only` is not a boolean.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Team not found:
+                  code: 66391
+                  message: Team not found
+                User not admin:
+                  code: 65582
+                  message: User is not admin/secondary admin on team
+                User not found:
+                  code: 65582
+                  message: User not found
+                Cancelling your own right:
+                  code: 65582
+                  message: Admin cannot delete himself
+                downgrade_only not boolean:
+                  code: 65582
+                  message: The `downgrade_only` parameter value should be `true` or `false`
+                Cancelling primary admin's rights:
+                  code: 65582
+                  message: Secondary admin cannot delete Admin of the team
+                Cancelling rights for a non-admin:
+                  code: 66350
+                  message: Team admin not found
+      security:
+      - Bearer: []
+      tags:
+      - Team
+  /team/{team_id}/transferownership/{user_id}:
+    post:
+      operationId: change-team-primary-admin
+      summary: Change team primary admin
+      description: This endpoint allows primary-admin of team to transfer team ownership to other team user.
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      - in: path
+        name: user_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  status: success
+        '400':
+          description: '* User is not a primary admin of the team.
+
+            * User is not in the team.'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                User not in the team:
+                  code: 65582
+                  message: Operation not allowed - Provided User not a member of team
+                User not primary admin:
+                  code: 65582
+                  message: Operation not allowed
+      security:
+      - Bearer: []
+      tags:
+      - Team
+  /team:
+    post:
+      operationId: create-team
+      summary: Create a team
+      description: This endpoint creates a new team.
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  id: e2XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        '400':
+          description: '* Incorrect or missing `name`
+
+            * Incorrect payload
+
+            * Incorrect team type
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Incorrect payload:
+                  code: 65536
+                  message: Invalid payload
+                Incorrect team type:
+                  code: 65536
+                  message: Team type is not valid
+                Incorrect or missing name:
+                  code: 65701
+                  message: Name must not be empty
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+        required: true
+      tags:
+      - Team
+  /team/{team_id}:
+    get:
+      operationId: get-team
+      summary: Get team
+      description: This endpoint returns information about the team.
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  id: d94cfb24fa04bf2f564a943921b302c6cadfbd4e
+                  name: New team
+                  type: VIEWABLE
+                  active: true
+                  created: '1534928514'
+                  members:
+                  - id: 5a81a4ecc895e6ceab5aa0b090747745a6339b95
+                    role: member
+                    emails:
+                    - member1@signnow.com
+                    status: accepted
+                    can_admin_view: true
+                  - id: caf31778ef8e4efdaa86e4e91067397f02d66508
+                    role: admin
+                    emails:
+                    - admin@signnow.com
+                    status: accepted
+                    billing: 1
+                    primary: false
+                    can_admin_view: false
+                    document_access: 1
+                  - id: 79c7ec6b258346105e415ceae13b687c4231966b
+                    role: admin
+                    emails:
+                    - admin2@signnow.com
+                    status: accepted
+                    billing: 1
+                    primary: true
+                    can_admin_view: false
+                    document_access: 1
+                  - id: d4943d8c8814667018060c79c760c8acfc870d3a
+                    role: member
+                    emails:
+                    - member2@signnow.com
+                    status: pending
+                    can_admin_view: false
+                  updated: ''
+        '400':
+          description: '* User is not in the team.
+
+            * Team not found.'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Team not found:
+                  code: 66391
+                  message: Team not found
+                User not in the team:
+                  code: 65582
+                  message: User is not part of this team
+      security:
+      - Bearer: []
+      tags:
+      - Team
+    put:
+      operationId: rename-team
+      summary: Rename team
+      description: This endpoint allows users to rename a team
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  id: 96XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        '400':
+          description: Trying to rename team by user who is not primary admin
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                application/json:
+                  code: 65582
+                  message: User is not an admin of this team
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+        required: true
+      tags:
+      - Team
+    delete:
+      operationId: delete-team
+      summary: Delete team
+      description: 'This endpoint deletes a team.
+
+
+        ***Requires access token of primary team admin.***'
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                x-examples:
+                  example-1:
+                    status: success
+              example:
+                application/json:
+                  status: success
+        '400':
+          description: '* User is not a primary admin of the team.
+
+            * Team not found.'
+          content:
+            application/json:
+              example:
+                Team not found:
+                  code: 66391
+                  message: Team not found
+                User not primary admin:
+                  code: 65582
+                  message: User is not an admin of this team
+      security:
+      - Bearer: []
+      tags:
+      - Team
+  /team/{request_id}/request:
+    put:
+      operationId: accept-decline-invitation-to-team
+      summary: Accept or decline invitation to a team
+      description: This endpoint allows user to accept or deny their invite to join a team
+      parameters:
+      - in: path
+        name: request_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  result: success
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+        required: true
+      tags:
+      - Team
+    get:
+      operationId: get-team-invite
+      summary: Get team invite
+      description: This endpoint returns information about user's invite.
+      parameters:
+      - in: path
+        name: request_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Possible statuses of `request_status`:
+
+
+            * `waiting`: user didn''t accept or reject the invite.
+
+            * `approved`: user accepted the invite.
+
+            * `denied`: user or team admin rejected the invite.
+
+            * `unknown` - an error occured.
+
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  team_id: c7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  team_name: HR
+                  request_id: 0aXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  request_status: approved
+        '400':
+          description: '* The invite is not for this user.
+
+            * Invite not found.'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Invite not found:
+                  code: 66392
+                  message: Team request not found
+                Invite belongs to another user:
+                  code: 65598
+                  message: You cannot access somebody else's team request
+      security:
+      - Bearer: []
+      tags:
+      - Team
+  /team/{team_id}/request:
+    post:
+      operationId: invite-user-to-team
+      summary: Invite user to a team
+      description: This endpoint allows team member to invite new users to their team
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  team_requests:
+                  - id: dfXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: user1@email.com
+                    status: success
+                  - id: 0eXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: user2@email.com
+                    status: success
+                  - id: d4XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    email: user3@email.com
+                    status: success
+        '400':
+          description: '* Incorrect or empty payload.
+
+            * One or more emails adresses are incorrect.
+
+            * User is not in the team.
+
+            * Team not found.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Team not found:
+                  code: 66391
+                  message: Team not found
+                User not in the team:
+                  code: 65615
+                  message: Operation not allowed
+                Incorrect email or emails:
+                  code: 65582
+                  message: Invalid Email.
+                Incorrect or missing payload:
+                  code: 65582
+                  message: Emails are required.
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+        required: true
+      tags:
+      - Team
+  /team/{team_id}/user/{user_id}:
+    delete:
+      operationId: delete-user-from-team
+      summary: Delete user from team
+      description: 'This endpoint allows:
+
+        * team primary admin to delete a user from a team
+
+        * team members to delete themselves from a team'
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      - in: path
+        name: user_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  result: success
+        '400':
+          description: '* Incorrect `access_token`: it must belong to the team primary admin or to the user being deleted.
+
+            * Team not found.
+
+            * User not found.'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Team not found:
+                  code: 66362
+                  message: Team not found
+                User not found:
+                  code: 65582
+                  message: User not found
+                Insufficient rights:
+                  code: 65582
+                  message: Only the admin or person being deleted can delete themselves
+      security:
+      - Bearer: []
+      tags:
+      - Team
+  /team/{team_id}/shared/document/folder:
+    post:
+      operationId: enable-documents-folder
+      summary: Enable Documents folder
+      description: 'This endpoint enables Documents folder for a team.
+
+
+        ***accepts access token of team primary admin or admin***'
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  id: c3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        '400':
+          description: '* User is not an admin
+
+            * Team not found'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Team not found:
+                  code: 66391
+                  message: Team not found
+                User not admin:
+                  code: 65615
+                  message: Operation not allowed
+      security:
+      - Bearer: []
+      tags:
+      - Team
+    delete:
+      operationId: delete-team-team-id-shared-document-folder
+      summary: Disable Documents folder
+      description: This endpoint allows users to disable "Documents" folder for a team.
+      parameters:
+      - in: path
+        name: team_id
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application/json:
+                  result: success
+        '400':
+          description: '* User is not an admin
+
+            * Team not found'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Team not found:
+                  code: 66391
+                  message: Team not found
+                User not admin:
+                  code: 65615
+                  message: Operation not allowed
+      security:
+      - Bearer: []
+      tags:
+      - Team
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

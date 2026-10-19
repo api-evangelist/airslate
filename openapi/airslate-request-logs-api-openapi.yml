@@ -1,0 +1,485 @@
+openapi: 3.2.0
+info:
+  title: SignNow Request Logs API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Request Logs
+paths:
+  /request-logs:
+    get:
+      operationId: get-request-logs
+      summary: Get logs
+      description: Retrieve logs for all user's active applications.
+      parameters:
+      - in: query
+        name: per_page
+        required: false
+        description: 'Allowed values: any positive integer starting from 1.'
+        schema:
+          type: string
+      - in: query
+        name: page
+        required: false
+        description: 'Allowed values: any positive integer starting from 1.'
+        schema:
+          type: string
+      - in: query
+        name: filter:error
+        required: false
+        description: 'Possible values: true/false. Format: `?filters=[{"error":{"type": "=", "value":true}}]``'
+        schema:
+          type: string
+      - in: query
+        name: filter:applicationId
+        required: false
+        description: 'Possible values: one or several strings in array. Format: `?filters=[{"applicationId":{"type": "in", "value":["e1656509199c931911e919a00b1906ad1a26a450", "e1656509199c931911e919a00b1906ad1a26a451"]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filter:method
+        required: false
+        description: 'Possible values: array of strings. Format: `?filters=[{"method":{"type": "in", "value": "POST", "PUT]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filter:uri
+        required: false
+        description: 'Possible values: array of strings. Format: `?filters=[{"uri":{"type": "match", "value": "string"}}]` - finds only requests where the uri contains the value of the filter; `?filters=[{"uri":{"type": "like", "value": "user"}}]` - finds requests where the uri contains text from values of the filter.'
+        schema:
+          type: string
+      - in: query
+        name: filter:code
+        required: false
+        description: 'Possible values: array of two integers. Format: `?filters=[{"code":{"type": "between", "value": [0,500]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filter:time
+        required: false
+        description: 'Possible values: integer. Format: `?filters=[{"time":{"type": "=", "value": 2}}]`'
+        schema:
+          type: string
+      - in: query
+        name: filter:created
+        required: false
+        description: 'Possible values: two integers in array. Format: `?filters=[{"created":{"type": "between", "value": [1565360895, 1565360896]}}]`'
+        schema:
+          type: string
+      - in: query
+        name: sort:created
+        required: false
+        description: 'Sort results in ascending or descending order. Possible values: asc/desc. Format: `?sort[email]=asc`'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Returns request logs in case of successful response. Returns an error when:
+
+
+            User does not have an active subscription, "code": 0. Message: "User does not have active subscription"'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error:
+                          type: boolean
+                        created:
+                          type: integer
+                        request:
+                          type: object
+                          properties:
+                            ip:
+                              type: string
+                            uri:
+                              type: string
+                            body:
+                              type: object
+                              properties:
+                                data:
+                                  type: string
+                            host:
+                              type: string
+                            method:
+                              type: string
+                            source:
+                              type: string
+                            headers:
+                              type: object
+                              properties:
+                                User-Agent:
+                                  type: string
+                        user_id:
+                          type: string
+                        response:
+                          type: object
+                          properties:
+                            body:
+                              type: object
+                              properties:
+                                data:
+                                  type: string
+                            code:
+                              type: integer
+                            time:
+                              type: integer
+                            headers:
+                              type: 'null'
+                        request_id:
+                          type: string
+                        api_version:
+                          type: integer
+                        application_id:
+                          type: string
+                  meta:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                          links:
+                            type: object
+                            properties:
+                              next:
+                                type: string
+                          total:
+                            type: integer
+                          per_page:
+                            type: integer
+                          total_pages:
+                            type: integer
+                          current_page:
+                            type: integer
+                x-examples:
+                  Example 1:
+                    data:
+                    - error: true
+                      created: 1565360895
+                      request:
+                        ip: 9X.XX.XX.XX
+                        uri: https://example.com
+                        body:
+                          data: sample text
+                        host: example.com
+                        method: POST
+                        source: some_source
+                        headers:
+                          User-Agent: Opera/9.27 (X11; Linux i686; en-US) Presto/2.9.200 Version/10.00
+                      user_id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      response:
+                        body:
+                          data: sample text
+                        code: 400
+                        time: 1
+                        headers: null
+                      request_id: 5dXXXXXXXXXXX
+                      api_version: 2
+                      application_id: e1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    meta:
+                      pagination:
+                        count: 1
+                        links:
+                          next: https://api.signnow.com/request-logs?page=2
+                        total: 1
+                        per_page: 15
+                        total_pages: 1
+                        current_page: 1
+              example:
+                Example 1:
+                  data:
+                  - error: true
+                    created: 1565360895
+                    request:
+                      ip: 9X.XX.XX.XX
+                      uri: https://example.com
+                      body:
+                        data: sample text
+                      host: example.com
+                      method: POST
+                      source: some_source
+                      headers:
+                        User-Agent: Opera/9.27 (X11; Linux i686; en-US) Presto/2.9.200 Version/10.00
+                    user_id: cdXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    response:
+                      body:
+                        data: sample text
+                      code: 400
+                      time: 1
+                      headers: null
+                    request_id: 5dXXXXXXXXXXX
+                    api_version: 2
+                    application_id: e1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                  meta:
+                    pagination:
+                      count: 1
+                      links:
+                        next: https://api.signnow.com/request-logs?page=2
+                      total: 1
+                      per_page: 15
+                      total_pages: 1
+                      current_page: 1
+      security:
+      - Bearer: []
+      tags:
+      - Request Logs
+  /request-logs/{request_id}:
+    get:
+      operationId: get-request-logs-request-id
+      summary: Get request log
+      description: Retrieve specific user log for an active application.
+      parameters:
+      - in: path
+        name: request_id
+        required: true
+        description: Can be retrieved from `GET /request-logs` request.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Returns the request log in case of successful response. Returns an error when:
+
+
+            * Given {request_id} does not exist or user doesn''t own this log, "code": 0. Message: "Request log with ID `{request_id}` not found"
+
+            * User does not have an active subscription, "code": 0. Message: "User does not have active subscription"'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: object
+                    required:
+                    - user_id
+                    - request_id
+                    - api_version
+                    - application_id
+                    - error
+                    - created
+                    - request
+                    - response
+                    properties:
+                      error:
+                        type: boolean
+                      created:
+                        type: number
+                      request:
+                        type: object
+                        required:
+                        - host
+                        - method
+                        - uri
+                        - ip
+                        - source
+                        - body
+                        - headers
+                        properties:
+                          ip:
+                            type: string
+                            minLength: 1
+                          uri:
+                            type: string
+                            minLength: 1
+                          body:
+                            type: object
+                            required:
+                            - file
+                            properties:
+                              file:
+                                type: object
+                                required:
+                                - filename
+                                - mime
+                                - name
+                                - size
+                                properties:
+                                  mime:
+                                    type: string
+                                    minLength: 1
+                                  name:
+                                    type: string
+                                    minLength: 1
+                                  size:
+                                    type: number
+                                  filename:
+                                    type: string
+                                    minLength: 1
+                          host:
+                            type: string
+                            minLength: 1
+                          method:
+                            type: string
+                            minLength: 1
+                          source:
+                            type: string
+                            minLength: 1
+                          headers:
+                            type: object
+                            required:
+                            - authorization
+                            - user-agent
+                            properties:
+                              user-agent:
+                                type: string
+                                minLength: 1
+                              authorization:
+                                type: string
+                                minLength: 1
+                      user_id:
+                        type: string
+                        minLength: 1
+                      response:
+                        type: object
+                        required:
+                        - code
+                        - time
+                        - body
+                        - headers
+                        properties:
+                          body:
+                            type: object
+                            required:
+                            - id
+                            properties:
+                              id:
+                                type: string
+                                minLength: 1
+                          code:
+                            type: number
+                          time:
+                            type: string
+                            minLength: 1
+                          headers:
+                            type: object
+                            required:
+                            - access-control-allow-headers
+                            - access-control-allow-origin
+                            - connection
+                            - content-encoding
+                            - content-type
+                            - transfer-encoding
+                            properties:
+                              connection:
+                                type: string
+                                minLength: 1
+                              content-type:
+                                type: string
+                                minLength: 1
+                              content-encoding:
+                                type: string
+                                minLength: 1
+                              transfer-encoding:
+                                type: string
+                                minLength: 1
+                              access-control-allow-origin:
+                                type: string
+                                minLength: 1
+                              access-control-allow-headers:
+                                type: string
+                                minLength: 1
+                      request_id:
+                        type: string
+                        minLength: 1
+                      api_version:
+                        type: string
+                        minLength: 1
+                      application_id:
+                        type: string
+                        minLength: 1
+                x-examples:
+                  example-1:
+                    data:
+                      error: false
+                      created: 1569941241.418
+                      request:
+                        ip: 217.20.164.1
+                        uri: /document
+                        body:
+                          file:
+                            mime: application/pdf
+                            name: file
+                            size: 147666
+                            filename: Test.pdf
+                        host: nginx-api-logger.signnow-dev.xyz
+                        method: POST
+                        source: PostmanRuntime/7.17.1
+                        headers:
+                          user-agent: PostmanRuntime/7.17.1
+                          authorization: '*****'
+                      user_id: 172e62b0e3a94735a989c8f5e3a451e7e8d9ba03
+                      response:
+                        body:
+                          id: 37c0a7ce2b611b70f9729d8628f373f6ce72b201
+                        code: 200
+                        time: '3.126'
+                        headers:
+                          connection: close
+                          content-type: application/json; charset=utf-8
+                          content-encoding: gzip
+                          transfer-encoding: chunked
+                          access-control-allow-origin: '*'
+                          access-control-allow-headers: Authorization
+                      request_id: ebebd9e90c6313e32284cdfdd630eeef
+                      api_version: legacy
+                      application_id: 15380b86f85e4235b16df86ae59336b1d5b06e32
+                description: ''
+              example:
+                example-1:
+                  data:
+                    error: false
+                    created: 1569941241.418
+                    request:
+                      ip: 2X.XX.XXX.X
+                      uri: /document
+                      body:
+                        file:
+                          mime: application/pdf
+                          name: file
+                          size: 147666
+                          filename: filename.pdf
+                      host: example.com
+                      method: POST
+                      source: PostmanRuntime/7.17.1
+                      headers:
+                        user-agent: PostmanRuntime/7.17.1
+                        authorization: '*****'
+                    user_id: 17XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    response:
+                      body:
+                        id: 37XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                      code: 200
+                      time: '3.126'
+                      headers:
+                        connection: close
+                        content-type: application/json; charset=utf-8
+                        content-encoding: gzip
+                        transfer-encoding: chunked
+                        access-control-allow-origin: '*'
+                        access-control-allow-headers: Authorization
+                    request_id: ebXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    api_version: api_version
+                    application_id: 15XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      security:
+      - Bearer: []
+      tags:
+      - Request Logs
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

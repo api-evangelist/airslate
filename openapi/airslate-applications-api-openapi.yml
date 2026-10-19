@@ -1,0 +1,264 @@
+openapi: 3.2.0
+info:
+  title: SignNow Applications API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Applications
+paths:
+  /v2/applications/{application_id}/brand:
+    put:
+      operationId: put-v2-applications-application-id-brand
+      summary: Assign brand to application
+      description: This endpoint allows users to assign branding to an application.
+      parameters:
+      - in: header
+        name: Content-Type
+        required: false
+        description: application/json
+        schema:
+          type: string
+      - in: path
+        name: application_id
+        required: true
+        description: ID of the application.
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: '* Incorrect or missing token.
+
+            * Incorrect payload.
+
+            * `brand_id` is not a string.
+
+            * Empty `brand_id`.
+
+            * Missing or incorrect `brand_id`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Empty brand_id:
+                  code: 25002071
+                  message: Brand id must not be an empty string.
+                Incorrect payload:
+                  code: 25002002
+                  message: Invalid payload given.
+                brand_id not string:
+                  code: 25002070
+                  message: Brand id must be a string.
+                Incorrect or missing token:
+                  code: 1537
+                  error: invalid_token
+                Missing or incorrect brand_id:
+                  code: 25002069
+                  message: Brand id is required
+        '403':
+          description: '* The user is authorized with a token from an app they don’t own.
+
+            * The bearer token is valid but it belongs to another user.
+
+            * Brand with this `brand_id` doesn''t exist.
+
+            * User doesn''t own this brand.'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Brand doesn't exist:
+                  code: 25002077
+                  message: You are not allowed to assign provided brand.
+                Another user's token:
+                  code: 25002075
+                  message: Brand assign to provided application is not allowed.
+                User doesn't own the app:
+                  code: 25002001
+                  message: Brand action not allowed.
+                User doesn't own this brand:
+                  code: 25002001
+                  message: Brand action not allowed.
+        '404':
+          description: '`application_id` does not exist
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                application_id does not exist:
+                  code: '25002076'
+                  message: Application unique identifier does not exist.
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - brand_id
+              properties:
+                brand_id:
+                  type: string
+                  description: ID of the brand that will be assigned.
+              x-examples:
+                Example 1:
+                  brand_id: '{{brand_id}}'
+        required: true
+      tags:
+      - Applications
+    get:
+      operationId: get-v2-applications-application-id-brand
+      summary: Get brand of application
+      description: This endpoint allows users to retrieve branding that has been assigned to an application.
+      parameters:
+      - in: query
+        name: use_hierarchy
+        required: false
+        description: 'Retrieve branding assigned specifically to the application with or without branding of its parent organization. Possible values: `true` - show organization branding if no specific branding is assigned to the application; `false` - show only the branding specifically assigned to the application (if any). '
+        schema:
+          type: string
+      - in: path
+        name: application_id
+        required: true
+        description: ID of the application.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: '* Correct request with `use_hierarchy = true` if there is no brand assigned directly to the `application_id`. The response retrieves the branding that is lower in the hierarchy.
+
+            * Correct request with `use_hierarchy=false` if there is no brand assigned directly to the `application_id`. The response is empty.
+
+            * Correct request with a bearer token from a user authorized under application with no brand assigned.'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                use_hierarchy=false:
+                  data: []
+                use_hierarchy = true:
+                  data:
+                    title: Brand number 2 name
+                    resources: {}
+                    unique_id: 45XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    owner_type: user
+                Application without brand_id:
+                  data: []
+        '400':
+          description: Incorrect or missing token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                no token/invalid token:
+                  code: 1537
+                  error: invalid_token
+        '404':
+          description: "* Incorrect `application_id`\n* `application_id` does not exist \n* `application_id` has been deleted"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Deleted application_id:
+                  code: 25002065
+                  message: Application deleted.
+                Incorrect application_id:
+                  '404': 'Unable to find a route to match the URI: v2/documents/567/brand'
+                application_id does not exist:
+                  code: 25002062
+                  message: Application unique identifier does not exist.
+      security:
+      - Bearer: []
+      tags:
+      - Applications
+    delete:
+      operationId: delete-v2-applications-application-id-brand
+      summary: Unassign brand from application
+      description: This endpoint allows users to delete branding assignment from an application.
+      parameters:
+      - in: path
+        name: application_id
+        required: true
+        description: ID of the application.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Success, no content
+        '400':
+          description: Incorrect or missing token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Incorrect or missing token:
+                  code: 1537
+                  error: invalid_token
+        '403':
+          description: '* The bearer token is valid but it belongs to another user.
+
+            * The user is authorized with a token from an app they don’t own.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                Another user's token:
+                  code: 25002075
+                  message: Brand assign to provided application is not allowed.
+                User doesn't own the app:
+                  code: 25002001
+                  message: Brand action not allowed.
+        '404':
+          description: '* `application_id` does not exist
+
+            * `application_id` has been deleted'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              example:
+                Deleted application_id:
+                  code: 25002065
+                  message: Application deleted.
+                application_id does not exist:
+                  code: 25002062
+                  message: Application unique identifier does not exist.
+      security:
+      - Bearer: []
+      tags:
+      - Applications
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic

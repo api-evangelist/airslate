@@ -1,0 +1,315 @@
+openapi: 3.2.0
+info:
+  title: SignNow Merchant Accounts API
+  version: 1.0.0
+servers:
+- url: https://api.signnow.com/
+tags:
+- name: Merchant Accounts
+paths:
+  /v2/merchant-accounts:
+    post:
+      operationId: post-v2-merchant-accounts
+      summary: Connect to personal merchant account
+      description: 'This endpoint allows API users to connect their personal SignNow account to the payment service.
+
+
+        Currently, users can connect to Stripe and Stripe Connect. To receive payments, you''ll need a valid payment system account.
+
+
+        **Use additional attributes to customize the request**
+
+
+        | Parameter | Description | Example |
+
+        | --- | --- | --- |
+
+        | `display_ach_form` | Boolean indicating whether to display the ACH payment form by Stripe to the recipient. | |
+
+        | `display_credit_card_form` | Boolean indicating whether to display the credit card form by Stripe to the recipient. Note that either `display_ach_form` or `display_credit_card_form` should be set to `true`. | |'
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                x-examples:
+                  Example 1:
+                    id: XXXX3dfe081e4bf7a3dd25d245cdff1bebe3YYYY
+              example:
+                Example 1:
+                  id: XXXX3dfe081e4bf7a3dd25d245cdff1bebe3YYYY
+                example-1:
+                  status: success
+        '400':
+          description: '- `account_type` is incorrect or empty.
+
+            - `account_name` is empty.
+
+            - `publishable_key` is empty.
+
+            - `secure_key` is empty.
+
+            - Either `display_ach_form`or `display_credit_card_form` must be set to `true`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 29004017
+                      message: 'Parameter `account_type` is required and must be one of: Stripe, StripeConnect, PayPal.'
+              example:
+                secure_key empty:
+                  errors:
+                  - code: 29004007
+                    message: Secure key is empty.
+                account_name empty:
+                  errors:
+                  - code: 29004001
+                    message: Account name is required.
+                Display form required:
+                  errors:
+                  - code: 29004014
+                    message: At least one display form is required
+                publishable_key empty:
+                  errors:
+                  - code: 29004004
+                    message: Publishable key is empty.
+                account_type incorrect or empty:
+                  errors:
+                  - code: 29004017
+                    message: 'Parameter `account_type` is required and must be one of: Stripe, StripeConnect, PayPal.'
+        '403':
+          description: Too many active accounts.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - code: 132
+                      message: Forbidden to create multiple active accounts of the same type.
+              example:
+                Active accounts limit:
+                  errors:
+                  - code: 132
+                    message: Forbidden to create multiple active accounts of the same type.
+      security:
+      - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - account_name
+              - account_type
+              properties:
+                currency:
+                  type: string
+                  default: USD
+                  example: USD
+                  description: The currency used for recipient transactions.
+                secure_key:
+                  type: string
+                  example: sk_yyyy_yyyyyjcpCb9qbdk8IMXNyyyy
+                  description: Secure API key (secret) given by Stripe. Required if `account_type` is `Stripe`.
+                account_name:
+                  type: string
+                  example: My Stripe
+                  description: Name of the new merchant account.
+                account_type:
+                  type: string
+                  example: Stripe
+                  description: 'The type of payment service. Allowed values: `Stripe`, `StripeConnect`.'
+                publishable_key:
+                  type: string
+                  example: pk_xxxx_xxxxxGDlOVChs1OowXjAiYYY
+                  description: Publishable API key given by Stripe. Required if `account_type` is `Stripe`.
+                display_ach_form:
+                  type: boolean
+                  description: Boolean indicating whether to display the ACH payment form by Stripe. Required if `account_type` is `Stripe`.
+                display_credit_card_form:
+                  type: boolean
+                  description: 'Boolean indicating whether to display the credit card form by Stripe. Required if `account_type` is `Stripe`.
+
+                    '
+              x-examples:
+                Example 1:
+                  currency: USD
+                  secure_key: sk_yyyy_yyyyyjcpCb9qbdk8IMXNyyyy
+                  account_name: My Stripe
+                  account_type: Stripe
+                  publishable_key: pk_xxxx_xxxxxGDlOVChs1OowXjAiYYY
+                  display_ach_form: true
+                  display_credit_card_form: true
+        required: true
+      tags:
+      - Merchant Accounts
+  /v2/merchant-accounts/{merchant_account_id}:
+    get:
+      operationId: get-v2-merchant-accounts
+      summary: Get personal merchant account
+      description: 'This endpoint allows API users to retrieve details about their connected payment account(s).
+
+
+        If you use the request without `merchant_account_id`, you will retrieve all connected payment accounts for the user.'
+      parameters:
+      - in: path
+        name: merchant_account_id
+        required: true
+        description: ID of the connected payment account.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns details of the connected payment account in case of successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      active:
+                        type: boolean
+                      created:
+                        type: integer
+                      updated:
+                        type: integer
+                      currency:
+                        type: string
+                      secure_key:
+                        type: string
+                      entity_type:
+                        type: string
+                      currency_name:
+                        type: string
+                      merchant_type:
+                        type: string
+                      publishable_key:
+                        type: string
+                      display_ach_form:
+                        type: boolean
+                      merchant_account_name:
+                        type: string
+                      display_credit_card_form:
+                        type: boolean
+                x-examples:
+                  Example 1:
+                    data:
+                      id: XXXXadb11c8c4658bc2170ded433617b237233ba
+                      active: true
+                      created: 1761755047
+                      updated: 1761755047
+                      currency: USD
+                      secure_key: '********yyyy'
+                      entity_type: user
+                      currency_name: US Dollar
+                      merchant_type: Stripe
+                      publishable_key: '********iYYY'
+                      display_ach_form: false
+                      merchant_account_name: Stripe 1
+                      display_credit_card_form: true
+              example:
+                Example 1:
+                  data:
+                    id: XXXXadb11c8c4658bc2170ded433617b237233ba
+                    active: true
+                    created: 1761755047
+                    updated: 1761755047
+                    currency: USD
+                    secure_key: '********yyyy'
+                    entity_type: user
+                    currency_name: US Dollar
+                    merchant_type: Stripe
+                    publishable_key: '********iYYY'
+                    display_ach_form: false
+                    merchant_account_name: Stripe 1
+                    display_credit_card_form: true
+      security:
+      - Bearer: []
+      tags:
+      - Merchant Accounts
+    delete:
+      operationId: delete-v2-merchant-accounts
+      summary: Delete personal merchant account
+      description: This endpoint allows API users to disconnect their payment account.
+      parameters:
+      - in: path
+        name: merchant_account_id
+        required: true
+        description: ID of the connected payment account.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No content
+        '404':
+          description: User account not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                x-examples:
+                  Example 1:
+                    errors:
+                    - message: User merchant account `xxxxe3853f4a4624a037d90d20513a195937yyyy` is not found.
+              example:
+                Example 1:
+                  errors:
+                  - message: User merchant account `xxxxe3853f4a4624a037d90d20513a195937yyyy` is not found.
+                Account not found:
+                  errors:
+                  - message: User merchant account `xxxxe3853f4a4624a037d90d20513a195937yyyy` is not found.
+      security:
+      - Bearer: []
+      tags:
+      - Merchant Accounts
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+    Basic:
+      type: http
+      scheme: basic
