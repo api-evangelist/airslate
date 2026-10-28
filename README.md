@@ -1,4 +1,4 @@
-# airSlate (airslate)
+# airSlate
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -66,161 +66,142 @@
 
 airSlate is a document workflow automation holding company whose product family covers no-code workflow automation (altaFlow, formerly airSlate WorkFlow), electronic signature (signNow), PDF editing and form filling (pdfFiller and DocHub), legal forms (US Legal Forms), landing pages (Instapage), and an AI-powered marketing intelligence platform. Developer APIs are exposed primarily through the signNow and pdfFiller product lines; WorkFlow / altaFlow surfaces automation bots and integrations rather than a broad public REST API.
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/airslate/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/airslate/refs/heads/main/apis.yml)
+**Areas:** Document Automation · E-Signature · Workflows · PDF · No-Code · Artificial Intelligence
 
-## Tags
+## airSlate on APIs.io
 
-- Document Automation
-- eSignature
-- Workflow
-- PDF
-- No-Code
-- AI
+Everything profiled for airSlate is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/airslate/](https://apis.io/providers/airslate/)** — or go straight to one of the APIs or properties below.
 
-## Timestamps
+### APIs (18)
 
-- **Created:** 2026-05-23
-- **Modified:** 2026-05-23
+- [airSlate WorkFlow (altaFlow)](https://apis.io/apis/airslate/workflow/) — No-code document workflow automation platform (recently rebranded as altaFlow). Supports building workflows that combine forms, contracts, bots, and…
+- [signNow API](https://apis.io/apis/airslate/signnow/) — REST API for signNow, airSlate's electronic signature product. Covers documents, signatures, templates, users, groups, fields, and webhooks. Supports OAuth…
+- [pdfFiller API](https://apis.io/apis/airslate/pdffiller/) — REST API for pdfFiller, covering document upload and conversion, form filling, templates, and e-signature flows. Used to embed PDF editing and form…
+- [DocHub](https://apis.io/apis/airslate/dochub/) — Cloud PDF editor that integrates with Google Workspace. Provides editing, signing, and sharing of PDFs from inside Google apps. Programmatic access is…
+- [US Legal Forms](https://apis.io/apis/airslate/us-legal-forms/) — Online catalog of 85,000+ state-specific legal forms. Consumer and SMB product; no public developer API.
+- [Instapage](https://apis.io/apis/airslate/instapage/) — Landing page builder and personalization platform. Offers REST endpoints for account integration via the Instapage developer surface.
+- [airSlate Marketing Intelligence Platform](https://apis.io/apis/airslate/marketing-intelligence/) — AI-powered automation platform for end-to-end marketing operations. Positioned as a vertical AI product rather than a developer API.
+- [airSlate Document Fields API](https://apis.io/apis/airslate/airslate-document-fields-api/) — The Document Fields API from airSlate — 3 operation(s) for document fields.
+- [airSlate Document Groups API](https://apis.io/apis/airslate/airslate-document-groups-api/) — The Document Groups API from airSlate — 4 operation(s) for document groups.
+- [airSlate Documents API](https://apis.io/apis/airslate/airslate-documents-api/) — The Documents API from airSlate — 7 operation(s) for documents.
+- [airSlate Embedded API](https://apis.io/apis/airslate/airslate-embedded-api/) — The Embedded API from airSlate — 3 operation(s) for embedded.
+- [airSlate Folders API](https://apis.io/apis/airslate/airslate-folders-api/) — The Folders API from airSlate — 2 operation(s) for folders.
+- [airSlate Invites API](https://apis.io/apis/airslate/airslate-invites-api/) — The Invites API from airSlate — 5 operation(s) for invites.
+- [airSlate Smart Fields API](https://apis.io/apis/airslate/airslate-smart-fields-api/) — The Smart Fields API from airSlate — 1 operation(s) for smart fields.
+- [airSlate Templates API](https://apis.io/apis/airslate/airslate-templates-api/) — The Templates API from airSlate — 4 operation(s) for templates.
+- [airSlate Users API](https://apis.io/apis/airslate/airslate-users-api/) — The Users API from airSlate — 3 operation(s) for users.
+- [airSlate Webhooks API](https://apis.io/apis/airslate/airslate-webhooks-api/) — The Webhooks API from airSlate — 2 operation(s) for webhooks.
+- [airSlate O Auth API](https://apis.io/apis/airslate/airslate-oauth-api/) — The OAuth API from airSlate — 1 operation(s) for oauth.
 
-## APIs
+### Published properties
 
-### airSlate WorkFlow (altaFlow)
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-No-code document workflow automation platform (recently rebranded as altaFlow). Supports building workflows that combine forms, contracts, bots, and integrations across CRM and ERP systems. Developer access is primarily via prebuilt bots and integration connectors.
+#### Agentic access (1)
 
-- **Human URL:** [https://www.airslate.com/workflow](https://www.airslate.com/workflow)
-- **Base URL:** `https://www.airslate.com/workflow`
+Which operations an agent can call, which act, and which need a human in the loop.
 
-#### Tags
+- [Airslate Agentic Access](https://apis.io/agentic-access/airslate/airslate-agentic-access/)
 
-- Workflow Automation
-- No-Code
-- Bots
+#### Collections (12)
 
-#### Properties
+Postman and Open Collection request collections.
 
-- [Website](https://www.airslate.com/workflow)
-- [Postman Collection](collections/airslate.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/airslate.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+- [airSlate signNow REST API](https://apis.io/collections/airslate/open-airslate/)
+- [airSlate signNow REST Document Fields API](https://apis.io/collections/airslate/open-airslate-document-fields-api/)
+- [airSlate signNow REST Document Fields Document Groups API](https://apis.io/collections/airslate/open-airslate-document-groups-api/)
+- [airSlate signNow REST Document Fields Documents API](https://apis.io/collections/airslate/open-airslate-documents-api/)
+- [airSlate signNow REST Document Fields Embedded API](https://apis.io/collections/airslate/open-airslate-embedded-api/)
+- [airSlate signNow REST Document Fields Folders API](https://apis.io/collections/airslate/open-airslate-folders-api/)
+- [airSlate signNow REST Document Fields Invites API](https://apis.io/collections/airslate/open-airslate-invites-api/)
+- [airSlate signNow REST Document Fields OAuth API](https://apis.io/collections/airslate/open-airslate-oauth-api/)
+- [airSlate signNow REST Document Fields Smart Fields API](https://apis.io/collections/airslate/open-airslate-smart-fields-api/)
+- [airSlate signNow REST Document Fields Templates API](https://apis.io/collections/airslate/open-airslate-templates-api/)
+- [airSlate signNow REST Document Fields Users API](https://apis.io/collections/airslate/open-airslate-users-api/)
+- [airSlate signNow REST Document Fields Webhooks API](https://apis.io/collections/airslate/open-airslate-webhooks-api/)
 
-### signNow API
+#### Security (2)
 
-REST API for signNow, airSlate's electronic signature product. Covers documents, signatures, templates, users, groups, fields, and webhooks. Supports OAuth 2.0 with production base api.signnow.com and evaluation base api-eval.signnow.com.
+Authentication, trust centre, and vulnerability disclosure.
 
-- **Human URL:** [https://docs.signnow.com/](https://docs.signnow.com/)
-- **Base URL:** `https://api.signnow.com`
+- [Airslate Authentication](https://apis.io/security/airslate/airslate-authentication/)
+- [Airslate Domain Security](https://apis.io/security/airslate/airslate-domain-security/)
 
-#### Tags
+#### Plans and pricing (1)
 
-- eSignature
-- REST
-- OAuth2
+Published plans, tiers and prices.
 
-#### Properties
+- [Airslate Plans Pricing](https://apis.io/plans/airslate/airslate-plans-pricing/)
 
-- [Documentation](https://docs.signnow.com/)
-- [Postman Collection](collections/airslate.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/airslate.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+#### Rate limits (1)
 
-### pdfFiller API
+Published request limits.
 
-REST API for pdfFiller, covering document upload and conversion, form filling, templates, and e-signature flows. Used to embed PDF editing and form workflows into third-party applications.
+- [Airslate Rate Limits](https://apis.io/rate-limits/airslate/airslate-rate-limits/)
 
-- **Human URL:** [https://www.pdffiller.com/en/api](https://www.pdffiller.com/en/api)
-- **Base URL:** `https://api.pdffiller.com/v2`
+#### FinOps (1)
 
-#### Tags
+What the API costs to run, by operation.
 
-- PDF
-- Forms
-- Document Editing
+- [Airslate Finops](https://apis.io/finops/airslate/airslate-finops/)
 
-#### Properties
+## Where to find this API
 
-- [Documentation](https://www.pdffiller.com/en/api)
-- [Postman Collection](collections/airslate.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/airslate.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
-
-### DocHub
-
-Cloud PDF editor that integrates with Google Workspace. Provides editing, signing, and sharing of PDFs from inside Google apps. Programmatic access is primarily via Google Workspace integration surfaces.
-
-- **Human URL:** [https://dochub.com/](https://dochub.com/)
-- **Base URL:** `https://dochub.com/`
-
-#### Tags
-
-- PDF
-- Google Workspace
-
-#### Properties
-
-- [Website](https://dochub.com/)
-- [Postman Collection](collections/airslate.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/airslate.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
-
-### US Legal Forms
-
-Online catalog of 85,000+ state-specific legal forms. Consumer and SMB product; no public developer API.
-
-- **Human URL:** [https://www.uslegalforms.com/](https://www.uslegalforms.com/)
-- **Base URL:** `https://www.uslegalforms.com/`
-
-#### Tags
-
-- Legal Forms
-
-#### Properties
-
-- [Website](https://www.uslegalforms.com/)
-- [Postman Collection](collections/airslate.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/airslate.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
-
-### Instapage
-
-Landing page builder and personalization platform. Offers REST endpoints for account integration via the Instapage developer surface.
-
-- **Human URL:** [https://instapage.com/](https://instapage.com/)
-- **Base URL:** `https://instapage.com/`
-
-#### Tags
-
-- Landing Pages
-- Marketing
-
-#### Properties
-
-- [Website](https://instapage.com/)
-- [Postman Collection](collections/airslate.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/airslate.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
-
-### airSlate Marketing Intelligence Platform
-
-AI-powered automation platform for end-to-end marketing operations. Positioned as a vertical AI product rather than a developer API.
-
-- **Human URL:** [https://www.airslate.com/](https://www.airslate.com/)
-- **Base URL:** `https://www.airslate.com/`
-
-#### Tags
-
-- AI
-- Marketing
-
-#### Properties
-
-- [Website](https://www.airslate.com/)
-- [Postman Collection](collections/airslate.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/airslate.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
-
-## Common Properties
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
 - [Website](https://www.airslate.com/)
 - [Documentation](https://docs.signnow.com/)
-- [LinkedIn](https://www.linkedin.com/company/airslate)
-- [Git Hub](https://github.com/signnow)
-- [Twitter](https://twitter.com/airSlate_)
+- [Blog](https://blog.airslate.com/feed/)
 
-## Maintainers
+## API Evangelist rating
 
-**FN:** Kin Lane
-**Email:** kin@apievangelist.com
+**Kin Score 23.5** — emerging · rubric 0.24.0 · scored 2026-10-17
+
+| Facet | Score |
+|---|---|
+| Discoverability | 57.1 |
+| Contract quality | 47.6 |
+| Contract governance | 0.0 |
+| Operational transparency | 10.5 |
+| Developer ergonomics | 23.8 |
+| Access clarity | 5.3 |
+
+**Agent readiness 19.6** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | documented (partial credit) |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | — |
+| OpenAPI Examples | — |
+| Rate Limit Signal | derived (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 10.9** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/airslate/](https://apis.io/providers/airslate/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for airSlate: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/airslate/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
